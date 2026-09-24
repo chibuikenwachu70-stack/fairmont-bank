@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <main class="dashboard-page">
+
+        <div class="dashboard-shell">
+
+            <!-- =====================================================
+                 TOP HEADER
+                 ===================================================== -->
+
+            <header class="dashboard-header">
+
+                <div class="dashboard-top-left">
+
+                    <a
+                        href="/my-profile"
+                        class="my-profile-button">
+
+                        <span class="my-profile-icon">
+                            ◯
+                        </span>
+
+                        <span>
+                            My Profile
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <div class="profile-button">
+
+                    {{ customer.full_name[0].upper() }}
+
+                </div>
+
+            </header>
+
+
+            <!-- =====================================================
+                 CUSTOMER GREETING
+                 ===================================================== -->
+
+            <section class="dashboard-greeting">
+
+                <p class="dashboard-eyebrow">
+                    FAIRMONT BANK
+                </p>
+
+                <h1>
+                    Hello, {{ customer.full_name.split()[0] }}.
+                </h1>
+
+            </section>
+
+
+            <!-- =====================================================
+                 AVAILABLE BALANCE
+                 ===================================================== -->
+
+            <section class="balance-card">
+
+                <div class="balance-top">
+
+                    <p class="balance-label">
+                        AVAILABLE BALANCE
+                    </p>
+
+                    <button
+                        type="button"
+                        class="balance-toggle"
+                        onclick="toggleBalance()">
+
+                        Hide
+
+                    </button>
+
+                </div>
+
+
+                <h2 id="balance">
+
+                    £{{ "{:,.2f}".format(customer.account_balance) }}
+
+                </h2>
+
+
+                <p class="customer-reference">
+
+                    Customer ID · {{ customer.customer_id }}
+
+                </p>
+
+            </section>
+
+
+            <!-- =====================================================
+                 SERVICES
+                 ===================================================== -->
+
+            <section class="dashboard-section services-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Services
+                    </h2>
+
+                </div>
+
+
+                <div class="services-scroll">
+
+
+                    <!-- Send Money -->
+
+                    <a
+                        href="/send-money"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ↑
+                        </span>
+
+                        <span class="service-name">
+                            Send Money
+                        </span>
+
+                    </a>
+
+
+                    <!-- Transaction History -->
+
+                    <a
+                        href="/transactions"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ≡
+                        </span>
+
+                        <span class="service-name">
+                            Transaction<br>
+                            History
+                        </span>
+
+                    </a>
+
+
+                    <!-- Pay Bills -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            £
+                        </span>
+
+                        <span class="service-name">
+                            Pay Bills
+                        </span>
+
+                    </a>
+
+
+                    <!-- Bank Statement -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            □
+                        </span>
+
+                        <span class="service-name">
+                            Bank<br>
+                            Statement
+                        </span>
+
+                    </a>
+
+
+                    <!-- Flights and Travels -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ✈
+                        </span>
+
+                        <span class="service-name">
+                            Flights &<br>
+                            Travels
+                        </span>
+
+                    </a>
+
+
+                    <!-- Lifestyles -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ◆
+                        </span>
+
+                        <span class="service-name">
+                            Lifestyles
+                        </span>
+
+                    </a>
+
+
+                    <!-- TV Subscriptions -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            TV
+                        </span>
+
+                        <span class="service-name">
+                            TV<br>
+                            Subscriptions
+                        </span>
+
+                    </a>
+
+
+                    <!-- Data Bundles -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ◇
+                        </span>
+
+                        <span class="service-name">
+                            Data<br>
+                            Bundles
+                        </span>
+
+                    </a>
+
+
+                    <!-- Airtime -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ☎
+                        </span>
+
+                        <span class="service-name">
+                            Airtime
+                        </span>
+
+                    </a>
+
+
+                    <!-- International Transfer -->
+
+                    <a
+                        href="/international-transfer"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ⇄
+                        </span>
+
+                        <span class="service-name">
+                            International<br>
+                            Transfer
+                        </span>
+
+                    </a>
+
+
+                    <!-- Electric Bills -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            ⚡
+                        </span>
+
+                        <span class="service-name">
+                            Electric<br>
+                            Bills
+                        </span>
+
+                    </a>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 RECENT ACTIVITY
+                 ===================================================== -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Recent Activity
+                    </h2>
+
+                    <a href="#">
+                        View all
+                    </a>
+
+                </div>
+
+
+                <div class="empty-activity">
+
+                    <div class="empty-activity-icon">
+                        —
+                    </div>
+
+                    <h3>
+                        No transactions yet
+                    </h3>
+
+                    <p>
+                        Your recent banking activity will appear here.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 SIGN OUT
+                 ===================================================== -->
+
+            <a
+                href="/logout"
+                class="dashboard-logout">
+
+                Sign out
+
+            </a>
+
+
+            <!-- =====================================================
+                 BOTTOM NAVIGATION
+                 ===================================================== -->
+
+            <nav class="bottom-navigation">
+
+
+                <a
+                    href="#"
+                    class="active">
+
+                    <span class="nav-icon">
+                        ●
+                    </span>
+
+                    <span>
+                        Home
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        □
+                    </span>
+
+                    <span>
+                        Accounts
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        ↑
+                    </span>
+
+                    <span>
+                        Payments
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        ≡
+                    </span>
+
+                    <span>
+                        Activity
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        •••
+                    </span>
+
+                    <span>
+                        More
+                    </span>
+
+                </a>
+
+
+            </nav>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         BALANCE VISIBILITY
+         ========================================================= -->
+
+    <script>
+
+        function toggleBalance() {
+
+            const balance =
+                document.getElementById("balance");
+
+            const button =
+                document.querySelector(".balance-toggle");
+
+
+            if (balance.dataset.hidden === "true") {
+
+                balance.textContent =
+                    "£" +
+                    Number(
+                        {{ customer.account_balance }}
+                    ).toLocaleString(
+                        "en-GB",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    );
+
+                balance.dataset.hidden = "false";
+
+                button.textContent = "Hide";
+
+            } else {
+
+                balance.textContent = "••••••";
+
+                balance.dataset.hidden = "true";
+
+                button.textContent = "Show";
+
+            }
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

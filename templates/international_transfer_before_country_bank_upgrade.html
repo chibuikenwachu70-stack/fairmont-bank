@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Transfer | Fairmont Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transfer.css') }}">
+</head>
+
+<body>
+
+<div class="transfer-page">
+
+    <header class="transfer-header">
+        <a href="{{ url_for('dashboard') }}" class="back-button">‹</a>
+
+        <div>
+            <div class="eyebrow">GLOBAL PAYMENTS</div>
+            <h1>International Transfer</h1>
+        </div>
+    </header>
+
+
+    <section class="balance-card">
+
+        <span>AVAILABLE BALANCE</span>
+
+        <strong>
+            £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+        </strong>
+
+        <div class="account-reference">
+
+            <div>
+                <small>Account Number</small>
+                <b>{{ customer.account_number or "Not assigned" }}</b>
+            </div>
+
+            <div>
+                <small>Currency</small>
+                <b>GBP</b>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    {% if error %}
+    <div class="alert error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+
+    <section class="panel">
+
+        <div class="section-heading">
+
+            <span class="section-icon">◎</span>
+
+            <div>
+                <h2>Beneficiary details</h2>
+                <p>Enter the destination bank information.</p>
+            </div>
+
+        </div>
+
+
+        <form method="POST" action="{{ url_for('international_transfer') }}">
+
+            <div class="field">
+
+                <label>Destination Country</label>
+
+                <select name="country" required>
+
+                    <option value="">
+                        Select country
+                    </option>
+
+                    {% for country in [
+                        "Afghanistan","Albania","Algeria","Andorra","Angola",
+                        "Argentina","Armenia","Australia","Austria","Azerbaijan",
+                        "Bahamas","Bahrain","Bangladesh","Barbados","Belgium",
+                        "Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina",
+                        "Botswana","Brazil","Brunei","Bulgaria","Cambodia",
+                        "Cameroon","Canada","Chile","China","Colombia",
+                        "Costa Rica","Croatia","Cyprus","Czechia","Denmark",
+                        "Dominican Republic","Ecuador","Egypt","Estonia","Ethiopia",
+                        "Fiji","Finland","France","Georgia","Germany","Ghana",
+                        "Greece","Guatemala","Honduras","Hong Kong","Hungary",
+                        "Iceland","India","Indonesia","Ireland","Israel","Italy",
+                        "Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait",
+                        "Latvia","Lebanon","Lithuania","Luxembourg","Malaysia",
+                        "Maldives","Malta","Mauritius","Mexico","Monaco",
+                        "Mongolia","Montenegro","Morocco","Mozambique","Namibia",
+                        "Nepal","Netherlands","New Zealand","Nigeria","Norway",
+                        "Oman","Pakistan","Panama","Peru","Philippines","Poland",
+                        "Portugal","Qatar","Romania","Rwanda","Saudi Arabia",
+                        "Serbia","Seychelles","Singapore","Slovakia","Slovenia",
+                        "South Africa","South Korea","Spain","Sri Lanka","Sweden",
+                        "Switzerland","Taiwan","Tanzania","Thailand","Tunisia",
+                        "Turkey","Uganda","Ukraine","United Arab Emirates",
+                        "United Kingdom","United States","Uruguay","Uzbekistan",
+                        "Venezuela","Vietnam","Zambia","Zimbabwe"
+                    ] %}
+
+                    <option value="{{ country }}">
+                        {{ country }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Beneficiary Name</label>
+
+                <input
+                    type="text"
+                    name="recipient_name"
+                    placeholder="Full legal name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Beneficiary Address <span>Optional</span></label>
+
+                <textarea
+                    name="recipient_address"
+                    rows="3"
+                    placeholder="Street, city, postal code and country"
+                ></textarea>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Bank Name</label>
+
+                <input
+                    type="text"
+                    name="bank_name"
+                    placeholder="Beneficiary bank"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Account Number</label>
+
+                <input
+                    type="text"
+                    name="account_number"
+                    placeholder="Local bank account number"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>IBAN <span>Where applicable</span></label>
+
+                <input
+                    type="text"
+                    name="iban"
+                    placeholder="International Bank Account Number"
+                >
+
+            </div>
+
+
+            <div class="field-row">
+
+                <div class="field">
+
+                    <label>SWIFT / BIC</label>
+
+                    <input
+                        type="text"
+                        name="bic"
+                        maxlength="11"
+                        placeholder="AAAA BB CC 123"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Local Bank Code <span>Optional</span></label>
+
+                    <input
+                        type="text"
+                        name="local_bank_code"
+                        placeholder="Routing / clearing code"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Currency</label>
+
+                <select name="currency" required>
+
+                    <option value="">Select currency</option>
+                    <option value="GBP">GBP — Pound Sterling</option>
+                    <option value="USD">USD — US Dollar</option>
+                    <option value="EUR">EUR — Euro</option>
+                    <option value="CAD">CAD — Canadian Dollar</option>
+                    <option value="AUD">AUD — Australian Dollar</option>
+                    <option value="NZD">NZD — New Zealand Dollar</option>
+                    <option value="CHF">CHF — Swiss Franc</option>
+                    <option value="JPY">JPY — Japanese Yen</option>
+                    <option value="CNY">CNY — Chinese Yuan</option>
+                    <option value="HKD">HKD — Hong Kong Dollar</option>
+                    <option value="SGD">SGD — Singapore Dollar</option>
+                    <option value="AED">AED — UAE Dirham</option>
+                    <option value="SAR">SAR — Saudi Riyal</option>
+                    <option value="ZAR">ZAR — South African Rand</option>
+                    <option value="INR">INR — Indian Rupee</option>
+                    <option value="KES">KES — Kenyan Shilling</option>
+                    <option value="NGN">NGN — Nigerian Naira</option>
+                    <option value="GHS">GHS — Ghanaian Cedi</option>
+                    <option value="BRL">BRL — Brazilian Real</option>
+                    <option value="MXN">MXN — Mexican Peso</option>
+                    <option value="TRY">TRY — Turkish Lira</option>
+                    <option value="PLN">PLN — Polish Zloty</option>
+                    <option value="NOK">NOK — Norwegian Krone</option>
+                    <option value="SEK">SEK — Swedish Krona</option>
+                    <option value="DKK">DKK — Danish Krone</option>
+                    <option value="THB">THB — Thai Baht</option>
+                    <option value="MYR">MYR — Malaysian Ringgit</option>
+                    <option value="IDR">IDR — Indonesian Rupiah</option>
+                    <option value="PHP">PHP — Philippine Peso</option>
+                    <option value="KRW">KRW — South Korean Won</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Amount</label>
+
+                <div class="money-input">
+
+                    <span>¤</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Payment Reference <span>Optional</span></label>
+
+                <input
+                    type="text"
+                    name="payment_reference"
+                    maxlength="255"
+                    placeholder="Reason or reference"
+                >
+
+            </div>
+
+
+            <div class="notice international-notice">
+
+                <strong>International payment information</strong>
+
+                <p>
+                    International payments require accurate beneficiary and
+                    bank information. The local Fairmont prototype records
+                    external transfer requests; it does not claim that funds
+                    have been delivered through an external payment network.
+                </p>
+
+            </div>
+
+
+            <button type="submit" class="primary-button">
+                Continue
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <a href="{{ url_for('transactions') }}" class="secondary-button">
+        View Transaction History
+    </a>
+
+</div>
+
+</body>
+</html>

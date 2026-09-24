@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtime Confirmation | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(47, 104, 180, 0.24), transparent 35%),
+                linear-gradient(145deg, #061426, #0a1c34 55%, #061426);
+            color: #ffffff;
+            padding: 24px 16px 40px;
+        }
+
+        .page {
+            width: min(650px, 100%);
+            margin: 0 auto;
+        }
+
+        .card {
+            margin-top: 50px;
+            background: rgba(14, 34, 59, 0.84);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 24px;
+            padding: 30px 24px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+            backdrop-filter: blur(18px);
+        }
+
+        .success {
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(63, 185, 130, 0.14);
+            border: 1px solid rgba(63, 185, 130, 0.3);
+            font-size: 31px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 27px;
+        }
+
+        .subtitle {
+            margin: 0 0 25px;
+            opacity: 0.65;
+            font-size: 14px;
+        }
+
+        .details {
+            text-align: left;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.045);
+            padding: 7px 17px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+        }
+
+        .label {
+            opacity: 0.58;
+            font-size: 13px;
+        }
+
+        .value {
+            text-align: right;
+            font-size: 14px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .amount {
+            font-size: 20px;
+        }
+
+        .status {
+            color: #9ee6c2;
+        }
+
+        .buttons {
+            display: grid;
+            gap: 10px;
+            margin-top: 23px;
+        }
+
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .primary {
+            background: #ffffff;
+            color: #07172a;
+        }
+
+        .secondary {
+            background: rgba(255,255,255,0.07);
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 12px;
+            }
+
+            .card {
+                padding: 26px 17px;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+
+    <div class="card">
+
+        <div class="success">✓</div>
+
+        <h1>Airtime Purchase Complete</h1>
+
+        <p class="subtitle">
+            Your airtime transaction has been processed successfully.
+        </p>
+
+        <div class="details">
+
+            <div class="row">
+                <div class="label">Mobile Network</div>
+                <div class="value">{{ provider }}</div>
+            </div>
+
+            <div class="row">
+                <div class="label">Mobile Number</div>
+                <div class="value">{{ phone_number }}</div>
+            </div>
+
+            <div class="row">
+                <div class="label">Amount</div>
+                <div class="value amount">
+                    £{{ "{:,.2f}".format(amount) }}
+                </div>
+            </div>
+
+            {% if payment_reference %}
+            <div class="row">
+                <div class="label">Payment Reference</div>
+                <div class="value">{{ payment_reference }}</div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="label">Transaction Reference</div>
+                <div class="value">{{ transaction_reference }}</div>
+            </div>
+
+            <div class="row">
+                <div class="label">Status</div>
+                <div class="value status">Completed</div>
+            </div>
+
+            <div class="row">
+                <div class="label">New Balance</div>
+                <div class="value">
+                    £{{ "{:,.2f}".format(new_balance) }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="buttons">
+            <a class="primary"
+               href="{{ url_for('transaction_details', transaction_reference=transaction_reference) }}">
+                View Transaction
+            </a>
+
+            <a class="secondary" href="{{ url_for('transactions') }}">
+                Transaction History
+            </a>
+
+            <a class="secondary" href="{{ url_for('dashboard') }}">
+                Back to Services
+            </a>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

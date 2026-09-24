@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Account Created | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <main class="login-page">
+
+        <div class="login-shell">
+
+            <div class="login-brand">
+
+                <div class="brand-mark">
+                    F
+                </div>
+
+                <div class="brand-name">
+                    <strong>FAIRMONT</strong>
+                    <span>BANK</span>
+                </div>
+
+            </div>
+
+            <section class="login-intro">
+
+                <p class="eyebrow">
+                    APPLICATION COMPLETE
+                </p>
+
+                <h1>
+                    Welcome to<br>
+                    Fairmont.
+                </h1>
+
+                <p>
+                    Your account has been successfully created.
+                </p>
+
+            </section>
+
+            <div class="account-success-card">
+
+                <p class="success-label">
+                    YOUR CUSTOMER ID
+                </p>
+
+                <div class="customer-id">
+                    {{ customer.customer_id }}
+                </div>
+
+                <p class="success-message">
+                    Keep your Customer ID safe. You will use it together with your password to sign in.
+                </p>
+
+            </div>
+
+            <a
+                href="/login"
+                class="login-button success-login-button">
+
+                Sign in to Fairmont
+
+            </a>
+
+            <div class="security-note">
+
+                <span class="security-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Your account information is protected.
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

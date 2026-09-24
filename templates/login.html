@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Sign In | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
+
+
+
+
+
+
+<style id="fairmont-login-logo-match-dashboard">
+.login-brand {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.login-fairmont-logo {
+    display: block;
+    width: 175px;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+@media (max-width: 600px) {
+    .login-fairmont-logo {
+        width: 155px;
+    }
+}
+
+.login-live-chat {
+    width: 100%;
+    margin: 16px 0 14px 0;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid rgba(184, 149, 74, 0.28);
+    border-radius: 12px;
+    background: rgba(184, 149, 74, 0.07);
+}
+
+.login-live-chat-label {
+    color: #9fb3cc;
+    font-size: 13px;
+}
+
+.login-live-chat-link {
+    color: #d8b96a;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.login-live-chat-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .login-live-chat {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+    <main class="login-page">
+
+        <div class="login-shell">
+
+            <a
+                href="/"
+                class="back-button"
+                aria-label="Go back">
+                ←
+            </a>
+
+            <div class="login-brand">
+
+                <img
+                    src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                    alt="Fairmont Bank"
+                    class="login-fairmont-logo">
+
+            </div>
+
+
+            {% if error %}
+
+            <div class="login-error">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            <section class="login-intro">
+
+                <p class="eyebrow">
+                    CUSTOMER BANKING
+                </p>
+
+                <h1>
+                    Welcome<br>
+                    back.
+                </h1>
+
+                <p>
+                    Sign in securely to access your Fairmont Bank account.
+                </p>
+
+            </section>
+
+
+            <form
+                class="login-form"
+                method="POST"
+                action="/login">
+
+                <div class="form-group">
+
+                    <label for="customer-id">
+                        Customer ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="customer-id"
+                        name="customer_id"
+                        placeholder="Enter your Customer ID"
+                        autocomplete="username"
+                        autocapitalize="characters"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-field">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="togglePassword()"
+                            aria-label="Show password">
+
+                            Show
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="login-options">
+
+                    <label class="remember-option">
+
+                        <input
+                            type="checkbox"
+                            name="remember">
+
+                        <span>
+                            Remember me
+                        </span>
+
+                    </label>
+
+
+                    <a
+                        href="#"
+                        class="forgot-link">
+
+                        Forgot password?
+
+                    </a>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-button">
+
+                    Sign in
+
+                </button>
+
+            </form>
+
+
+            <div class="new-customer">
+
+                <span>
+                    Don't have a Fairmont account?
+                </span>
+
+                <a href="/open-account">
+                    Open an account
+                </a>
+
+            </div>
+
+
+                        <div class="login-live-chat">
+                <span class="login-live-chat-label">
+                    Need help?
+                </span>
+
+                <a
+                    href="/live-chat"
+                    class="login-live-chat-link">
+                    Live Chat with Fairmont Bank Support
+                </a>
+            </div>
+
+
+<div class="security-note">
+
+                <span class="security-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Your connection is protected by secure encryption.
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        function togglePassword() {
+
+            const password =
+                document.getElementById("password");
+
+            const button =
+                document.querySelector(".password-toggle");
+
+
+            if (password.type === "password") {
+
+                password.type = "text";
+
+                button.textContent = "Hide";
+
+                button.setAttribute(
+                    "aria-label",
+                    "Hide password"
+                );
+
+            } else {
+
+                password.type = "password";
+
+                button.textContent = "Show";
+
+                button.setAttribute(
+                    "aria-label",
+                    "Show password"
+                );
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

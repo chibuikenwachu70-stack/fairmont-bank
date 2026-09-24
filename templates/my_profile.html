@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <main class="profile-page">
+
+        <div class="profile-shell">
+
+
+            <header class="profile-page-header">
+
+                <a href="/dashboard" class="profile-back-button">
+
+                    ←
+
+                </a>
+
+                <div class="profile-page-title">
+
+                    <p>
+                        FAIRMONT BANK
+                    </p>
+
+                    <h1>
+                        My Profile
+                    </h1>
+
+                </div>
+
+            </header>
+
+
+            <section class="profile-identity-card">
+
+                <div class="large-profile-avatar">
+
+                    {{ customer.full_name[0].upper() }}
+
+                </div>
+
+
+                <div class="profile-identity-details">
+
+                    <h2>
+                        {{ customer.full_name }}
+                    </h2>
+
+                    <p>
+                        Customer ID · {{ customer.customer_id }}
+                    </p>
+
+                    <span class="profile-status">
+
+                        <span class="status-dot"></span>
+
+                        {{ customer.account_status }}
+
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <section class="profile-section">
+
+                <div class="profile-section-heading">
+
+                    <p>
+                        PERSONAL INFORMATION
+                    </p>
+
+                    <h2>
+                        Personal details
+                    </h2>
+
+                </div>
+
+
+                <div class="profile-details-card">
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Full name
+                        </div>
+
+                        <div class="profile-detail-value">
+                            {{ customer.full_name }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Email address
+                        </div>
+
+                        <div class="profile-detail-value">
+                            {{ customer.email }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Phone number
+                        </div>
+
+                        <div class="profile-detail-value">
+                            {{ customer.phone }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Country of residence
+                        </div>
+
+                        <div class="profile-detail-value">
+                            {{ customer.country }}
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <section class="profile-section">
+
+                <div class="profile-section-heading">
+
+                    <p>
+                        ACCOUNT INFORMATION
+                    </p>
+
+                    <h2>
+                        Account details
+                    </h2>
+
+                </div>
+
+
+                <div class="profile-details-card">
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Customer ID
+                        </div>
+
+                        <div class="profile-detail-value">
+                            {{ customer.customer_id }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Account type
+                        </div>
+
+                        <div class="profile-detail-value account-type-value">
+                            {{ customer.account_type }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Account status
+                        </div>
+
+                        <div class="profile-detail-value profile-active-status">
+                            {{ customer.account_status }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-detail-row">
+
+                        <div class="profile-detail-label">
+                            Available balance
+                        </div>
+
+                        <div class="profile-detail-value profile-balance-value">
+
+                            £{{ "{:,.2f}".format(customer.account_balance) }}
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <section class="profile-section">
+
+                <div class="profile-section-heading">
+
+                    <p>
+                        SECURITY
+                    </p>
+
+                    <h2>
+                        Account security
+                    </h2>
+
+                </div>
+
+
+                <div class="profile-security-card">
+
+                    <div class="security-check">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Your account is protected
+                        </strong>
+
+                        <p>
+                            Your password is securely stored and your account information is protected.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <a
+                href="/dashboard"
+                class="profile-dashboard-button">
+
+                Return to dashboard
+
+            </a>
+
+
+            <a
+                href="/logout"
+                class="profile-logout">
+
+                Sign out
+
+            </a>
+
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

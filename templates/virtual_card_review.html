@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Virtual ATM Card | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, system-ui, -apple-system,
+                         BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            color: #172235;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 28px 18px 55px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #40556f;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .card-panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 14px 40px rgba(20, 40, 70, .09);
+        }
+
+        .header {
+            padding: 28px;
+            border-bottom: 1px solid #edf1f5;
+        }
+
+        .bank-name {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #356fb1;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 27px;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: #6b788b;
+            line-height: 1.55;
+        }
+
+        .content {
+            padding: 28px;
+        }
+
+        /* ==============================
+           FLASH MESSAGES
+           ============================== */
+
+        .flash {
+            margin-bottom: 18px;
+            padding: 13px 15px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .flash.success {
+            background: #effaf3;
+            border: 1px solid #ccebd7;
+            color: #176b3a;
+        }
+
+        .flash.error {
+            background: #fff1f1;
+            border: 1px solid #f2cccc;
+            color: #a12626;
+        }
+
+        /* ==============================
+           VIRTUAL CARD
+           ============================== */
+
+        .virtual-card {
+            position: relative;
+            overflow: hidden;
+            min-height: 245px;
+            padding: 28px;
+            border-radius: 24px;
+            color: #ffffff;
+
+            background:
+                radial-gradient(
+                    circle at 90% 110%,
+                    rgba(255,255,255,.13) 0 50px,
+                    transparent 51px
+                ),
+                linear-gradient(
+                    135deg,
+                    #17365f 0%,
+                    #245c96 52%,
+                    #102844 100%
+                );
+
+            box-shadow:
+                0 18px 38px rgba(12, 35, 66, .25);
+        }
+
+        .virtual-card::before {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: -105px;
+            bottom: -120px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.13);
+
+            box-shadow:
+                0 0 0 25px rgba(255,255,255,.035),
+                0 0 0 50px rgba(255,255,255,.025);
+        }
+
+        .top,
+        .bottom {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 1.7px;
+        }
+
+        .card-type {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.1px;
+            opacity: .8;
+        }
+
+        .chip {
+            position: relative;
+            z-index: 2;
+            width: 48px;
+            height: 35px;
+            margin: 30px 0 19px;
+            border-radius: 8px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #d5b969,
+                    #f4e3a0
+                );
+
+            box-shadow:
+                inset 0 0 0 1px rgba(0,0,0,.08);
+        }
+
+        .chip::after {
+            content: "";
+            position: absolute;
+            inset: 7px;
+            border: 1px solid rgba(70,50,10,.28);
+            border-radius: 4px;
+        }
+
+        .card-number {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 25px;
+
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Consolas,
+                monospace;
+
+            font-size: 21px;
+            letter-spacing: 2.2px;
+            word-spacing: 5px;
+        }
+
+        .bottom {
+            justify-content: flex-start;
+        }
+
+        .field {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            margin-right: 34px;
+        }
+
+        .label {
+            font-size: 8px;
+            letter-spacing: 1.2px;
+            opacity: .68;
+            text-transform: uppercase;
+        }
+
+        .value {
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        /* ==============================
+           CARD STATUS
+           ============================== */
+
+        .status-panel {
+            margin-top: 20px;
+            padding: 17px 18px;
+            border-radius: 14px;
+            border: 1px solid #e3e9f1;
+            background: #f8fafc;
+        }
+
+        .status-title {
+            margin: 0 0 7px;
+            font-size: 12px;
+            color: #748196;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 12px;
+            border-radius: 999px;
+
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-active {
+            background: #eaf8ef;
+            color: #176b3a;
+        }
+
+        .status-active .status-dot {
+            background: #24a05a;
+        }
+
+        .status-frozen {
+            background: #fff7df;
+            color: #8a6200;
+        }
+
+        .status-frozen .status-dot {
+            background: #d99b00;
+        }
+
+        .status-cancelled {
+            background: #fff0f0;
+            color: #a12626;
+        }
+
+        .status-cancelled .status-dot {
+            background: #d13d3d;
+        }
+
+        /* ==============================
+           SECURITY
+           ============================== */
+
+        .security-section {
+            margin-top: 22px;
+            padding: 19px;
+
+            border: 1px solid #e3e9f1;
+            border-radius: 15px;
+
+            background: #f8fafc;
+        }
+
+        .security-title {
+            margin: 0 0 6px;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .security-text {
+            margin: 0 0 16px;
+            color: #6b788b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .security-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .security-box {
+            padding: 14px;
+
+            background: #ffffff;
+            border: 1px solid #dfe6ef;
+            border-radius: 11px;
+        }
+
+        .security-box span {
+            display: block;
+
+            color: #758297;
+            font-size: 10px;
+            font-weight: 700;
+
+            margin-bottom: 6px;
+
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .security-value {
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Consolas,
+                monospace;
+
+            font-size: 16px;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .hidden-security {
+            color: #7b8798;
+            letter-spacing: 3px;
+        }
+
+        .reveal-button {
+            margin-top: 15px;
+            width: 100%;
+
+            padding: 12px 15px;
+
+            border: 1px solid #cfd9e6;
+            border-radius: 10px;
+
+            background: #ffffff;
+            color: #245c96;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            cursor: pointer;
+        }
+
+        .reveal-button:hover {
+            background: #f1f6fb;
+        }
+
+        .security-warning {
+            margin-top: 12px;
+            padding: 11px 13px;
+
+            border-radius: 9px;
+            background: #fff9e9;
+            border: 1px solid #f0dfaa;
+
+            color: #765900;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* ==============================
+           CARD CONTROLS
+           ============================== */
+
+        .controls {
+            margin-top: 22px;
+            padding: 20px;
+
+            border: 1px solid #e3e9f1;
+            border-radius: 15px;
+
+            background: #ffffff;
+        }
+
+        .controls-title {
+            margin: 0 0 5px;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .controls-subtitle {
+            margin: 0 0 16px;
+            color: #748196;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .control-form {
+            margin: 0;
+        }
+
+        .control-button {
+            width: 100%;
+            padding: 13px 15px;
+
+            border-radius: 10px;
+            border: 1px solid #d8e0ea;
+
+            background: #ffffff;
+            color: #24415f;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            cursor: pointer;
+        }
+
+        .control-button:hover {
+            background: #f6f9fc;
+        }
+
+        .freeze-button {
+            border-color: #ead79d;
+            color: #8a6200;
+            background: #fffaf0;
+        }
+
+        .unfreeze-button {
+            border-color: #cce6d5;
+            color: #176b3a;
+            background: #f2fbf5;
+        }
+
+        .cancel-button {
+            border-color: #efcaca;
+            color: #a12626;
+            background: #fff5f5;
+        }
+
+        .cancel-button:hover {
+            background: #ffebeb;
+        }
+
+        .disabled-button {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .cancel-note {
+            margin-top: 13px;
+            padding: 11px 13px;
+
+            background: #fff5f5;
+            border: 1px solid #f0d0d0;
+            border-radius: 9px;
+
+            color: #8c3838;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* ==============================
+           NOTICE
+           ============================== */
+
+        .notice {
+            margin-top: 18px;
+            padding: 14px;
+
+            border-radius: 11px;
+            background: #f8fafc;
+
+            color: #69778b;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        /* ==============================
+           MOBILE
+           ============================== */
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 20px 14px 35px;
+            }
+
+            .header,
+            .content {
+                padding: 21px;
+            }
+
+            .virtual-card {
+                min-height: 225px;
+                padding: 21px;
+            }
+
+            .card-number {
+                font-size: 16px;
+                letter-spacing: 1.5px;
+            }
+
+            .field {
+                margin-right: 16px;
+            }
+
+            .security-row,
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom {
+                gap: 8px;
+            }
+
+            .value {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <a href="{{ url_for('dashboard') }}" class="back">
+        ← Back to Dashboard
+    </a>
+
+    <div class="card-panel">
+
+        <!-- ==============================
+             HEADER
+             ============================== -->
+
+        <div class="header">
+
+            <div class="bank-name">
+                FAIRMONT BANK
+            </div>
+
+            <h1>
+                Virtual ATM Card
+            </h1>
+
+            <p class="subtitle">
+                Review and securely manage your virtual card.
+                Keep your card information private.
+            </p>
+
+        </div>
+
+
+        <div class="content">
+
+            <!-- ==============================
+                 FLASH MESSAGES
+                 ============================== -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <!-- ==============================
+                 VIRTUAL CARD
+                 ============================== -->
+
+            <div class="virtual-card">
+
+                <div class="top">
+
+                    <span class="brand">
+                        FAIRMONT BANK
+                    </span>
+
+                    <span class="card-type">
+                        VIRTUAL ATM
+                    </span>
+
+                </div>
+
+
+                <div class="chip"></div>
+
+
+                <div class="card-number">
+                    {{ virtual_card.card_number }}
+                </div>
+
+
+                <div class="bottom">
+
+                    <div class="field">
+
+                        <span class="label">
+                            Cardholder
+                        </span>
+
+                        <span class="value">
+                            {{ customer.full_name }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <span class="label">
+                            Expires
+                        </span>
+
+                        <span class="value">
+                            {{ virtual_card.expiry_date }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <span class="label">
+                            Status
+                        </span>
+
+                        <span class="value">
+                            {{ virtual_card.status }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==============================
+                 STATUS
+                 ============================== -->
+
+            <div class="status-panel">
+
+                <p class="status-title">
+                    Current card status
+                </p>
+
+                {% if virtual_card.status == "Active" %}
+
+                    <span class="status-badge status-active">
+                        <span class="status-dot"></span>
+                        Card Active
+                    </span>
+
+                {% elif virtual_card.status == "Frozen" %}
+
+                    <span class="status-badge status-frozen">
+                        <span class="status-dot"></span>
+                        Card Frozen
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge status-cancelled">
+                        <span class="status-dot"></span>
+                        Card Cancelled
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ==============================
+                 SECURITY DETAILS
+                 ============================== -->
+
+            <div class="security-section">
+
+                <h3 class="security-title">
+                    Card Security Details
+                </h3>
+
+                <p class="security-text">
+                    Your security code is hidden by default.
+                    Reveal it only when you need to use your virtual
+                    card. Never share your security code with another person.
+                </p>
+
+
+                <div class="security-row">
+
+                    <div class="security-box">
+
+                        <span>
+                            Card Number
+                        </span>
+
+                        <strong class="security-value">
+                            {{ virtual_card.card_number }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="security-box">
+
+                        <span>
+                            Security Code
+                        </span>
+
+                        <strong
+                            id="securityCode"
+                            class="security-value hidden-security">
+
+                            •••
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="reveal-button"
+                    id="securityToggle"
+                    onclick="toggleSecurityCode()">
+
+                    Show Security Code
+
+                </button>
+
+
+                <div class="security-warning">
+
+                    Security reminder: Fairmont Bank will never ask you
+                    to disclose your complete card security code through
+                    an unsolicited message, phone call, or email.
+
+                </div>
+
+            </div>
+
+
+            <!-- ==============================
+                 CARD MANAGEMENT
+                 ============================== -->
+
+            <div class="controls">
+
+                <h3 class="controls-title">
+                    Manage Card
+                </h3>
+
+                <p class="controls-subtitle">
+                    You can temporarily freeze your card or permanently
+                    cancel it from this page.
+                </p>
+
+
+                <div class="control-grid">
+
+                    {% if virtual_card.status == "Active" %}
+
+                        <!-- FREEZE -->
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('virtual_card_freeze') }}"
+                            class="control-form">
+
+                            <button
+                                type="submit"
+                                class="control-button freeze-button">
+
+                                Freeze Card
+
+                            </button>
+
+                        </form>
+
+
+                    {% elif virtual_card.status == "Frozen" %}
+
+                        <!-- UNFREEZE -->
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('virtual_card_unfreeze') }}"
+                            class="control-form">
+
+                            <button
+                                type="submit"
+                                class="control-button unfreeze-button">
+
+                                Unfreeze Card
+
+                            </button>
+
+                        </form>
+
+
+                    {% else %}
+
+                        <!-- CANCELLED -->
+
+                        <button
+                            type="button"
+                            class="control-button disabled-button"
+                            disabled>
+
+                            Card Cancelled
+
+                        </button>
+
+                    {% endif %}
+
+
+                    <!-- CANCEL CARD -->
+
+                    {% if virtual_card.status != "Cancelled" %}
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('virtual_card_cancel') }}"
+                            class="control-form"
+                            onsubmit="return confirmCancelCard();">
+
+                            <button
+                                type="submit"
+                                class="control-button cancel-button">
+
+                                Cancel Card
+
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <button
+                            type="button"
+                            class="control-button disabled-button"
+                            disabled>
+
+                            Permanently Cancelled
+
+                        </button>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if virtual_card.status == "Cancelled" %}
+
+                    <div class="cancel-note">
+
+                        This virtual ATM card has been permanently cancelled.
+                        It cannot be unfrozen or reactivated.
+
+                    </div>
+
+                {% elif virtual_card.status == "Frozen" %}
+
+                    <div class="cancel-note"
+                         style="
+                            background:#fffaf0;
+                            border-color:#ead79d;
+                            color:#765900;
+                         ">
+
+                        Your card is currently frozen.
+                        Unfreeze it when you want to make it active again.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ==============================
+                 SECURITY NOTICE
+                 ============================== -->
+
+            <div class="notice">
+
+                For your protection, keep your virtual card number and
+                security code private. If you believe your card details
+                have been compromised, freeze the card immediately or
+                cancel it and contact the bank.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * SECURITY CODE VISIBILITY
+     *
+     * The security code is hidden when the page first loads.
+     * The customer must deliberately click the button to reveal it.
+     */
+
+    const securityCode =
+        "{{ virtual_card.security_code }}";
+
+    let securityVisible = false;
+
+
+    function toggleSecurityCode() {
+
+        const codeElement =
+            document.getElementById("securityCode");
+
+        const toggleButton =
+            document.getElementById("securityToggle");
+
+
+        if (!securityVisible) {
+
+            codeElement.textContent =
+                securityCode || "•••";
+
+            codeElement.classList.remove(
+                "hidden-security"
+            );
+
+            toggleButton.textContent =
+                "Hide Security Code";
+
+            securityVisible = true;
+
+        } else {
+
+            codeElement.textContent =
+                "•••";
+
+            codeElement.classList.add(
+                "hidden-security"
+            );
+
+            toggleButton.textContent =
+                "Show Security Code";
+
+            securityVisible = false;
+
+        }
+
+    }
+
+
+    /*
+     * CANCEL CONFIRMATION
+     */
+
+    function confirmCancelCard() {
+
+        return window.confirm(
+            "Are you sure you want to permanently cancel this virtual ATM card?\n\n" +
+            "This action cannot be undone."
+        );
+
+    }
+
+</script>
+
+</body>
+</html>

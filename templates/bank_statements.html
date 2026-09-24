@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bank Statement | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(30, 82, 150, .35),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    145deg,
+                    #06152c,
+                    #0a2345 55%,
+                    #06152c
+                );
+            color: #ffffff;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 18px 50px;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #d8e8ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .card {
+            background: rgba(10, 31, 61, .80);
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 22px;
+            padding: 25px;
+            box-shadow: 0 18px 50px rgba(0,0,0,.28);
+            backdrop-filter: blur(14px);
+        }
+
+        .brand {
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: #9fc7ff;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+
+        .intro {
+            margin: 0 0 25px;
+            color: #aebfd7;
+            line-height: 1.55;
+        }
+
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .account-box {
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.055);
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .account-label {
+            color: #8fa6c4;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .account-value {
+            font-size: 15px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .balance-box {
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.09);
+            margin-bottom: 25px;
+        }
+
+        .balance-label {
+            color: #9eb2cd;
+            font-size: 13px;
+        }
+
+        .balance-value {
+            margin-top: 5px;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .statement-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 13px;
+        }
+
+        .statement-heading h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .statement-date {
+            color: #8fa6c4;
+            font-size: 12px;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 13px 12px;
+            text-align: left;
+            background: rgba(255,255,255,.055);
+            color: #a9bdd6;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            color: #eaf2ff;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .date {
+            white-space: nowrap;
+            color: #a8bad2;
+        }
+
+        .description {
+            min-width: 190px;
+        }
+
+        .reference {
+            color: #91a8c5;
+            font-size: 11px;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        .debit {
+            color: #ffb4bd;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .credit {
+            color: #78e3a7;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .balance {
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .status {
+            color: #78e3a7;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 45px 20px;
+            color: #91a6c2;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            color: #8196b2;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 13px 18px;
+            border-radius: 13px;
+            text-decoration: none;
+            background: #2e78d1;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .button.secondary {
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.09);
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                padding: 18px 12px 40px;
+            }
+
+            .card {
+                padding: 19px 14px;
+                border-radius: 19px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .account-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .statement-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .button {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <a class="back" href="/dashboard">
+        ← Back to Dashboard
+    </a>
+
+    <div class="card">
+
+        <div class="brand">FAIRMONT BANK</div>
+
+        <h1>Bank Statement</h1>
+
+        <p class="intro">
+            Your account statement and transaction activity.
+        </p>
+
+        <div class="account-grid">
+
+            <div class="account-box">
+                <div class="account-label">Account Holder</div>
+                <div class="account-value">
+                    {{ customer.full_name }}
+                </div>
+            </div>
+
+            <div class="account-box">
+                <div class="account-label">Customer ID</div>
+                <div class="account-value">
+                    {{ customer.customer_id }}
+                </div>
+            </div>
+
+            <div class="account-box">
+                <div class="account-label">Account Number</div>
+                <div class="account-value">
+                    {{ customer.account_number }}
+                </div>
+            </div>
+
+            <div class="account-box">
+                <div class="account-label">Account Type</div>
+                <div class="account-value">
+                    {{ customer.account_type|title }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="balance-box">
+
+            <div class="balance-label">
+                Current Available Balance
+            </div>
+
+            <div class="balance-value">
+                £{{ "{:,.2f}".format(customer.account_balance|float) }}
+            </div>
+
+        </div>
+
+        <div class="statement-heading">
+
+            <h2>Transaction Statement</h2>
+
+            <div class="statement-date">
+                Generated {{ statement_date.strftime("%d %B %Y") }}
+            </div>
+
+        </div>
+
+        <div class="table-wrap">
+
+            {% if transactions %}
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for transaction in transactions %}
+
+                    <tr>
+
+                        <td class="date">
+                            {{ transaction.created_at.strftime("%d %b %Y") }}<br>
+                            {{ transaction.created_at.strftime("%H:%M") }}
+                        </td>
+
+                        <td class="description">
+
+                            {{ transaction.description or "Transaction" }}
+
+                            {% if transaction.counterparty %}
+                                <div>
+                                    {{ transaction.counterparty }}
+                                </div>
+                            {% endif %}
+
+                            <div class="reference">
+                                {{ transaction.transaction_reference }}
+                            </div>
+
+                        </td>
+
+                        <td>
+                            {{ transaction.transaction_type }}
+                        </td>
+
+                        <td class="debit">
+
+                            {% if transaction.direction == "Debit" %}
+                                £{{ "{:,.2f}".format(transaction.amount|float) }}
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        </td>
+
+                        <td class="credit">
+
+                            {% if transaction.direction == "Credit" %}
+                                £{{ "{:,.2f}".format(transaction.amount|float) }}
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        </td>
+
+                        <td class="balance">
+                            £{{ "{:,.2f}".format(transaction.balance_after|float) }}
+                        </td>
+
+                        <td class="status">
+                            {{ transaction.status }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+                <div class="empty">
+                    No transactions are currently available for this account.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <div class="footer-note">
+            This statement displays transaction activity recorded on your
+            Fairmont Bank account. Transaction references can be used to
+            locate individual transactions in your transaction history.
+        </div>
+
+        <div class="actions">
+
+            <a class="button" href="/transactions">
+                Transaction History
+            </a>
+
+            <a class="button secondary" href="/dashboard">
+                Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

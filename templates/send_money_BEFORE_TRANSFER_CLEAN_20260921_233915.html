@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Money | Fairmont Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transfer.css') }}">
+</head>
+
+<body>
+
+<div class="transfer-page">
+
+    <header class="transfer-header">
+        <a href="{{ url_for('dashboard') }}" class="back-button">‹</a>
+
+        <div>
+            <div class="eyebrow">PAYMENTS</div>
+            <h1>Send Money</h1>
+        </div>
+    </header>
+
+
+    <section class="balance-card">
+        <span>AVAILABLE BALANCE</span>
+        <strong>£{{ "{:,.2f}".format(customer.account_balance or 0) }}</strong>
+
+        <div class="account-reference">
+            <div>
+                <small>Account Number</small>
+                <b>{{ customer.account_number or "Not assigned" }}</b>
+            </div>
+
+            <div>
+                <small>Customer ID</small>
+                <b>{{ customer.customer_id }}</b>
+            </div>
+        </div>
+    </section>
+
+
+    {% if error %}
+    <div class="alert error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+
+    <section class="panel">
+
+        <div class="section-heading">
+            <span class="section-icon">£</span>
+            <div>
+                <h2>Choose transfer type</h2>
+                <p>Select where you want the money to go.</p>
+            </div>
+        </div>
+
+
+        <div class="transfer-types">
+
+            <button
+                type="button"
+                class="transfer-type active"
+                data-type="uk"
+                onclick="selectTransferType('uk')">
+
+                <span class="type-icon">UK</span>
+
+                <span>
+                    <strong>UK Bank Account</strong>
+                    <small>Send GBP to a UK bank account</small>
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="transfer-type"
+                data-type="fairmont"
+                onclick="selectTransferType('fairmont')">
+
+                <span class="type-icon">F</span>
+
+                <span>
+                    <strong>Fairmont Account</strong>
+                    <small>Transfer to another Fairmont customer</small>
+                </span>
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <form method="POST" action="{{ url_for('send_money') }}" id="sendMoneyForm">
+
+            <input
+                type="hidden"
+                name="transfer_type"
+                id="transfer_type"
+                value="uk"
+            >
+
+
+            <!-- FAIRmont -->
+
+            <div id="fairmontFields" class="transfer-fields hidden">
+
+                <div class="field">
+                    <label>Fairmont Account Number</label>
+
+                    <input
+                        type="text"
+                        name="account_number"
+                        id="fairmont_account_number"
+                        maxlength="10"
+                        inputmode="numeric"
+                        placeholder="Enter 10-digit account number"
+                    >
+
+                    <small>
+                        Use the recipient's Fairmont Account Number, not their Customer ID.
+                    </small>
+                </div>
+
+
+                <div class="field">
+                    <label>Recipient Name</label>
+
+                    <input
+                        type="text"
+                        name="recipient_name"
+                        id="fairmont_recipient_name"
+                        placeholder="Recipient's full name"
+                    >
+                </div>
+
+
+                <input
+                    type="hidden"
+                    name="bank_name"
+                    value="Fairmont Bank"
+                />
+
+                <input
+                    type="hidden"
+                    name="sort_code"
+                    value=""
+                />
+
+            </div>
+
+
+            <!-- UK BANK -->
+
+            <div id="ukFields">
+
+                <div class="field">
+
+                    <label>Bank</label>
+
+                    
+<div class="quick-search-select" data-search-select>
+    <input
+        type="text"
+        class="quick-search-input"
+        id="ukBankSearch"
+        placeholder="Search UK bank..."
+        autocomplete="off"
+        aria-label="Search UK bank"
+    >
+
+    
+<select
+    name="bank_name"
+    id="ukBank"
+    class="quick-select-hidden"
+    required
+>
+    <option value="">Select bank</option>
+    {% for bank in banks %}
+    <option value="{{ bank.name }}">
+        {{ bank.name }}
+    </option>
+    {% endfor %}
+</select>
+
+<div class="search-select-wrapper">
+    <input
+        type="text"
+        id="ukBankSearch"
+        class="transfer-search-input"
+        placeholder="Search UK bank..."
+        autocomplete="off"
+    >
+
+    <div
+        id="ukBankSearchResults"
+        class="transfer-search-results"
+    ></div>
+</div>
+
+
+    <div class="quick-search-results" id="ukBankSearchResults"></div>
+</div>
+
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Account Holder Name</label>
+
+                    <input
+                        type="text"
+                        name="recipient_name"
+                        id="recipient_name"
+                        placeholder="Full name on the account"
+                    >
+
+                </div>
+
+
+                <div class="field-row">
+
+                    <div class="field">
+
+                        <label>Sort Code</label>
+
+                        <input
+                            type="text"
+                            name="sort_code"
+                            id="sort_code"
+                            maxlength="8"
+                            inputmode="numeric"
+                            placeholder="00-00-00"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Account Number</label>
+
+                        <input
+                            type="text"
+                            name="account_number"
+                            id="account_number"
+                            maxlength="8"
+                            inputmode="numeric"
+                            placeholder="8 digits"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Amount</label>
+
+                <div class="money-input">
+
+                    <span>£</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Payment Reference <span>Optional</span></label>
+
+                <input
+                    type="text"
+                    name="payment_reference"
+                    maxlength="255"
+                    placeholder="What is this payment for?"
+                >
+
+            </div>
+
+
+            <div class="notice">
+
+                <strong>Before you send</strong>
+
+                <p>
+                    Check the recipient's bank details and amount carefully.
+                    Fairmont-to-Fairmont transfers update both accounts immediately.
+                    External bank transfers are recorded as transfer requests until
+                    a real external payment connection is configured.
+                </p>
+
+            </div>
+
+
+            <button type="submit" class="primary-button">
+                Continue
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <a href="{{ url_for('transactions') }}" class="secondary-button">
+        View Transaction History
+    </a>
+
+
+    <section class="security-note">
+
+        <span>🔒</span>
+
+        <div>
+            <strong>Secure payment</strong>
+            <p>Your transfer details are handled within your Fairmont account session.</p>
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/transfer.js') }}"></script>
+
+
+<script id="FAIRMONT_UK_BANK_SEARCH_V2">
+(function () {
+    "use strict";
+
+    const select =
+        document.getElementById("ukBank");
+
+    const input =
+        document.getElementById("ukBankSearch");
+
+    const results =
+        document.getElementById("ukBankSearchResults");
+
+    if (!select || !input || !results) {
+        return;
+    }
+
+    function getBanks() {
+        return Array.from(select.options)
+            .filter(function (option) {
+                return option.value;
+            })
+            .map(function (option) {
+                return {
+                    value: option.value,
+                    label: option.textContent.trim()
+                };
+            });
+    }
+
+    function render() {
+
+        const query =
+            input.value.trim().toLowerCase();
+
+        results.innerHTML = "";
+
+        const banks =
+            getBanks().filter(function (bank) {
+
+                return bank.label
+                    .toLowerCase()
+                    .includes(query)
+                    ||
+                    bank.value
+                    .toLowerCase()
+                    .includes(query);
+            });
+
+        if (!banks.length) {
+
+            const empty =
+                document.createElement("div");
+
+            empty.className =
+                "transfer-search-empty";
+
+            empty.textContent =
+                "No matching banks found";
+
+            results.appendChild(empty);
+
+            results.style.display = "block";
+
+            return;
+        }
+
+        banks.slice(0, 15).forEach(function (bank) {
+
+            const button =
+                document.createElement("button");
+
+            button.type = "button";
+
+            button.className =
+                "transfer-search-option";
+
+            button.textContent =
+                bank.label;
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    select.value =
+                        bank.value;
+
+                    input.value =
+                        bank.label;
+
+                    results.style.display =
+                        "none";
+
+                    select.dispatchEvent(
+                        new Event(
+                            "change",
+                            { bubbles: true }
+                        )
+                    );
+                }
+            );
+
+            results.appendChild(button);
+        });
+
+        results.style.display = "block";
+    }
+
+
+    input.addEventListener(
+        "focus",
+        render
+    );
+
+    input.addEventListener(
+        "input",
+        render
+    );
+
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !event.target.closest(
+                    ".search-select-wrapper"
+                )
+            ) {
+                results.style.display =
+                    "none";
+            }
+        }
+    );
+
+})();
+</script>
+
+</body>
+</html>
+
+
+<style id="FAIRMONT_DROPDOWN_SEARCH_PICKER_STYLE">
+
+/* ----------------------------------------------------------
+   Native select stays in the form for Flask submission.
+   It is visually hidden but remains accessible to the form.
+   ---------------------------------------------------------- */
+
+.fairmont-native-picker {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    opacity: 0 !important;
+}
+
+
+/* ----------------------------------------------------------
+   Visible field
+   ---------------------------------------------------------- */
+
+.fairmont-picker {
+    position: relative;
+    width: 100%;
+}
+
+.fairmont-picker-trigger {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 15px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.045);
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease;
+}
+
+.fairmont-picker-trigger:hover {
+    background: rgba(255,255,255,0.065);
+}
+
+.fairmont-picker-trigger:focus {
+    outline: none;
+    border-color: rgba(120,170,255,0.75);
+}
+
+.fairmont-picker-trigger.open {
+    border-color: rgba(120,170,255,0.8);
+}
+
+.fairmont-picker-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fairmont-picker-value.placeholder {
+    opacity: .65;
+}
+
+.fairmont-picker-arrow {
+    flex: 0 0 auto;
+    font-size: 14px;
+    opacity: .7;
+    transition: transform .18s ease;
+}
+
+.fairmont-picker-trigger.open .fairmont-picker-arrow {
+    transform: rotate(180deg);
+}
+
+
+/* ----------------------------------------------------------
+   Dropdown popup
+   ---------------------------------------------------------- */
+
+.fairmont-picker-popup {
+    position: fixed;
+    z-index: 999999;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 14px;
+    background: #101a2c;
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.42),
+        0 5px 18px rgba(0,0,0,.25);
+    backdrop-filter: blur(18px);
+}
+
+.fairmont-picker-search-wrap {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.025);
+}
+
+.fairmont-picker-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    outline: none;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font: inherit;
+}
+
+.fairmont-picker-search::placeholder {
+    color: rgba(255,255,255,.55);
+}
+
+.fairmont-picker-search:focus {
+    border-color: rgba(120,170,255,.75);
+}
+
+.fairmont-picker-options {
+    max-height: 270px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.fairmont-picker-option {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    padding: 11px 13px;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.fairmont-picker-option:hover,
+.fairmont-picker-option.active {
+    background: rgba(100,150,255,.16);
+}
+
+.fairmont-picker-option.selected {
+    background: rgba(100,150,255,.22);
+}
+
+.fairmont-picker-empty {
+    padding: 14px;
+    color: rgba(255,255,255,.58);
+    text-align: center;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    .fairmont-picker-popup {
+        max-width: calc(100vw - 24px);
+    }
+
+    .fairmont-picker-options {
+        max-height: 250px;
+    }
+}
+
+</style>
+
+<script id="FAIRMONT_DROPDOWN_SEARCH_PICKER_SCRIPT">
+(function() {
+    "use strict";
+
+    const COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "São Tomé and Príncipe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Türkiye", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+    const COUNTRY_BANKS = {"United Kingdom": ["Allied Irish Bank (GB)", "Bank of Ireland UK", "Bank of Scotland", "Barclays Bank", "Birmingham Bank", "Card One Money", "Cashplus Bank", "Chase UK", "Citibank UK", "ClearBank", "C. Hoare & Co.", "Co-operative Bank", "Coutts", "Danske Bank", "First Direct", "Halifax", "Handelsbanken UK", "HSBC UK", "Investec Bank", "Lloyds Bank", "Metro Bank", "Monzo Bank", "Nationwide Building Society", "NatWest", "Revolut", "Royal Bank of Scotland", "Santander UK", "Skipton Building Society", "Starling Bank", "TSB Bank", "Ulster Bank", "Virgin Money", "Yorkshire Building Society", "Zopa Bank", "Other UK Bank or Building Society"], "Suriname": ["De Surinaamsche Bank", "Republic Bank Suriname", "Hakrinbank", "Surinaamse Volkscredietbank", "Finabank", "Surichange Bank", "GODO", "Trustbank Amanah"], "United States": ["Bank of America", "JPMorgan Chase", "Wells Fargo", "Citibank", "U.S. Bank", "PNC Bank", "Truist", "Capital One", "TD Bank", "Charles Schwab Bank"], "Canada": ["Royal Bank of Canada", "Toronto-Dominion Bank", "Bank of Montreal", "Bank of Nova Scotia", "Canadian Imperial Bank of Commerce", "National Bank of Canada", "Desjardins"], "Australia": ["Commonwealth Bank", "Westpac", "ANZ", "National Australia Bank", "Macquarie Bank", "Bendigo Bank", "Bank of Queensland"], "New Zealand": ["ANZ New Zealand", "ASB Bank", "Bank of New Zealand", "Westpac New Zealand", "Kiwibank"], "Ireland": ["AIB", "Bank of Ireland", "Permanent TSB", "Revolut Bank"], "France": ["BNP Paribas", "Crédit Agricole", "Société Générale", "BPCE", "La Banque Postale", "Crédit Mutuel"], "Germany": ["Deutsche Bank", "Commerzbank", "DZ Bank", "KfW", "ING Germany", "N26"], "Spain": ["Banco Santander", "BBVA", "CaixaBank", "Banco Sabadell", "Unicaja Banco"], "Italy": ["UniCredit", "Intesa Sanpaolo", "Banco BPM", "BPER Banca", "Monte dei Paschi di Siena"], "Netherlands": ["ING Bank", "ABN AMRO", "Rabobank", "de Volksbank"], "Belgium": ["KBC Bank", "BNP Paribas Fortis", "Belfius", "ING Belgium"], "Switzerland": ["UBS", "Julius Baer", "Zürcher Kantonalbank", "Banque Cantonale Vaudoise", "PostFinance"], "Austria": ["Erste Bank", "Raiffeisen Bank", "Bank Austria", "BAWAG"], "Portugal": ["Caixa Geral de Depósitos", "Millennium BCP", "Novo Banco", "Banco Santander Totta"], "South Africa": ["Standard Bank", "First National Bank", "Absa Bank", "Nedbank", "Capitec Bank"], "Kenya": ["KCB Bank Kenya", "Equity Bank Kenya", "Co-operative Bank of Kenya", "Absa Bank Kenya", "NCBA Bank Kenya", "Standard Chartered Bank Kenya", "Stanbic Bank Kenya", "I&M Bank", "DTB Kenya", "Family Bank"], "Nigeria": ["Access Bank", "First Bank of Nigeria", "Guaranty Trust Bank", "United Bank for Africa", "Zenith Bank", "Fidelity Bank", "Stanbic IBTC Bank", "First City Monument Bank"], "Ghana": ["GCB Bank", "Ecobank Ghana", "Absa Bank Ghana", "Stanbic Bank Ghana", "Fidelity Bank Ghana", "United Bank for Africa Ghana"], "Uganda": ["Stanbic Bank Uganda", "Absa Bank Uganda", "Centenary Bank", "Stanbic Bank", "DFCU Bank", "Bank of Uganda"], "Tanzania": ["CRDB Bank", "NMB Bank", "NBC Tanzania", "Stanbic Bank Tanzania", "Absa Bank Tanzania", "Exim Bank Tanzania"], "Rwanda": ["Bank of Kigali", "I&M Bank Rwanda", "Equity Bank Rwanda", "Absa Bank Rwanda", "Access Bank Rwanda"], "India": ["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank", "Punjab National Bank", "Bank of Baroda"], "China": ["Industrial and Commercial Bank of China", "China Construction Bank", "Agricultural Bank of China", "Bank of China", "Bank of Communications"], "Japan": ["MUFG Bank", "SMBC", "Mizuho Bank", "Resona Bank", "Japan Post Bank"], "Singapore": ["DBS Bank", "OCBC Bank", "United Overseas Bank"], "Malaysia": ["Maybank", "CIMB Bank", "Public Bank", "RHB Bank", "Hong Leong Bank"], "Indonesia": ["Bank Mandiri", "Bank Central Asia", "Bank Rakyat Indonesia", "Bank Negara Indonesia", "CIMB Niaga"], "Philippines": ["BDO Unibank", "Bank of the Philippine Islands", "Metrobank", "Philippine National Bank", "Security Bank"], "United Arab Emirates": ["Emirates NBD", "First Abu Dhabi Bank", "Abu Dhabi Commercial Bank", "Mashreq Bank", "Dubai Islamic Bank"], "Saudi Arabia": ["Saudi National Bank", "Al Rajhi Bank", "Riyad Bank", "Alinma Bank", "Banque Saudi Fransi"], "Qatar": ["Qatar National Bank", "Qatar Islamic Bank", "Commercial Bank of Qatar", "Doha Bank"], "Israel": ["Bank Leumi", "Bank Hapoalim", "Mizrahi-Tefahot Bank", "Israel Discount Bank"], "Brazil": ["Banco do Brasil", "Itaú Unibanco", "Bradesco", "Caixa Econômica Federal", "Santander Brasil"], "Mexico": ["BBVA México", "Santander México", "Banorte", "HSBC México", "Citibanamex"], "Argentina": ["Banco de la Nación Argentina", "Banco Galicia", "Banco Santander Argentina", "BBVA Argentina", "Banco Macro"], "Colombia": ["Bancolombia", "Banco de Bogotá", "Davivienda", "BBVA Colombia", "Banco de Occidente"], "Chile": ["Banco de Chile", "Banco Santander Chile", "Banco de Crédito e Inversiones", "Scotiabank Chile"], "Peru": ["Banco de Crédito del Perú", "BBVA Perú", "Interbank", "Scotiabank Perú"], "Norway": ["DNB", "Nordea Norway", "SpareBank 1", "Danske Bank Norway"], "Sweden": ["Swedbank", "SEB", "Handelsbanken", "Nordea Sweden"], "Denmark": ["Danske Bank", "Nordea Denmark", "Jyske Bank", "Sydbank"], "Finland": ["Nordea Finland", "OP Financial Group", "Danske Bank Finland"], "Poland": ["PKO Bank Polski", "Bank Pekao", "Santander Bank Polska", "mBank", "ING Bank Śląski"], "Czech Republic": ["Česká spořitelna", "ČSOB", "Komerční banka", "Raiffeisenbank"], "Romania": ["Banca Transilvania", "BCR", "BRD", "Raiffeisen Bank Romania", "ING Bank Romania"], "Greece": ["National Bank of Greece", "Piraeus Bank", "Alpha Bank", "Eurobank"], "Turkey": ["Ziraat Bank", "Garanti BBVA", "İş Bankası", "Akbank", "Yapı Kredi"], "Pakistan": ["Habib Bank", "United Bank Limited", "MCB Bank", "Meezan Bank", "Bank Alfalah"], "Bangladesh": ["Dutch-Bangla Bank", "BRAC Bank", "Eastern Bank", "City Bank", "Islami Bank Bangladesh"], "Sri Lanka": ["Bank of Ceylon", "Commercial Bank of Ceylon", "Hatton National Bank", "Sampath Bank", "Nations Trust Bank"], "Thailand": ["Bangkok Bank", "Kasikornbank", "Siam Commercial Bank", "Krung Thai Bank", "Bank of Ayudhya"], "Vietnam": ["Vietcombank", "VietinBank", "BIDV", "Agribank", "ACB"], "Egypt": ["National Bank of Egypt", "Banque Misr", "Commercial International Bank", "QNB Alahli", "AlexBank"], "Morocco": ["Attijariwafa Bank", "Banque Populaire", "Bank of Africa", "Crédit du Maroc"], "Mauritius": ["Mauritius Commercial Bank", "Absa Bank Mauritius", "AfrAsia Bank", "MCB"], "Zambia": ["Zanaco", "Stanbic Bank Zambia", "Absa Bank Zambia", "First National Bank Zambia", "Standard Chartered Zambia"], "Zimbabwe": ["CBZ Bank", "Stanbic Bank Zimbabwe", "FBC Bank", "Nedbank Zimbabwe", "First Capital Bank"], "Botswana": ["First National Bank Botswana", "Absa Bank Botswana", "Stanbic Bank Botswana", "Bank Gaborone"], "Namibia": ["First National Bank Namibia", "Bank Windhoek", "Standard Bank Namibia", "Nedbank Namibia"], "Afghanistan": ["Other bank or financial institution in Afghanistan"], "Albania": ["Other bank or financial institution in Albania"], "Algeria": ["Other bank or financial institution in Algeria"], "Andorra": ["Other bank or financial institution in Andorra"], "Angola": ["Other bank or financial institution in Angola"], "Antigua and Barbuda": ["Other bank or financial institution in Antigua and Barbuda"], "Armenia": ["Other bank or financial institution in Armenia"], "Azerbaijan": ["Other bank or financial institution in Azerbaijan"], "Bahamas": ["Other bank or financial institution in Bahamas"], "Bahrain": ["Other bank or financial institution in Bahrain"], "Barbados": ["Other bank or financial institution in Barbados"], "Belarus": ["Other bank or financial institution in Belarus"], "Belize": ["Other bank or financial institution in Belize"], "Benin": ["Other bank or financial institution in Benin"], "Bhutan": ["Other bank or financial institution in Bhutan"], "Bolivia": ["Other bank or financial institution in Bolivia"], "Bosnia and Herzegovina": ["Other bank or financial institution in Bosnia and Herzegovina"], "Brunei": ["Other bank or financial institution in Brunei"], "Bulgaria": ["Other bank or financial institution in Bulgaria"], "Burkina Faso": ["Other bank or financial institution in Burkina Faso"], "Burundi": ["Other bank or financial institution in Burundi"], "Cabo Verde": ["Other bank or financial institution in Cabo Verde"], "Cambodia": ["Other bank or financial institution in Cambodia"], "Cameroon": ["Other bank or financial institution in Cameroon"], "Central African Republic": ["Other bank or financial institution in Central African Republic"], "Chad": ["Other bank or financial institution in Chad"], "Comoros": ["Other bank or financial institution in Comoros"], "Congo": ["Other bank or financial institution in Congo"], "Costa Rica": ["Other bank or financial institution in Costa Rica"], "Côte d'Ivoire": ["Other bank or financial institution in Côte d'Ivoire"], "Croatia": ["Other bank or financial institution in Croatia"], "Cuba": ["Other bank or financial institution in Cuba"], "Cyprus": ["Other bank or financial institution in Cyprus"], "Democratic Republic of the Congo": ["Other bank or financial institution in Democratic Republic of the Congo"], "Djibouti": ["Other bank or financial institution in Djibouti"], "Dominica": ["Other bank or financial institution in Dominica"], "Dominican Republic": ["Other bank or financial institution in Dominican Republic"], "Ecuador": ["Other bank or financial institution in Ecuador"], "El Salvador": ["Other bank or financial institution in El Salvador"], "Equatorial Guinea": ["Other bank or financial institution in Equatorial Guinea"], "Eritrea": ["Other bank or financial institution in Eritrea"], "Estonia": ["Other bank or financial institution in Estonia"], "Eswatini": ["Other bank or financial institution in Eswatini"], "Ethiopia": ["Other bank or financial institution in Ethiopia"], "Fiji": ["Other bank or financial institution in Fiji"], "Gabon": ["Other bank or financial institution in Gabon"], "Gambia": ["Other bank or financial institution in Gambia"], "Georgia": ["Other bank or financial institution in Georgia"], "Grenada": ["Other bank or financial institution in Grenada"], "Guatemala": ["Other bank or financial institution in Guatemala"], "Guinea": ["Other bank or financial institution in Guinea"], "Guinea-Bissau": ["Other bank or financial institution in Guinea-Bissau"], "Guyana": ["Other bank or financial institution in Guyana"], "Haiti": ["Other bank or financial institution in Haiti"], "Honduras": ["Other bank or financial institution in Honduras"], "Hungary": ["Other bank or financial institution in Hungary"], "Iceland": ["Other bank or financial institution in Iceland"], "Iran": ["Other bank or financial institution in Iran"], "Iraq": ["Other bank or financial institution in Iraq"], "Jamaica": ["Other bank or financial institution in Jamaica"], "Jordan": ["Other bank or financial institution in Jordan"], "Kazakhstan": ["Other bank or financial institution in Kazakhstan"], "Kiribati": ["Other bank or financial institution in Kiribati"], "Kuwait": ["Other bank or financial institution in Kuwait"], "Kyrgyzstan": ["Other bank or financial institution in Kyrgyzstan"], "Laos": ["Other bank or financial institution in Laos"], "Latvia": ["Other bank or financial institution in Latvia"], "Lebanon": ["Other bank or financial institution in Lebanon"], "Lesotho": ["Other bank or financial institution in Lesotho"], "Liberia": ["Other bank or financial institution in Liberia"], "Libya": ["Other bank or financial institution in Libya"], "Liechtenstein": ["Other bank or financial institution in Liechtenstein"], "Lithuania": ["Other bank or financial institution in Lithuania"], "Luxembourg": ["Other bank or financial institution in Luxembourg"], "Madagascar": ["Other bank or financial institution in Madagascar"], "Malawi": ["Other bank or financial institution in Malawi"], "Maldives": ["Other bank or financial institution in Maldives"], "Mali": ["Other bank or financial institution in Mali"], "Malta": ["Other bank or financial institution in Malta"], "Marshall Islands": ["Other bank or financial institution in Marshall Islands"], "Mauritania": ["Other bank or financial institution in Mauritania"], "Micronesia": ["Other bank or financial institution in Micronesia"], "Moldova": ["Other bank or financial institution in Moldova"], "Monaco": ["Other bank or financial institution in Monaco"], "Mongolia": ["Other bank or financial institution in Mongolia"], "Montenegro": ["Other bank or financial institution in Montenegro"], "Mozambique": ["Other bank or financial institution in Mozambique"], "Myanmar": ["Other bank or financial institution in Myanmar"], "Nauru": ["Other bank or financial institution in Nauru"], "Nepal": ["Other bank or financial institution in Nepal"], "Nicaragua": ["Other bank or financial institution in Nicaragua"], "Niger": ["Other bank or financial institution in Niger"], "North Korea": ["Other bank or financial institution in North Korea"], "North Macedonia": ["Other bank or financial institution in North Macedonia"], "Oman": ["Other bank or financial institution in Oman"], "Palau": ["Other bank or financial institution in Palau"], "Palestine": ["Other bank or financial institution in Palestine"], "Panama": ["Other bank or financial institution in Panama"], "Papua New Guinea": ["Other bank or financial institution in Papua New Guinea"], "Paraguay": ["Other bank or financial institution in Paraguay"], "Russia": ["Other bank or financial institution in Russia"], "Saint Kitts and Nevis": ["Other bank or financial institution in Saint Kitts and Nevis"], "Saint Lucia": ["Other bank or financial institution in Saint Lucia"], "Saint Vincent and the Grenadines": ["Other bank or financial institution in Saint Vincent and the Grenadines"], "Samoa": ["Other bank or financial institution in Samoa"], "San Marino": ["Other bank or financial institution in San Marino"], "São Tomé and Príncipe": ["Other bank or financial institution in São Tomé and Príncipe"], "Senegal": ["Other bank or financial institution in Senegal"], "Serbia": ["Other bank or financial institution in Serbia"], "Seychelles": ["Other bank or financial institution in Seychelles"], "Sierra Leone": ["Other bank or financial institution in Sierra Leone"], "Slovakia": ["Other bank or financial institution in Slovakia"], "Slovenia": ["Other bank or financial institution in Slovenia"], "Solomon Islands": ["Other bank or financial institution in Solomon Islands"], "Somalia": ["Other bank or financial institution in Somalia"], "South Korea": ["Other bank or financial institution in South Korea"], "South Sudan": ["Other bank or financial institution in South Sudan"], "Sudan": ["Other bank or financial institution in Sudan"], "Syria": ["Other bank or financial institution in Syria"], "Taiwan": ["Other bank or financial institution in Taiwan"], "Tajikistan": ["Other bank or financial institution in Tajikistan"], "Timor-Leste": ["Other bank or financial institution in Timor-Leste"], "Togo": ["Other bank or financial institution in Togo"], "Tonga": ["Other bank or financial institution in Tonga"], "Trinidad and Tobago": ["Other bank or financial institution in Trinidad and Tobago"], "Tunisia": ["Other bank or financial institution in Tunisia"], "Türkiye": ["Other bank or financial institution in Türkiye"], "Turkmenistan": ["Other bank or financial institution in Turkmenistan"], "Tuvalu": ["Other bank or financial institution in Tuvalu"], "Ukraine": ["Other bank or financial institution in Ukraine"], "Uruguay": ["Other bank or financial institution in Uruguay"], "Uzbekistan": ["Other bank or financial institution in Uzbekistan"], "Vanuatu": ["Other bank or financial institution in Vanuatu"], "Vatican City": ["Other bank or financial institution in Vatican City"], "Venezuela": ["Other bank or financial institution in Venezuela"], "Yemen": ["Other bank or financial institution in Yemen"]};
+    const CURRENCIES = [["GBP", "GBP — Pound Sterling"], ["USD", "USD — US Dollar"], ["EUR", "EUR — Euro"], ["CAD", "CAD — Canadian Dollar"], ["AUD", "AUD — Australian Dollar"], ["NZD", "NZD — New Zealand Dollar"], ["CHF", "CHF — Swiss Franc"], ["JPY", "JPY — Japanese Yen"], ["CNY", "CNY — Chinese Yuan"], ["HKD", "HKD — Hong Kong Dollar"], ["SGD", "SGD — Singapore Dollar"], ["AED", "AED — UAE Dirham"], ["SAR", "SAR — Saudi Riyal"], ["QAR", "QAR — Qatari Riyal"], ["ZAR", "ZAR — South African Rand"], ["KES", "KES — Kenyan Shilling"], ["NGN", "NGN — Nigerian Naira"], ["GHS", "GHS — Ghanaian Cedi"], ["UGX", "UGX — Ugandan Shilling"], ["TZS", "TZS — Tanzanian Shilling"], ["RWF", "RWF — Rwandan Franc"], ["INR", "INR — Indian Rupee"], ["PKR", "PKR — Pakistani Rupee"], ["BDT", "BDT — Bangladeshi Taka"], ["LKR", "LKR — Sri Lankan Rupee"], ["THB", "THB — Thai Baht"], ["MYR", "MYR — Malaysian Ringgit"], ["IDR", "IDR — Indonesian Rupiah"], ["PHP", "PHP — Philippine Peso"], ["BRL", "BRL — Brazilian Real"], ["MXN", "MXN — Mexican Peso"], ["ARS", "ARS — Argentine Peso"], ["CLP", "CLP — Chilean Peso"], ["COP", "COP — Colombian Peso"], ["PEN", "PEN — Peruvian Sol"], ["PLN", "PLN — Polish Zloty"], ["CZK", "CZK — Czech Koruna"], ["RON", "RON — Romanian Leu"], ["TRY", "TRY — Turkish Lira"], ["EGP", "EGP — Egyptian Pound"], ["MAD", "MAD — Moroccan Dirham"], ["MUR", "MUR — Mauritian Rupee"], ["ZMW", "ZMW — Zambian Kwacha"], ["ZWL", "ZWL — Zimbabwe Dollar"], ["SRD", "SRD — Surinamese Dollar"]];
+
+    let activePicker = null;
+    let popup = null;
+
+    function closePicker() {
+        if (!activePicker || !popup) {
+            return;
+        }
+
+        const trigger = activePicker.trigger;
+
+        if (trigger) {
+            trigger.classList.remove("open");
+        }
+
+        popup.remove();
+        popup = null;
+        activePicker = null;
+    }
+
+    function positionPopup() {
+        if (!activePicker || !popup) {
+            return;
+        }
+
+        const rect = activePicker.trigger.getBoundingClientRect();
+
+        let width = rect.width;
+
+        if (width < 250) {
+            width = 250;
+        }
+
+        width = Math.min(
+            width,
+            window.innerWidth - 24
+        );
+
+        popup.style.width = width + "px";
+
+        const popupHeight = Math.min(
+            popup.scrollHeight,
+            360
+        );
+
+        let left = rect.left;
+
+        if (left + width > window.innerWidth - 12) {
+            left = window.innerWidth - width - 12;
+        }
+
+        if (left < 12) {
+            left = 12;
+        }
+
+        let top = rect.bottom + 7;
+
+        if (top + popupHeight > window.innerHeight - 12) {
+            const above = rect.top - popupHeight - 7;
+
+            if (above >= 12) {
+                top = above;
+            }
+        }
+
+        popup.style.left = left + "px";
+        popup.style.top = top + "px";
+    }
+
+    function openPicker(state) {
+        if (activePicker === state) {
+            closePicker();
+            return;
+        }
+
+        closePicker();
+
+        activePicker = state;
+
+        state.trigger.classList.add("open");
+
+        popup = document.createElement("div");
+        popup.className = "fairmont-picker-popup";
+
+        const searchWrap = document.createElement("div");
+        searchWrap.className = "fairmont-picker-search-wrap";
+
+        const search = document.createElement("input");
+        search.type = "search";
+        search.className = "fairmont-picker-search";
+        search.placeholder = state.searchPlaceholder;
+        search.autocomplete = "off";
+        search.spellcheck = false;
+
+        searchWrap.appendChild(search);
+
+        const optionsBox = document.createElement("div");
+        optionsBox.className = "fairmont-picker-options";
+
+        popup.appendChild(searchWrap);
+        popup.appendChild(optionsBox);
+
+        document.body.appendChild(popup);
+
+        function renderOptions() {
+            const query = search.value.trim().toLowerCase();
+
+            const options = state.getOptions();
+
+            optionsBox.innerHTML = "";
+
+            const filtered = options.filter(function(option) {
+                return option.label.toLowerCase().includes(query);
+            });
+
+            if (!filtered.length) {
+                const empty = document.createElement("div");
+                empty.className = "fairmont-picker-empty";
+                empty.textContent = "No matching options found";
+                optionsBox.appendChild(empty);
+                positionPopup();
+                return;
+            }
+
+            filtered.forEach(function(option) {
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className = "fairmont-picker-option";
+
+                if (option.value === state.select.value) {
+                    button.classList.add("selected");
+                }
+
+                button.textContent = option.label;
+
+                button.addEventListener("mousedown", function(event) {
+                    event.preventDefault();
+                });
+
+                button.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    state.select.value = option.value;
+
+                    state.select.dispatchEvent(
+                        new Event("change", {
+                            bubbles: true
+                        })
+                    );
+
+                    state.updateLabel();
+
+                    closePicker();
+
+                    if (state.afterSelect) {
+                        state.afterSelect(option.value);
+                    }
+                });
+
+                optionsBox.appendChild(button);
+            });
+
+            positionPopup();
+        }
+
+        search.addEventListener("input", renderOptions);
+
+        search.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                closePicker();
+            }
+        });
+
+        renderOptions();
+
+        requestAnimationFrame(function() {
+            positionPopup();
+            search.focus();
+        });
+    }
+
+    function createPicker(select, options) {
+        if (!select) {
+            return null;
+        }
+
+        if (select.dataset.fairmontPickerReady === "1") {
+            return select._fairmontPickerState || null;
+        }
+
+        select.dataset.fairmontPickerReady = "1";
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "fairmont-picker";
+
+        select.parentNode.insertBefore(wrapper, select);
+
+        wrapper.appendChild(select);
+
+        const trigger = document.createElement("button");
+
+        trigger.type = "button";
+        trigger.className = "fairmont-picker-trigger";
+
+        const value = document.createElement("span");
+        value.className = "fairmont-picker-value";
+
+        const arrow = document.createElement("span");
+        arrow.className = "fairmont-picker-arrow";
+        arrow.textContent = "▾";
+
+        trigger.appendChild(value);
+        trigger.appendChild(arrow);
+
+        wrapper.appendChild(trigger);
+
+        const state = {
+            select: select,
+            wrapper: wrapper,
+            trigger: trigger,
+            value: value,
+            getOptions: options.getOptions,
+            searchPlaceholder: options.searchPlaceholder,
+            afterSelect: options.afterSelect || null,
+
+            updateLabel: function() {
+                const selected = select.options[
+                    select.selectedIndex
+                ];
+
+                if (!selected || !selected.value) {
+                    value.textContent = options.placeholder;
+                    value.classList.add("placeholder");
+                } else {
+                    value.textContent = selected.textContent;
+                    value.classList.remove("placeholder");
+                }
+            }
+        };
+
+        select._fairmontPickerState = state;
+
+        trigger.addEventListener("click", function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            openPicker(state);
+        });
+
+        select.addEventListener("change", function() {
+            state.updateLabel();
+        });
+
+        state.updateLabel();
+
+        return state;
+    }
+
+    function populateSelect(select, items, placeholder) {
+        if (!select) {
+            return;
+        }
+
+        const current = select.value;
+
+        select.innerHTML = "";
+
+        const first = document.createElement("option");
+        first.value = "";
+        first.textContent = placeholder;
+        select.appendChild(first);
+
+        items.forEach(function(item) {
+            const option = document.createElement("option");
+
+            option.value = item.value;
+            option.textContent = item.label;
+
+            select.appendChild(option);
+        });
+
+        if (
+            current &&
+            items.some(function(item) {
+                return item.value === current;
+            })
+        ) {
+            select.value = current;
+        } else {
+            select.value = "";
+        }
+
+        select.dispatchEvent(
+            new Event("change", { bubbles: true })
+        );
+    }
+
+    function getCountryOptions() {
+        return COUNTRIES.map(function(country) {
+            return {
+                value: country,
+                label: country
+            };
+        });
+    }
+
+    function getBankOptions() {
+        const countrySelect =
+            document.getElementById("internationalCountry");
+
+        if (!countrySelect || !countrySelect.value) {
+            return [];
+        }
+
+        const banks =
+            COUNTRY_BANKS[countrySelect.value] || [];
+
+        return banks.map(function(bank) {
+            return {
+                value: bank,
+                label: bank
+            };
+        });
+    }
+
+    function getCurrencyOptions() {
+        return CURRENCIES.map(function(item) {
+            return {
+                value: item[0],
+                label: item[1]
+            };
+        });
+    }
+
+    function initializeInternational() {
+        const country =
+            document.getElementById("internationalCountry");
+
+        const bank =
+            document.getElementById("internationalBank");
+
+        const currency =
+            document.getElementById("internationalCurrency");
+
+        if (!country) {
+            return;
+        }
+
+        const countryPicker = createPicker(
+            country,
+            {
+                placeholder: "Select country",
+                searchPlaceholder: "Search country...",
+                getOptions: getCountryOptions
+            }
+        );
+
+        if (bank) {
+            const bankPicker = createPicker(
+                bank,
+                {
+                    placeholder: "Select a bank",
+                    searchPlaceholder: "Search bank...",
+                    getOptions: getBankOptions
+                }
+            );
+
+            country.addEventListener("change", function() {
+                populateSelect(
+                    bank,
+                    getBankOptions(),
+                    "Select a bank"
+                );
+
+                if (bankPicker) {
+                    bankPicker.updateLabel();
+                }
+
+                closePicker();
+            });
+
+            populateSelect(
+                bank,
+                getBankOptions(),
+                "Select a bank"
+            );
+
+            bankPicker.updateLabel();
+        }
+
+        if (currency) {
+            createPicker(
+                currency,
+                {
+                    placeholder: "Select currency",
+                    searchPlaceholder: "Search currency...",
+                    getOptions: getCurrencyOptions
+                }
+            );
+        }
+
+        if (countryPicker) {
+            countryPicker.updateLabel();
+        }
+    }
+
+    function initializeSendMoney() {
+        const bank =
+            document.getElementById("bankName") ||
+            document.getElementById("bank_name") ||
+            document.getElementById("ukBank") ||
+            document.querySelector(
+                'select[name="bank_name"]'
+            );
+
+        if (!bank) {
+            return;
+        }
+
+        const options = Array.from(
+            bank.options
+        ).map(function(option) {
+            return {
+                value: option.value,
+                label: option.textContent
+            };
+        }).filter(function(option) {
+            return option.value !== "";
+        });
+
+        createPicker(
+            bank,
+            {
+                placeholder: "Select a bank",
+                searchPlaceholder: "Search bank...",
+                getOptions: function() {
+                    return options;
+                }
+            }
+        );
+    }
+
+    document.addEventListener("click", function(event) {
+        if (!activePicker || !popup) {
+            return;
+        }
+
+        if (
+            popup.contains(event.target) ||
+            activePicker.wrapper.contains(event.target)
+        ) {
+            return;
+        }
+
+        closePicker();
+    });
+
+    window.addEventListener("resize", function() {
+        positionPopup();
+    });
+
+    window.addEventListener("scroll", function() {
+        positionPopup();
+    }, true);
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            closePicker();
+        }
+    });
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+            initializeInternational();
+            initializeSendMoney();
+        }
+    );
+
+})();
+</script>
+

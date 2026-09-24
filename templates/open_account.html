@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Open an Account | Fairmont Bank</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top right, rgba(201,163,78,0.18), transparent 35%),
+                linear-gradient(135deg, #07152f 0%, #0b2142 52%, #061329 100%);
+            color: #172033;
+        }
+
+        .open-account-page {
+            min-height: 100vh;
+            padding: 45px 20px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .open-account-shell {
+            position: relative;
+            width: 100%;
+            max-width: 920px;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 42px 55px 45px;
+            box-shadow:
+                0 30px 70px rgba(0, 0, 0, 0.28),
+                0 8px 25px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .open-account-shell::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #b58a35, #e2c06d, #b58a35);
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            left: 32px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #0b2142;
+            background: #f2f4f7;
+            border: 1px solid #e0e4ea;
+            font-size: 22px;
+            transition: 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: #d9b45a;
+            color: #07152f;
+            transform: translateX(-2px);
+        }
+
+        .login-brand {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding-top: 5px;
+        }
+
+        .fairmont-page-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fairmont-page-logo {
+            display: block;
+            width: 245px;
+            max-width: 75%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .account-intro {
+            max-width: 700px;
+            margin: 0 auto 35px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            margin: 0 0 12px;
+            color: #b58a35;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        .account-intro h1 {
+            margin: 0 0 15px;
+            color: #07152f;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(38px, 5vw, 56px);
+            line-height: 1.02;
+            font-weight: 700;
+        }
+
+        .account-intro > p:last-child {
+            margin: 0 auto;
+            max-width: 610px;
+            color: #687386;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .account-form {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .form-section-title {
+            margin: 30px 0 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e7eaf0;
+            color: #07152f;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .form-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #26344a;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            min-height: 52px;
+            padding: 14px 15px;
+            border: 1px solid #d8dee8;
+            border-radius: 10px;
+            background: #fbfcfe;
+            color: #172033;
+            font-size: 15px;
+            outline: none;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .form-group input::placeholder {
+            color: #9aa4b2;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #b58a35;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(181, 138, 53, 0.12);
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: auto;
+        }
+
+        .password-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-field input {
+            padding-right: 82px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 9px;
+            height: 36px;
+            padding: 0 12px;
+            border: 0;
+            border-radius: 7px;
+            background: #eef1f5;
+            color: #26344a;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .password-toggle:hover {
+            background: #dfe4eb;
+        }
+
+        .terms-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            margin: 27px 0;
+            color: #697486;
+            font-size: 13px;
+            line-height: 1.6;
+            cursor: pointer;
+        }
+
+        .terms-option input {
+            width: 17px;
+            height: 17px;
+            margin: 2px 0 0;
+            accent-color: #b58a35;
+            flex: 0 0 auto;
+        }
+
+        .account-submit {
+            width: 100%;
+            min-height: 54px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0b2142, #07152f);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(7, 21, 47, 0.22);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .account-submit:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #122f58, #0b2142);
+            box-shadow: 0 12px 24px rgba(7, 21, 47, 0.28);
+        }
+
+        .existing-customer {
+            margin-top: 27px;
+            text-align: center;
+            color: #727d8e;
+            font-size: 14px;
+        }
+
+        .existing-customer a {
+            margin-left: 5px;
+            color: #a47727;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .existing-customer a:hover {
+            text-decoration: underline;
+        }
+
+        .security-note {
+            max-width: 720px;
+            margin: 25px auto 0;
+            padding: 13px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid #e2e8df;
+            border-radius: 9px;
+            background: #f7faf6;
+            color: #5d695e;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .security-icon {
+            color: #3c7b4b;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        @media (max-width: 700px) {
+            .open-account-page {
+                padding: 20px 12px 35px;
+            }
+
+            .open-account-shell {
+                padding: 34px 22px 32px;
+                border-radius: 18px;
+            }
+
+            .back-button {
+                top: 20px;
+                left: 20px;
+            }
+
+            .fairmont-page-logo {
+                width: 210px;
+            }
+
+            .account-intro {
+                margin-top: 15px;
+            }
+
+            .account-intro h1 {
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .open-account-shell {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .fairmont-page-logo {
+                width: 190px;
+            }
+
+            .account-intro h1 {
+                font-size: 35px;
+            }
+
+            .terms-option {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="open-account-page">
+
+    <div class="open-account-shell">
+
+        <a href="/" class="back-button" aria-label="Go back">
+            &#8592;
+        </a>
+
+        <div class="login-brand">
+            <div class="fairmont-page-brand">
+                <img
+                    src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                    alt="Fairmont Bank"
+                    class="fairmont-page-logo">
+            </div>
+        </div>
+
+        <section class="account-intro">
+
+            <p class="eyebrow">NEW CUSTOMER</p>
+
+            <h1>
+                Open your<br>
+                account.
+            </h1>
+
+            <p>
+                Complete the application below to begin your Fairmont Bank account opening process.
+            </p>
+
+        </section>
+
+        <form class="account-form" method="POST" action="/open-account">
+
+            <div class="form-section-title">
+                Personal information
+            </div>
+
+            <div class="form-group">
+                <label for="full-name">Full name</label>
+
+                <input
+                    type="text"
+                    id="full-name"
+                    name="full_name"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email address"
+                    autocomplete="email"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone number</label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    placeholder="Enter your phone number"
+                    autocomplete="tel"
+                    required>
+            </div>
+
+            <div class="form-section-title">
+                Account details
+            </div>
+
+            <div class="form-group">
+                <label for="account-type">Account type</label>
+
+                <select
+                    id="account-type"
+                    name="account_type"
+                    required>
+
+                    <option value="" selected disabled>
+                        Select account type
+                    </option>
+
+                    <option value="personal">
+                        Personal Account
+                    </option>
+
+                    <option value="savings">
+                        Savings Account
+                    </option>
+
+                    <option value="current">
+                        Current Account
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="country">Country of residence</label>
+
+                <input
+                    type="text"
+                    id="country"
+                    name="country"
+                    placeholder="Enter your country"
+                    autocomplete="country-name"
+                    required>
+            </div>
+
+            <div class="form-section-title">
+                Security
+            </div>
+
+            <div class="form-group">
+
+                <label for="password">
+                    Create password
+                </label>
+
+                <div class="password-field">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a secure password"
+                        autocomplete="new-password"
+                        required>
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        onclick="toggleAccountPassword()"
+                        aria-label="Show password">
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+            <label class="terms-option">
+
+                <input
+                    type="checkbox"
+                    name="terms"
+                    required>
+
+                <span>
+                    I confirm that the information provided is accurate and I agree to Fairmont Bank's account terms and privacy policy.
+                </span>
+
+            </label>
+
+            <button
+                type="submit"
+                class="login-button account-submit">
+                Submit application
+            </button>
+
+        </form>
+
+        <div class="existing-customer">
+
+            <span>Already have a Fairmont account?</span>
+
+            <a href="/login">
+                Sign in
+            </a>
+
+        </div>
+
+        <div class="security-note">
+
+            <span class="security-icon">&#10003;</span>
+
+            <span>
+                Your information is transmitted using secure encryption.
+            </span>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script>
+function toggleAccountPassword() {
+
+    const password = document.getElementById("password");
+    const button = document.querySelector(".password-toggle");
+
+    if (password.type === "password") {
+        password.type = "text";
+        button.textContent = "Hide";
+        button.setAttribute("aria-label", "Hide password");
+    } else {
+        password.type = "password";
+        button.textContent = "Show";
+        button.setAttribute("aria-label", "Show password");
+    }
+}
+</script>
+
+</body>
+</html>

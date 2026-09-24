@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Live Chat | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #06152d;
+            color: #ffffff;
+        }
+
+        .chat-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 18px 22px;
+            background: rgba(8, 28, 56, 0.96);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .chat-brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-logo {
+            width: 150px;
+            height: auto;
+            display: block;
+        }
+
+        .chat-header-title {
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .chat-header-title strong {
+            display: block;
+            font-size: 15px;
+        }
+
+        .chat-header-title span {
+            display: block;
+            margin-top: 3px;
+            font-size: 12px;
+            color: #9fb3cc;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .support-card {
+            background: rgba(15, 38, 70, 0.88);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .support-card h1 {
+            margin: 0 0 7px;
+            font-size: 22px;
+        }
+
+        .support-card p {
+            margin: 0;
+            color: #aebed2;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .conversation {
+            flex: 1;
+            min-height: 420px;
+            max-height: 58vh;
+            overflow-y: auto;
+            padding: 18px;
+            background: rgba(7, 25, 49, 0.9);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+        }
+
+        .empty-chat {
+            height: 100%;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #91a5bf;
+            padding: 30px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 14px;
+        }
+
+        .message.customer {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 78%;
+            padding: 12px 15px;
+            border-radius: 16px;
+            background: #17385f;
+        }
+
+        .message.customer .message-bubble {
+            background: #b8954a;
+            color: #07162d;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.support .message-bubble {
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-label {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            opacity: 0.75;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .message-time {
+            margin-top: 5px;
+            font-size: 10px;
+            opacity: 0.65;
+        }
+
+        .chat-form {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(15, 38, 70, 0.88);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+        }
+
+        .chat-input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            resize: none;
+            min-height: 48px;
+            max-height: 130px;
+            padding: 14px;
+            border-radius: 12px;
+            background: #071a35;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .chat-input::placeholder {
+            color: #7188a5;
+        }
+
+        .send-button {
+            align-self: stretch;
+            min-width: 90px;
+            border: none;
+            border-radius: 12px;
+            background: #b8954a;
+            color: #07162d;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 18px;
+        }
+
+        .send-button:hover {
+            opacity: 0.92;
+        }
+
+        @media (max-width: 600px) {
+            .chat-header {
+                padding: 15px;
+            }
+
+            .chat-logo {
+                width: 125px;
+            }
+
+            .chat-header-title {
+                display: none;
+            }
+
+            .chat-container {
+                padding: 16px 12px;
+            }
+
+            .conversation {
+                min-height: 50vh;
+            }
+
+            .message-bubble {
+                max-width: 88%;
+            }
+
+            .chat-form {
+                align-items: stretch;
+            }
+
+            .send-button {
+                min-width: 72px;
+                padding: 0 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="chat-page">
+
+    <header class="chat-header">
+
+        <a href="{{ url_for('dashboard') }}"
+           class="back-button"
+           aria-label="Back to dashboard">
+            &#8592;
+        </a>
+
+        <div class="chat-brand">
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank"
+                class="chat-logo">
+        </div>
+
+        <div class="chat-header-title">
+            <strong>Live Chat</strong>
+            <span>Fairmont Bank Support</span>
+        </div>
+
+    </header>
+
+    <main class="chat-container">
+
+        <section class="support-card">
+            <h1>Live Chat</h1>
+            <p>
+                Chat securely with Fairmont Bank Support.
+                Send us your question and our support team will respond here.
+            </p>
+        </section>
+
+        <section class="conversation">
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="message
+                        {% if message.sender_type == 'customer' %}
+                            customer
+                        {% else %}
+                            support
+                        {% endif %}
+                    ">
+
+                        <div class="message-bubble">
+
+                            <div class="message-label">
+                                {% if message.sender_type == 'customer' %}
+                                    You
+                                {% else %}
+                                    Fairmont Bank Support
+                                {% endif %}
+                            </div>
+
+                            <div class="message-text">{{ message.message }}</div>
+
+                            <div class="message-time">
+                                {{ message.created_at.strftime('%d %b %Y, %H:%M') }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-chat">
+                    <div>
+                        <strong>No messages yet.</strong>
+                        <p>
+                            Start a conversation with Fairmont Bank Support below.
+                        </p>
+                    </div>
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <form
+            method="POST"
+            action="{{ url_for('live_chat') }}"
+            class="chat-form"
+        >
+
+            <textarea
+                name="message"
+                class="chat-input"
+                placeholder="Type your message..."
+                maxlength="2000"
+                required
+            ></textarea>
+
+            <button type="submit" class="send-button">
+                Send
+            </button>
+
+        </form>
+
+    </main>
+
+</div>
+
+</body>
+</html>

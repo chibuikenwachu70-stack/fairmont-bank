@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debit Card Withdrawal</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #182033;
+        }
+        .page {
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 12px 35px rgba(20, 30, 55, .10);
+        }
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #475569;
+        }
+        h1 { margin: 0 0 8px; }
+        .intro {
+            color: #64748b;
+            margin-bottom: 26px;
+        }
+        label {
+            display: block;
+            margin: 16px 0 7px;
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #d7dce5;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .balance {
+            background: #f1f5f9;
+            padding: 14px;
+            border-radius: 10px;
+            margin: 18px 0;
+        }
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px;
+            border: 0;
+            border-radius: 10px;
+            background: #1d4ed8;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .notice {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            color: #9a3412;
+            font-size: 13px;
+        }
+        .flash {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .flash.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .flash.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        @media (max-width: 600px) {
+            .row { grid-template-columns: 1fr; }
+            .page { margin: 15px auto; }
+            .card { padding: 22px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <a class="back" href="{{ url_for('withdraw') }}">← Back to withdrawal methods</a>
+
+    <div class="card">
+        <h1>Debit Card Withdrawal</h1>
+        <p class="intro">
+            Enter the details required to submit your debit card withdrawal request.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="balance">
+            Available balance:
+            <strong>£{{ "%.2f"|format(customer.account_balance or 0) }}</strong>
+        </div>
+
+        <form method="POST" autocomplete="off">
+            <label for="cardholder_name">Cardholder Name</label>
+            <input
+                id="cardholder_name"
+                name="cardholder_name"
+                type="text"
+                required
+                autocomplete="cc-name"
+            >
+
+            <label for="card_number">Debit Card Number</label>
+            <input
+                id="card_number"
+                name="card_number"
+                type="text"
+                inputmode="numeric"
+                maxlength="19"
+                placeholder="Enter card number"
+                required
+                autocomplete="cc-number"
+            >
+
+            <div class="row">
+                <div>
+                    <label for="expiry_month">Expiry Month</label>
+                    <input
+                        id="expiry_month"
+                        name="expiry_month"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="MM"
+                        required
+                        autocomplete="cc-exp-month"
+                    >
+                </div>
+
+                <div>
+                    <label for="expiry_year">Expiry Year</label>
+                    <input
+                        id="expiry_year"
+                        name="expiry_year"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="4"
+                        placeholder="YYYY"
+                        required
+                        autocomplete="cc-exp-year"
+                    >
+                </div>
+            </div>
+
+            <label for="amount">Withdrawal Amount</label>
+            <input
+                id="amount"
+                name="amount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="0.00"
+                required
+            >
+
+            <button type="submit">Submit Withdrawal Request</button>
+        </form>
+
+        <div class="notice">
+            For security, the bank application does not store your full card number
+            or CVV. Only the last four digits are retained with the withdrawal request.
+        </div>
+    </div>
+</div>
+</body>
+</html>

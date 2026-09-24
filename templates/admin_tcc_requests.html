@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Fairmont Bank — TCC Verification</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #071426;
+            color: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+        }
+
+        .header {
+            min-height: 76px;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: #08182b;
+            border-bottom: 1px solid rgba(184, 149, 74, 0.18);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .back-link {
+            color: #9fb3cc;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            color: #d8b96a;
+        }
+
+        .logo {
+            display: block;
+            width: 175px;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 1px solid rgba(255, 255, 255, 0.10);
+            padding-left: 18px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .header-title p {
+            margin: 4px 0 0;
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .admin-info {
+            color: #9fb3cc;
+            font-size: 12px;
+        }
+
+        .admin-info strong {
+            color: #d8b96a;
+        }
+
+        .content {
+            max-width: 1450px;
+            margin: 0 auto;
+            padding: 28px;
+        }
+
+        .page-heading {
+            margin-bottom: 22px;
+        }
+
+        .page-heading h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .page-heading p {
+            margin: 7px 0 0;
+            color: #71869e;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .notice {
+            margin-bottom: 20px;
+            padding: 15px 17px;
+            border-radius: 12px;
+            border: 1px solid rgba(184, 149, 74, 0.18);
+            background: rgba(184, 149, 74, 0.045);
+            color: #aebfd0;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .table-card {
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.025);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .table-header h3 {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .table-header p {
+            margin: 5px 0 0;
+            color: #71869e;
+            font-size: 10px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            color: #71869e;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        td {
+            padding: 15px;
+            color: #d4dfeb;
+            font-size: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .customer-name {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .customer-id {
+            margin-top: 4px;
+            color: #71869e;
+            font-size: 9px;
+        }
+
+        .tcc-code {
+            display: inline-block;
+            padding: 8px 11px;
+            border-radius: 8px;
+            color: #071426;
+            background: linear-gradient(
+                135deg,
+                #b8954a,
+                #d8b96a
+            );
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .amount {
+            color: #d8b96a;
+            font-weight: 700;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 20px;
+            color: #e3c879;
+            background: rgba(184, 149, 74, 0.09);
+            border: 1px solid rgba(184, 149, 74, 0.20);
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .date {
+            color: #71869e;
+            line-height: 1.5;
+        }
+
+        .empty {
+            padding: 45px 20px;
+            text-align: center;
+            color: #687e96;
+            font-size: 11px;
+        }
+
+        @media (max-width: 650px) {
+
+            .header {
+                padding: 15px 17px;
+                align-items: flex-start;
+            }
+
+            .header-left {
+                gap: 12px;
+            }
+
+            .logo {
+                width: 145px;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .admin-info {
+                display: none;
+            }
+
+            .content {
+                padding: 18px 14px;
+            }
+
+            .page-heading h2 {
+                font-size: 19px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="back-link"
+            >
+                Back to Dashboard
+            </a>
+
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='images/fairmont-bank-logo.png'
+                ) }}"
+                alt="Fairmont Bank"
+                class="logo"
+            >
+
+
+            <div class="header-title">
+
+                <h1>
+                    TCC Verification
+                </h1>
+
+                <p>
+                    Payment verification management
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="admin-info">
+
+            Administrator:
+            <strong>{{ admin.username }}</strong>
+
+        </div>
+
+    </header>
+
+
+    <main class="content">
+
+
+        <section class="page-heading">
+
+            <h2>
+                TCC Verification Requests
+            </h2>
+
+            <p>
+                Generated TCC codes for customer payments
+                requiring additional verification.
+            </p>
+
+        </section>
+
+
+        <div class="notice">
+
+            When a customer's TCC Payment Restriction is enabled,
+            the payment remains in TCC Verification Required until
+            the customer enters the correct code. The code shown
+            here is available only to authorized Fairmont Bank
+            management.
+
+        </div>
+
+
+        <section class="table-card">
+
+
+            <div class="table-header">
+
+                <h3>
+                    Pending TCC Requests
+                </h3>
+
+                <p>
+                    Provide the appropriate TCC to the customer
+                    through the bank's authorized support process.
+                </p>
+
+            </div>
+
+
+            {% if requests_list %}
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Customer
+                                </th>
+
+                                <th>
+                                    Payment Reference
+                                </th>
+
+                                <th>
+                                    Payment Type
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                                <th>
+                                    Description
+                                </th>
+
+                                <th>
+                                    TCC Code
+                                </th>
+
+                                <th>
+                                    Generated
+                                </th>
+
+                                <th>
+                                    Expires
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                        {% for payment in requests_list %}
+
+                            {% set customer =
+                                customers.get(payment.id)
+                            %}
+
+
+                            <tr>
+
+
+                                <td>
+
+                                    {% if customer %}
+
+                                        <div class="customer-name">
+                                            {{ customer.full_name }}
+                                        </div>
+
+                                        <div class="customer-id">
+                                            {{ customer.customer_id }}
+                                        </div>
+
+                                    {% else %}
+
+                                        <div class="customer-name">
+                                            Customer unavailable
+                                        </div>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ payment.payment_reference }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ payment.payment_type }}
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="amount">
+
+                                        {{ customer.preferred_currency_display
+                                           if customer
+                                           else "GBP" }}
+
+                                        {{ "{:,.2f}".format(
+                                            payment.amount or 0
+                                        ) }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ payment.description }}
+
+                                    {% if payment.counterparty %}
+
+                                        <div class="customer-id">
+                                            {{ payment.counterparty }}
+                                        </div>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if payment.tcc_code %}
+
+                                        <span class="tcc-code">
+                                            {{ payment.tcc_code }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="customer-id">
+                                            Not generated
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="date">
+
+                                        {% if payment.tcc_generated_at %}
+
+                                            {{ payment.tcc_generated_at.strftime(
+                                                '%d %b %Y, %H:%M'
+                                            ) }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="date">
+
+                                        {% if payment.tcc_expires_at %}
+
+                                            {{ payment.tcc_expires_at.strftime(
+                                                '%d %b %Y, %H:%M'
+                                            ) }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="status">
+                                        TCC Required
+                                    </span>
+
+                                </td>
+
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty">
+
+                    There are currently no TCC verification
+                    requests waiting for customer verification.
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+</body>
+
+</html>

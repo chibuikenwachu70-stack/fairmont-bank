@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtime | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(47, 104, 180, 0.24), transparent 35%),
+                linear-gradient(145deg, #061426, #0a1c34 55%, #061426);
+            color: #ffffff;
+            padding: 24px 16px 40px;
+        }
+
+        .page {
+            width: min(720px, 100%);
+            margin: 0 auto;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .back {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.10);
+            font-size: 22px;
+        }
+
+        .brand {
+            font-size: 13px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            opacity: 0.72;
+        }
+
+        .title {
+            font-size: 30px;
+            font-weight: 700;
+            margin: 5px 0 0;
+        }
+
+        .card {
+            background: rgba(14, 34, 59, 0.82);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+            backdrop-filter: blur(18px);
+        }
+
+        .balance {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.055);
+            margin-bottom: 22px;
+        }
+
+        .balance-label {
+            font-size: 13px;
+            opacity: 0.68;
+            margin-bottom: 6px;
+        }
+
+        .balance-value {
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.88;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 52px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            background: rgba(4, 18, 35, 0.78);
+            color: #ffffff;
+            padding: 0 15px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(93, 157, 230, 0.7);
+        }
+
+        select option {
+            background: #0b1c31;
+            color: #ffffff;
+        }
+
+        .hint {
+            margin-top: 7px;
+            font-size: 12px;
+            opacity: 0.55;
+        }
+
+        .errors {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(180, 35, 35, 0.18);
+            border: 1px solid rgba(255, 90, 90, 0.25);
+            color: #ffd7d7;
+        }
+
+        .errors div {
+            margin: 3px 0;
+        }
+
+        button {
+            width: 100%;
+            height: 54px;
+            border: 0;
+            border-radius: 15px;
+            background: #ffffff;
+            color: #07172a;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        button:hover {
+            opacity: 0.93;
+        }
+
+        .secure {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.48;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 18px 13px 30px;
+            }
+
+            .card {
+                padding: 19px;
+                border-radius: 20px;
+            }
+
+            .title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+
+    <div class="top">
+        <a class="back" href="{{ url_for('dashboard') }}">‹</a>
+
+        <div>
+            <div class="brand">FAIRMONT BANK</div>
+            <div class="title">Airtime</div>
+        </div>
+    </div>
+
+    <div class="card">
+
+        <div class="balance">
+            <div class="balance-label">Available Balance</div>
+            <div class="balance-value">
+                £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+            </div>
+        </div>
+
+        {% if errors %}
+        <div class="errors">
+            {% for error in errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('airtime') }}">
+
+            <div class="field">
+                <label for="provider">Mobile Network</label>
+
+                <select id="provider" name="provider" required>
+                    <option value="">Select mobile network</option>
+                    <option value="EE" {% if provider == "EE" %}selected{% endif %}>EE</option>
+                    <option value="O2" {% if provider == "O2" %}selected{% endif %}>O2</option>
+                    <option value="Vodafone" {% if provider == "Vodafone" %}selected{% endif %}>Vodafone</option>
+                    <option value="Three UK" {% if provider == "Three UK" %}selected{% endif %}>Three UK</option>
+                    <option value="Tesco Mobile" {% if provider == "Tesco Mobile" %}selected{% endif %}>Tesco Mobile</option>
+                    <option value="giffgaff" {% if provider == "giffgaff" %}selected{% endif %}>giffgaff</option>
+                    <option value="Lebara" {% if provider == "Lebara" %}selected{% endif %}>Lebara</option>
+                    <option value="Lycamobile" {% if provider == "Lycamobile" %}selected{% endif %}>Lycamobile</option>
+                    <option value="Other Mobile Network" {% if provider == "Other Mobile Network" %}selected{% endif %}>Other Mobile Network</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="phone_number">Mobile Number</label>
+
+                <input
+                    type="tel"
+                    id="phone_number"
+                    name="phone_number"
+                    value="{{ phone_number or '' }}"
+                    placeholder="Enter mobile number"
+                    autocomplete="tel"
+                    required
+                >
+            </div>
+
+            <div class="field">
+                <label for="amount">Airtime Amount</label>
+
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    value="{{ amount or '' }}"
+                    placeholder="0.00"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+
+                <div class="hint">
+                    Enter the amount you want to purchase.
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="payment_reference">Payment Reference (Optional)</label>
+
+                <input
+                    type="text"
+                    id="payment_reference"
+                    name="payment_reference"
+                    value="{{ payment_reference or '' }}"
+                    placeholder="Optional reference"
+                >
+            </div>
+
+            <button type="submit">Purchase Airtime</button>
+
+        </form>
+
+        <div class="secure">
+            Secure transaction processing
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

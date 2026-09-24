@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Money | Fairmont Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transfer.css') }}">
+</head>
+
+<body>
+
+<div class="transfer-page">
+
+    <header class="transfer-header">
+        <a href="{{ url_for('dashboard') }}" class="back-button">‹</a>
+
+        <div>
+            <div class="eyebrow">PAYMENTS</div>
+            <h1>Send Money</h1>
+        </div>
+    </header>
+
+
+    <section class="balance-card">
+        <span>AVAILABLE BALANCE</span>
+        <strong>£{{ "{:,.2f}".format(customer.account_balance or 0) }}</strong>
+
+        <div class="account-reference">
+            <div>
+                <small>Account Number</small>
+                <b>{{ customer.account_number or "Not assigned" }}</b>
+            </div>
+
+            <div>
+                <small>Customer ID</small>
+                <b>{{ customer.customer_id }}</b>
+            </div>
+        </div>
+    </section>
+
+
+    {% if error %}
+    <div class="alert error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+
+    <section class="panel">
+
+        <div class="section-heading">
+            <span class="section-icon">£</span>
+            <div>
+                <h2>Choose transfer type</h2>
+                <p>Select where you want the money to go.</p>
+            </div>
+        </div>
+
+
+        <div class="transfer-types">
+
+            <button
+                type="button"
+                class="transfer-type active"
+                data-type="uk"
+                onclick="selectTransferType('uk')">
+
+                <span class="type-icon">UK</span>
+
+                <span>
+                    <strong>UK Bank Account</strong>
+                    <small>Send GBP to a UK bank account</small>
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="transfer-type"
+                data-type="fairmont"
+                onclick="selectTransferType('fairmont')">
+
+                <span class="type-icon">F</span>
+
+                <span>
+                    <strong>Fairmont Account</strong>
+                    <small>Transfer to another Fairmont customer</small>
+                </span>
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <form method="POST" action="{{ url_for('send_money') }}" id="sendMoneyForm">
+
+            <input
+                type="hidden"
+                name="transfer_type"
+                id="transfer_type"
+                value="uk"
+            >
+
+
+            <!-- FAIRmont -->
+
+            <div id="fairmontFields" class="transfer-fields hidden">
+
+                <div class="field">
+                    <label>Fairmont Account Number</label>
+
+                    <input
+                        type="text"
+                        name="account_number"
+                        id="fairmont_account_number"
+                        maxlength="10"
+                        inputmode="numeric"
+                        placeholder="Enter 10-digit account number"
+                    >
+
+                    <small>
+                        Use the recipient's Fairmont Account Number, not their Customer ID.
+                    </small>
+                </div>
+
+
+                <div class="field">
+                    <label>Recipient Name</label>
+
+                    <input
+                        type="text"
+                        name="recipient_name"
+                        id="fairmont_recipient_name"
+                        placeholder="Recipient's full name"
+                    >
+                </div>
+
+
+                <input
+                    type="hidden"
+                    name="bank_name"
+                    value="Fairmont Bank"
+                />
+
+                <input
+                    type="hidden"
+                    name="sort_code"
+                    value=""
+                />
+
+            </div>
+
+
+            <!-- UK BANK -->
+
+            <div id="ukFields">
+
+                <div class="field">
+
+                    <label>Bank</label>
+
+                    <select name="bank_name" id="bank_name">
+
+                        <option value="">
+                            Select recipient's bank
+                        </option>
+
+                        {% for bank in banks %}
+
+                        <option value="{{ bank.name }}">
+                            {{ bank.name }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Account Holder Name</label>
+
+                    <input
+                        type="text"
+                        name="recipient_name"
+                        id="recipient_name"
+                        placeholder="Full name on the account"
+                    >
+
+                </div>
+
+
+                <div class="field-row">
+
+                    <div class="field">
+
+                        <label>Sort Code</label>
+
+                        <input
+                            type="text"
+                            name="sort_code"
+                            id="sort_code"
+                            maxlength="8"
+                            inputmode="numeric"
+                            placeholder="00-00-00"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>Account Number</label>
+
+                        <input
+                            type="text"
+                            name="account_number"
+                            id="account_number"
+                            maxlength="8"
+                            inputmode="numeric"
+                            placeholder="8 digits"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Amount</label>
+
+                <div class="money-input">
+
+                    <span>£</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Payment Reference <span>Optional</span></label>
+
+                <input
+                    type="text"
+                    name="payment_reference"
+                    maxlength="255"
+                    placeholder="What is this payment for?"
+                >
+
+            </div>
+
+
+            <div class="notice">
+
+                <strong>Before you send</strong>
+
+                <p>
+                    Check the recipient's bank details and amount carefully.
+                    Fairmont-to-Fairmont transfers update both accounts immediately.
+                    External bank transfers are recorded as transfer requests until
+                    a real external payment connection is configured.
+                </p>
+
+            </div>
+
+
+            <button type="submit" class="primary-button">
+                Continue
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <a href="{{ url_for('transactions') }}" class="secondary-button">
+        View Transaction History
+    </a>
+
+
+    <section class="security-note">
+
+        <span>🔒</span>
+
+        <div>
+            <strong>Secure payment</strong>
+            <p>Your transfer details are handled within your Fairmont account session.</p>
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/transfer.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fairmont Bank — Administrator Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(184, 149, 74, 0.12), transparent 35%),
+                linear-gradient(135deg, #071426 0%, #0b1d35 55%, #06111f 100%);
+            color: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .admin-login-wrapper {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .admin-login-card {
+            background: rgba(10, 27, 48, 0.94);
+            border: 1px solid rgba(184, 149, 74, 0.25);
+            border-radius: 20px;
+            padding: 38px 34px;
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.42),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand img {
+            width: 230px;
+            max-width: 82%;
+            height: auto;
+            display: block;
+            margin: 0 auto 22px;
+            object-fit: contain;
+        }
+
+        .admin-label {
+            color: #d8b96a;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .title {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            margin: 9px 0 0;
+            color: #9fb3cc;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(180, 60, 60, 0.12);
+            border: 1px solid rgba(220, 100, 100, 0.35);
+            color: #f0b4b4;
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #dce6f2;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 48px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(159, 179, 204, 0.20);
+            background: rgba(255, 255, 255, 0.055);
+            color: #ffffff;
+            outline: none;
+            font-size: 14px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .form-group input::placeholder {
+            color: #71849b;
+        }
+
+        .form-group input:focus {
+            border-color: rgba(184, 149, 74, 0.75);
+            background: rgba(255, 255, 255, 0.075);
+        }
+
+        .login-button {
+            width: 100%;
+            height: 50px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #b8954a, #d8b96a);
+            color: #081426;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: transform 0.15s, opacity 0.15s;
+        }
+
+        .login-button:hover {
+            opacity: 0.94;
+            transform: translateY(-1px);
+        }
+
+        .security-note {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(159, 179, 204, 0.12);
+            text-align: center;
+            color: #788da6;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #9fb3cc;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            color: #d8b96a;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 16px;
+            }
+
+            .admin-login-card {
+                padding: 30px 22px;
+                border-radius: 16px;
+            }
+
+            .brand img {
+                width: 205px;
+            }
+
+            .title {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-login-wrapper">
+
+    <div class="admin-login-card">
+
+        <div class="brand">
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank">
+
+            <div class="admin-label">Secure Administration</div>
+
+            <h1 class="title">Administrator Login</h1>
+
+            <p class="subtitle">
+                Authorized Fairmont Bank administration access.
+            </p>
+        </div>
+
+        {% if error %}
+            <div class="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('admin_login') }}">
+
+            <div class="form-group">
+                <label for="username">Administrator Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required>
+            </div>
+
+            <button type="submit" class="login-button">
+                Sign In Securely
+            </button>
+
+        </form>
+
+        <div class="security-note">
+            Administrator access is restricted to authorized personnel.
+            Your credentials are protected using secure password hashing.
+        </div>
+
+        <a href="{{ url_for('login') }}" class="back-link">
+            ← Return to Customer Banking
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

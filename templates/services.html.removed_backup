@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Services | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(61, 91, 145, 0.22),
+                    transparent 38%
+                ),
+                #07111f;
+            color: #ffffff;
+        }
+
+        .services-page {
+            min-height: 100vh;
+            padding: 24px 18px 40px;
+        }
+
+        .services-container {
+            width: min(1080px, 100%);
+            margin: 0 auto;
+        }
+
+        .services-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.78);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
+        }
+
+        .brand-small {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-small-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.12);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .brand-small-name {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+
+        .brand-small-name strong {
+            font-size: 13px;
+            letter-spacing: 2px;
+        }
+
+        .brand-small-name span {
+            margin-top: 3px;
+            font-size: 8px;
+            letter-spacing: 3px;
+            opacity: 0.65;
+        }
+
+        .services-hero {
+            padding: 30px 0 24px;
+        }
+
+        .services-eyebrow {
+            margin: 0 0 10px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.52);
+        }
+
+        .services-title {
+            margin: 0;
+            font-size: clamp(32px, 6vw, 48px);
+            line-height: 1.05;
+            letter-spacing: -1.5px;
+        }
+
+        .services-description {
+            max-width: 650px;
+            margin: 15px 0 0;
+            color: rgba(255,255,255,0.64);
+            font-size: 15px;
+            line-height: 1.65;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .service-card {
+            position: relative;
+            min-height: 150px;
+            padding: 22px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #ffffff;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.105),
+                    rgba(255,255,255,0.045)
+                );
+
+            border: 1px solid rgba(255,255,255,0.09);
+
+            box-shadow:
+                0 16px 35px rgba(0,0,0,0.18);
+
+            transition:
+                transform 0.18s ease,
+                border-color 0.18s ease,
+                background 0.18s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.18);
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.13),
+                    rgba(255,255,255,0.055)
+                );
+        }
+
+        .service-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.09);
+            font-size: 19px;
+        }
+
+        .service-card h2 {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.25;
+        }
+
+        .service-card p {
+            margin: 8px 0 0;
+            color: rgba(255,255,255,0.53);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .service-arrow {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            color: rgba(255,255,255,0.35);
+            font-size: 18px;
+        }
+
+        .services-footer {
+            margin-top: 28px;
+            padding: 18px 0 0;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.38);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 760px) {
+
+            .services-page {
+                padding: 18px 14px 32px;
+            }
+
+            .services-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .service-card {
+                min-height: 145px;
+                padding: 18px;
+                border-radius: 17px;
+            }
+
+            .service-card h2 {
+                font-size: 15px;
+            }
+
+        }
+
+        @media (max-width: 470px) {
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-card {
+                min-height: 130px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<main class="services-page">
+
+    <div class="services-container">
+
+        <div class="services-topbar">
+
+            <a
+                href="/airtime"
+                class="back-link"
+            >
+                ← Dashboard
+            </a>
+
+            <div class="brand-small">
+
+                <div class="brand-small-mark">
+                    F
+                </div>
+
+                <div class="brand-small-name">
+                    <strong>FAIRMONT</strong>
+                    <span>BANK</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <section class="services-hero">
+
+            <p class="services-eyebrow">
+                Fairmont Bank
+            </p>
+
+            <h1 class="services-title">
+                Services
+            </h1>
+
+            <p class="services-description">
+                Manage your everyday banking, payments, statements,
+                travel and lifestyle services from one secure place.
+            </p>
+
+        </section>
+
+
+        <section class="services-grid">
+
+
+            <a
+                href="{{ url_for('transactions') }}"
+                class="service-card"
+            >
+
+                <div class="service-icon">
+                    ≡
+                </div>
+
+                <h2>
+                    Transaction History
+                </h2>
+
+                <p>
+                    View and review your recent account activity.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="/pay-bills"
+                class="service-card"
+            >
+
+                <div class="service-icon">
+                    £
+                </div>
+
+                <h2>
+                    Pay Bills
+                </h2>
+
+                <p>
+                    Manage household and regular bill payments.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="/electric-bills"
+                class="service-card"
+                data-service="bank-statements"
+            >
+
+                <div class="service-icon">
+                    ▣
+                </div>
+
+                <h2>
+                    Bank Statements
+                </h2>
+
+                <p>
+                    Access account statements and financial records.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="/airtime
+                class="service-card"
+                data-service="travel"
+            >
+
+                <div class="service-icon">
+                    ✈
+                </div>
+
+                <h2>
+                    Flights & Travel
+                </h2>
+
+                <p>
+                    Explore travel-related banking services and payments.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="#"
+                class="service-card"
+                data-service="lifestyle"
+            >
+
+                <div class="service-icon">
+                    ◆
+                </div>
+
+                <h2>
+                    Lifestyle
+                </h2>
+
+                <p>
+                    Discover lifestyle services and everyday experiences.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="#"
+                class="service-card"
+                data-service="tv"
+            >
+
+                <div class="service-icon">
+                    TV
+                </div>
+
+                <h2>
+                    TV Subscriptions
+                </h2>
+
+                <p>
+                    Manage eligible television subscription payments.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="#"
+                class="service-card"
+                data-service="data"
+            >
+
+                <div class="service-icon">
+                    ◇
+                </div>
+
+                <h2>
+                    Data Bundles
+                </h2>
+
+                <p>
+                    Purchase mobile data bundles when supported.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('airtime') }}"
+                class="service-card"
+            >
+
+                <div class="service-icon">
+                    ☎
+                </div>
+
+                <h2>
+                    Airtime
+                </h2>
+
+                <p>
+                    Purchase airtime for supported mobile networks.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('send_money') }}"
+                class="service-card"
+            >
+
+                <div class="service-icon">
+                    ↑
+                </div>
+
+                <h2>
+                    Send Money
+                </h2>
+
+                <p>
+                    Make a domestic bank payment.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('international_transfer') }}"
+                class="service-card"
+            >
+
+                <div class="service-icon">
+                    ⇄
+                </div>
+
+                <h2>
+                    International Transfer
+                </h2>
+
+                <p>
+                    Initiate an international transfer.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="#"
+                class="service-card"
+                data-service="electricity"
+            >
+
+                <div class="service-icon">
+                    ⚡
+                </div>
+
+                <h2>
+                    Electric Bills
+                </h2>
+
+                <p>
+                    Manage electricity bill payments.
+                </p>
+
+                <span class="service-arrow">
+                    →
+                </span>
+
+            </a>
+
+
+        </section>
+
+
+        <div class="services-footer">
+            Fairmont Bank services are provided through the available
+            banking features of this application. Payment availability
+            depends on the service and account status.
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

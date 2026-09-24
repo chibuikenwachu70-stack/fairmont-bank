@@ -1,0 +1,513 @@
+
+/* =========================================================
+   FAIRMONT BANK
+   CUSTOMER LOGIN - FULL SCREEN MOBILE STYLE LAYOUT
+   ========================================================= */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #061225;
+}
+
+.login-page {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    overflow-x: hidden;
+
+    color: #ffffff;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 50% 15%,
+            rgba(60, 130, 230, 0.30),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 15% 80%,
+            rgba(20, 80, 160, 0.20),
+            transparent 35%
+        ),
+        linear-gradient(
+            180deg,
+            #071a36 0%,
+            #08234a 45%,
+            #041225 100%
+        );
+}
+
+.login-page *,
+.login-page *::before,
+.login-page *::after {
+    box-sizing: border-box;
+}
+
+/* Subtle background glow */
+
+.login-page::before {
+    content: "";
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+
+    top: -260px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: rgba(66, 153, 225, 0.13);
+    filter: blur(10px);
+
+    pointer-events: none;
+}
+
+.login-page::after {
+    content: "";
+    position: absolute;
+    width: 700px;
+    height: 260px;
+    border-radius: 50%;
+
+    bottom: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: rgba(18, 74, 140, 0.20);
+    filter: blur(35px);
+
+    pointer-events: none;
+}
+
+/* =========================================================
+   MAIN SHELL
+   ========================================================= */
+
+.login-shell {
+    width: 100%;
+    max-width: 620px;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    margin: 0;
+    padding: 34px 28px 26px;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    position: relative;
+    z-index: 5;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================================
+   TOP BRANDING
+   ========================================================= */
+
+.login-shell > :first-child {
+    width: 100%;
+    min-height: 190px;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center;
+
+    position: relative;
+
+    border: 0 !important;
+}
+
+.login-shell > :first-child::after {
+    display: none !important;
+}
+
+/* Fairmont F mark */
+
+.login-page .logo,
+.login-page .brand-logo,
+.login-page .login-logo,
+.login-page .logo-mark {
+    width: 72px !important;
+    height: 72px !important;
+
+    margin: 0 auto 17px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 22px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #dcecff
+        ) !important;
+
+    color: #0b2a55 !important;
+
+    font-size: 34px !important;
+    font-weight: 850 !important;
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.28),
+        0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* Brand name */
+
+.login-page .brand-name,
+.login-page .bank-name,
+.login-page .brand-title {
+    color: #ffffff !important;
+
+    font-size: 28px !important;
+    line-height: 1.08 !important;
+
+    font-weight: 800 !important;
+
+    letter-spacing: 0.08em !important;
+
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   CONTENT AREA
+   ========================================================= */
+
+.login-shell > :last-child {
+    width: 100%;
+    max-width: 470px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: stretch;
+
+    text-align: left;
+
+    margin: 0 auto;
+
+    background: rgba(5, 19, 39, 0.56);
+
+    border: 1px solid rgba(255, 255, 255, 0.11);
+
+    border-radius: 26px;
+
+    padding: 30px 28px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+.login-page h1,
+.login-page h2,
+.login-page h3 {
+    color: #ffffff !important;
+}
+
+.login-page h1 {
+    font-size: 38px !important;
+    line-height: 1.05 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.035em !important;
+}
+
+.login-page h2 {
+    font-size: 27px !important;
+    line-height: 1.1 !important;
+    font-weight: 800 !important;
+}
+
+.login-page p {
+    color: #a9bfdc;
+    line-height: 1.55;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.login-page form {
+    width: 100%;
+}
+
+.login-page label {
+    display: block;
+
+    margin: 0 0 8px;
+
+    color: #dcecff;
+
+    font-size: 13px;
+
+    font-weight: 650;
+}
+
+.login-page input,
+.login-page select,
+.login-page textarea {
+    width: 100%;
+
+    min-height: 53px;
+
+    padding: 14px 15px;
+
+    border: 1px solid rgba(148, 190, 235, 0.22);
+
+    border-radius: 14px;
+
+    outline: none;
+
+    background: rgba(3, 13, 29, 0.72);
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 15px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.login-page input::placeholder {
+    color: #718baa;
+}
+
+.login-page input:focus,
+.login-page select:focus,
+.login-page textarea:focus {
+    border-color: rgba(96, 165, 250, 0.85);
+
+    background: rgba(3, 13, 29, 0.90);
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.13),
+        0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+.login-page button,
+.login-page input[type="submit"] {
+    width: 100%;
+
+    min-height: 55px;
+
+    margin-top: 8px;
+
+    border: 0;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2672e8 0%,
+            #1689d8 100%
+        );
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 14px 30px rgba(25, 103, 211, 0.28);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease;
+}
+
+.login-page button:hover,
+.login-page input[type="submit"]:hover {
+    transform: translateY(-2px);
+
+    filter: brightness(1.05);
+
+    box-shadow:
+        0 18px 38px rgba(25, 103, 211, 0.36);
+}
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+
+.login-page input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    min-height: 16px !important;
+
+    margin: 0 !important;
+
+    accent-color: #3985ef;
+}
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+.login-page a {
+    color: #86bfff;
+
+    text-decoration: none;
+
+    transition: color 0.18s ease;
+}
+
+.login-page a:hover {
+    color: #c5e2ff;
+}
+
+/* =========================================================
+   SECURITY / FOOTER
+   ========================================================= */
+
+.login-page .security,
+.login-page .secure,
+.login-page .security-notice {
+    color: #7794b8;
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .login-shell {
+        min-height: 100dvh;
+
+        padding:
+            22px
+            16px
+            18px;
+    }
+
+    .login-shell > :first-child {
+        min-height: 165px;
+    }
+
+    .login-shell > :last-child {
+        max-width: 100%;
+
+        padding:
+            25px
+            20px;
+
+        border-radius: 22px;
+    }
+
+    .login-page .logo,
+    .login-page .brand-logo,
+    .login-page .login-logo,
+    .login-page .logo-mark {
+        width: 62px !important;
+        height: 62px !important;
+
+        font-size: 29px !important;
+
+        border-radius: 19px !important;
+    }
+
+    .login-page .brand-name,
+    .login-page .bank-name,
+    .login-page .brand-title {
+        font-size: 24px !important;
+    }
+
+    .login-page h1 {
+        font-size: 32px !important;
+    }
+
+    .login-page h2 {
+        font-size: 25px !important;
+    }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 390px) {
+
+    .login-shell {
+        padding:
+            16px
+            12px
+            14px;
+    }
+
+    .login-shell > :first-child {
+        min-height: 145px;
+    }
+
+    .login-shell > :last-child {
+        padding:
+            22px
+            17px;
+    }
+
+    .login-page h1 {
+        font-size: 29px !important;
+    }
+}

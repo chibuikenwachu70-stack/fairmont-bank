@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PayPal Withdrawal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            background: #071a33;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(52, 105, 170, 0.30), transparent 38%),
+                linear-gradient(145deg, #06172e, #0b2749 55%, #071a33);
+            color: white;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 720px;
+            margin: auto;
+            padding: 22px 16px 50px;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .card {
+            padding: 28px;
+            border-radius: 24px;
+            background: rgba(20, 55, 92, 0.78);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+            backdrop-filter: blur(18px);
+        }
+
+        .paypal-icon {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 18px;
+            border-radius: 20px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0070ba;
+            font-size: 38px;
+            font-weight: 900;
+            font-style: italic;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 29px;
+        }
+
+        .subtitle {
+            margin: 0 0 25px;
+            color: rgba(255,255,255,0.68);
+            line-height: 1.5;
+        }
+
+        .balance {
+            padding: 17px;
+            margin-bottom: 24px;
+            border-radius: 15px;
+            background: rgba(0,0,0,0.16);
+        }
+
+        .balance-label {
+            color: rgba(255,255,255,0.62);
+            font-size: 13px;
+        }
+
+        .balance-amount {
+            margin-top: 5px;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 13px;
+            outline: none;
+            background: rgba(255,255,255,0.07);
+            color: white;
+            font-size: 15px;
+        }
+
+        input::placeholder {
+            color: rgba(255,255,255,0.38);
+        }
+
+        input:focus {
+            border-color: rgba(100,180,255,0.65);
+            background: rgba(255,255,255,0.09);
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.65);
+            font-weight: 700;
+        }
+
+        .currency-input input {
+            padding-left: 35px;
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 5px;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            background: #0878c9;
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .submit-button:hover {
+            background: #096eb5;
+            transform: translateY(-1px);
+        }
+
+        .cancel-button {
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 14px;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .notice {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.055);
+            color: rgba(255,255,255,0.55);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .flash {
+            padding: 13px 15px;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            background: rgba(255, 80, 80, 0.13);
+            border: 1px solid rgba(255, 100, 100, 0.25);
+            color: #ffd6d6;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 21px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <a href="{{ url_for('withdraw') }}" class="back">
+        ← Back to Withdrawal Methods
+    </a>
+
+    <div class="card">
+
+        <div class="paypal-icon">
+            P
+        </div>
+
+        <h1>Withdraw to PayPal</h1>
+
+        <p class="subtitle">
+            Enter your PayPal account details and the amount you would like
+            to request for withdrawal.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="balance">
+
+            <div class="balance-label">
+                Available Balance
+            </div>
+
+            <div class="balance-amount">
+                £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+            </div>
+
+        </div>
+
+        <form method="POST">
+
+            <div class="form-group">
+
+                <label for="paypal_email">
+                    PayPal Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="paypal_email"
+                    name="paypal_email"
+                    placeholder="you@example.com"
+                    required
+                    autocomplete="email"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Withdrawal Amount
+                </label>
+
+                <div class="currency-input">
+
+                    <span class="currency-symbol">
+                        £
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        placeholder="0.00"
+                        min="0.01"
+                        step="0.01"
+                        max="{{ customer.account_balance or 0 }}"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit-button">
+
+                Submit Withdrawal Request
+
+            </button>
+
+        </form>
+
+        <a
+            href="{{ url_for('withdraw') }}"
+            class="cancel-button">
+
+            Cancel
+
+        </a>
+
+        <div class="notice">
+            Your withdrawal request will be reviewed before processing.
+            Your account balance will not be changed merely by opening
+            or submitting this form.
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Transfer | Fairmont Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transfer.css') }}">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="fairmont-clean-dropdown-style">
+
+.fairmont-real-select {
+    display: none !important;
+}
+
+.fairmont-clean-field {
+    width: 100%;
+    position: relative;
+}
+
+.fairmont-clean-trigger {
+    width: 100%;
+    min-height: 52px;
+    box-sizing: border-box;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.055);
+    color: rgba(255,255,255,0.72);
+    padding: 0 46px 0 16px;
+    font-size: 15px;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+}
+
+.fairmont-clean-trigger::after {
+    content: "▾";
+    position: absolute;
+    right: 17px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+}
+
+.fairmont-clean-trigger.selected {
+    color: #ffffff;
+}
+
+.fairmont-clean-popup {
+    position: fixed;
+    z-index: 999999;
+    width: min(430px, calc(100vw - 28px));
+    background: #111b30;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+    overflow: hidden;
+    display: none;
+}
+
+.fairmont-clean-popup.open {
+    display: block;
+}
+
+.fairmont-clean-search {
+    width: calc(100% - 24px);
+    height: 44px;
+    margin: 12px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 11px;
+    background: rgba(255,255,255,0.07);
+    color: #ffffff;
+    padding: 0 13px;
+    outline: none;
+    font-size: 15px;
+}
+
+.fairmont-clean-search::placeholder {
+    color: rgba(255,255,255,0.45);
+}
+
+.fairmont-clean-list {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.fairmont-clean-option {
+    padding: 13px 16px;
+    color: #ffffff;
+    border-top: 1px solid rgba(255,255,255,0.055);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.fairmont-clean-option:hover {
+    background: rgba(255,255,255,0.09);
+}
+
+.fairmont-clean-empty {
+    padding: 20px 16px;
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+}
+
+</style>
+
+
+
+
+
+<style id="fairmont-clean-picker-css">
+
+/* ==========================================================
+   FAIRMONT CLEAN SEARCH DROPDOWNS
+   ========================================================== */
+
+.fairmont-clean-picker-select {
+    position: relative;
+}
+
+.fairmont-clean-real-select {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    min-width: 1px !important;
+    min-height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+}
+
+.fairmont-clean-trigger {
+    width: 100%;
+    min-height: 50px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    background: rgba(255,255,255,.055);
+    color: #ffffff;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+
+.fairmont-clean-trigger:hover {
+    border-color: rgba(255,255,255,.25);
+}
+
+.fairmont-clean-trigger:focus {
+    outline: none;
+    border-color: rgba(255,255,255,.38);
+}
+
+.fairmont-clean-trigger-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fairmont-clean-trigger-arrow {
+    flex: 0 0 auto;
+    opacity: .7;
+    font-size: 13px;
+}
+
+.fairmont-clean-popup {
+    position: fixed;
+    z-index: 999999;
+    width: min(420px, calc(100vw - 28px));
+    background: #111b30;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 16px;
+    box-shadow: 0 22px 70px rgba(0,0,0,.60);
+    overflow: hidden;
+}
+
+.fairmont-clean-search {
+    display: block;
+    width: calc(100% - 24px);
+    height: 44px;
+    margin: 12px;
+    padding: 0 13px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 11px;
+    background: rgba(255,255,255,.07);
+    color: #ffffff;
+    outline: none;
+    font-size: 14px;
+}
+
+.fairmont-clean-search::placeholder {
+    color: rgba(255,255,255,.50);
+}
+
+.fairmont-clean-options {
+    max-height: min(360px, 48vh);
+    overflow-y: auto;
+    padding: 6px;
+}
+
+.fairmont-clean-option {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    padding: 12px 13px;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.fairmont-clean-option:hover {
+    background: rgba(255,255,255,.09);
+}
+
+.fairmont-clean-option.selected {
+    background: rgba(255,255,255,.13);
+}
+
+.fairmont-clean-empty {
+    padding: 20px;
+    color: rgba(255,255,255,.50);
+    text-align: center;
+    font-size: 14px;
+}
+
+</style>
+
+
+<style id="fairmont-final-select-visibility">
+/*
+ * The real selects remain in the form so Flask receives
+ * the selected values, but they are not displayed.
+ */
+
+#internationalCountry,
+#internationalBank,
+#internationalCurrency {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    min-width: 1px !important;
+    min-height: 1px !important;
+    pointer-events: none !important;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="transfer-page">
+
+    <header class="transfer-header">
+        <a href="{{ url_for('dashboard') }}" class="back-button">‹</a>
+
+        <div>
+            <div class="eyebrow">GLOBAL PAYMENTS</div>
+            <h1>International Transfer</h1>
+        </div>
+    </header>
+
+
+    <section class="balance-card">
+
+        <span>AVAILABLE BALANCE</span>
+
+        <strong>
+            £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+        </strong>
+
+        <div class="account-reference">
+
+            <div>
+                <small>Account Number</small>
+                <b>{{ customer.account_number or "Not assigned" }}</b>
+            </div>
+
+            <div>
+                <small>Currency</small>
+                <b>GBP</b>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    {% if error %}
+    <div class="alert error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+
+    <section class="panel">
+
+        <div class="section-heading">
+
+            <span class="section-icon">◎</span>
+
+            <div>
+                <h2>Beneficiary details</h2>
+                <p>Enter the destination bank information.</p>
+            </div>
+
+        </div>
+
+
+        <form method="POST" action="{{ url_for('international_transfer') }}">
+
+            
+<div class="field fairmont-final-field">
+
+    <label>Destination Country</label>
+
+    <select
+        id="internationalCountry"
+        name="country"
+        class="fairmont-final-real-select"
+        required
+    >
+        <option value="">Select country</option>
+    </select>
+
+    
+
+</div>
+
+
+<div class="field">
+
+                <label>Beneficiary Name</label>
+
+                <input
+                    type="text"
+                    name="recipient_name"
+                    placeholder="Full legal name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Beneficiary Address <span>Optional</span></label>
+
+                <textarea
+                    name="recipient_address"
+                    rows="3"
+                    placeholder="Street, city, postal code and country"
+                ></textarea>
+
+            </div>
+
+
+            
+<div class="field fairmont-final-field">
+
+    <label>Bank Name</label>
+
+    <select
+        id="internationalBank"
+        name="bank_name"
+        class="fairmont-final-real-select"
+        required
+    >
+        <option value="">Select a bank</option>
+    </select>
+
+    
+
+</div>
+
+
+<div class="field">
+
+                <label>Account Number</label>
+
+                <input
+                    type="text"
+                    name="account_number"
+                    placeholder="Local bank account number"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>IBAN <span>Where applicable</span></label>
+
+                <input
+                    type="text"
+                    name="iban"
+                    placeholder="International Bank Account Number"
+                >
+
+            </div>
+
+
+            <div class="field-row">
+
+                <div class="field">
+
+                    <label>SWIFT / BIC</label>
+
+                    <input
+                        type="text"
+                        name="bic"
+                        maxlength="11"
+                        placeholder="AAAA BB CC 123"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Local Bank Code <span>Optional</span></label>
+
+                    <input
+                        type="text"
+                        name="local_bank_code"
+                        placeholder="Routing / clearing code"
+                    >
+
+                </div>
+
+            </div>
+
+
+            
+<div class="field fairmont-final-field">
+
+    <label>Currency</label>
+
+    <select
+        id="internationalCurrency"
+        name="currency"
+        class="fairmont-final-real-select"
+        required
+    >
+        <option value="">Select currency</option>
+        <option value="GBP">GBP — Pound Sterling</option>
+        <option value="EUR">EUR — Euro</option>
+        <option value="USD">USD — US Dollar</option>
+        <option value="CAD">CAD — Canadian Dollar</option>
+        <option value="AUD">AUD — Australian Dollar</option>
+        <option value="NZD">NZD — New Zealand Dollar</option>
+        <option value="CHF">CHF — Swiss Franc</option>
+        <option value="JPY">JPY — Japanese Yen</option>
+        <option value="CNY">CNY — Chinese Yuan</option>
+        <option value="HKD">HKD — Hong Kong Dollar</option>
+        <option value="SGD">SGD — Singapore Dollar</option>
+        <option value="INR">INR — Indian Rupee</option>
+        <option value="AED">AED — UAE Dirham</option>
+        <option value="SAR">SAR — Saudi Riyal</option>
+        <option value="QAR">QAR — Qatari Riyal</option>
+        <option value="ZAR">ZAR — South African Rand</option>
+        <option value="KES">KES — Kenyan Shilling</option>
+        <option value="NGN">NGN — Nigerian Naira</option>
+        <option value="GHS">GHS — Ghanaian Cedi</option>
+        <option value="TZS">TZS — Tanzanian Shilling</option>
+        <option value="UGX">UGX — Ugandan Shilling</option>
+        <option value="RWF">RWF — Rwandan Franc</option>
+        <option value="BRL">BRL — Brazilian Real</option>
+        <option value="MXN">MXN — Mexican Peso</option>
+        <option value="ARS">ARS — Argentine Peso</option>
+        <option value="SRD">SRD — Surinamese Dollar</option>
+        <option value="THB">THB — Thai Baht</option>
+        <option value="MYR">MYR — Malaysian Ringgit</option>
+        <option value="IDR">IDR — Indonesian Rupiah</option>
+        <option value="KRW">KRW — South Korean Won</option>
+        <option value="TRY">TRY — Turkish Lira</option>
+        <option value="PLN">PLN — Polish Zloty</option>
+        <option value="SEK">SEK — Swedish Krona</option>
+        <option value="NOK">NOK — Norwegian Krone</option>
+        <option value="DKK">DKK — Danish Krone</option>
+        <option value="CZK">CZK — Czech Koruna</option>
+        <option value="HUF">HUF — Hungarian Forint</option>
+        <option value="RON">RON — Romanian Leu</option>
+        <option value="ILS">ILS — Israeli New Shekel</option>
+    </select>
+
+    
+
+</div>
+
+
+<div class="field">
+
+                <label>Amount</label>
+
+                <div class="money-input">
+
+                    <span>¤</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Payment Reference <span>Optional</span></label>
+
+                <input
+                    type="text"
+                    name="payment_reference"
+                    maxlength="255"
+                    placeholder="Reason or reference"
+                >
+
+            </div>
+
+
+            <div class="notice international-notice">
+
+                <strong>International payment information</strong>
+
+                <p>
+                    International payments require accurate beneficiary and
+                    bank information. The local Fairmont prototype records
+                    external transfer requests; it does not claim that funds
+                    have been delivered through an external payment network.
+                </p>
+
+            </div>
+
+
+            <button type="submit" class="primary-button">
+                Continue
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <a href="{{ url_for('transactions') }}" class="secondary-button">
+        View Transaction History
+    </a>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="fairmont-clean-dropdown-script">
+
+(function () {
+
+    "use strict";
+
+    var DATA = {"countries": ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"], "banks": {"United Kingdom": ["Allied Irish Bank (GB)", "Bank of Ireland UK", "Bank of Scotland", "Barclays Bank", "Birmingham Bank", "Card One Money", "Cashplus Bank", "Chase UK", "Citibank UK", "ClearBank", "C. Hoare & Co.", "Co-operative Bank", "Coutts", "Danske Bank", "First Direct", "Halifax", "Handelsbanken UK", "HSBC UK", "Investec Bank", "Lloyds Bank", "Metro Bank", "Monzo Bank", "Nationwide Building Society", "NatWest", "Revolut", "Royal Bank of Scotland", "Santander UK", "Skipton Building Society", "Starling Bank", "TSB Bank", "Ulster Bank", "Virgin Money", "Yorkshire Building Society", "Zopa Bank", "Other UK Bank or Building Society"], "Suriname": ["De Surinaamsche Bank (DSB)", "Republic Bank Suriname", "Hakrinbank", "Surinaamse Volkscredietbank", "Finabank", "Surichange Bank", "GODO", "Trustbank Amanah", "Postspaarbank", "Other Surinamese Bank"], "United States": ["Bank of America", "JPMorgan Chase Bank", "Wells Fargo Bank", "Citibank", "U.S. Bank", "PNC Bank", "Truist Bank", "Capital One", "TD Bank", "Other US Bank"], "Canada": ["Royal Bank of Canada", "Toronto-Dominion Bank", "Bank of Montreal", "Bank of Nova Scotia", "Canadian Imperial Bank of Commerce", "National Bank of Canada", "Desjardins", "Other Canadian Bank"], "Australia": ["Commonwealth Bank", "Westpac", "ANZ", "National Australia Bank", "Macquarie Bank", "Bank of Queensland", "Bendigo Bank", "Other Australian Bank"], "Germany": ["Deutsche Bank", "Commerzbank", "DZ Bank", "ING Germany", "N26", "Sparkasse", "Volksbank", "Other German Bank"], "France": ["BNP Paribas", "Crédit Agricole", "Société Générale", "BPCE", "Crédit Mutuel", "La Banque Postale", "Other French Bank"], "Ireland": ["AIB", "Bank of Ireland", "Permanent TSB", "Revolut Bank Ireland", "Other Irish Bank"], "Netherlands": ["ING Bank", "ABN AMRO", "Rabobank", "de Volksbank", "Other Dutch Bank"], "Switzerland": ["UBS", "Credit Suisse", "Zürcher Kantonalbank", "Raiffeisen Switzerland", "Julius Baer", "Other Swiss Bank"], "India": ["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank", "Punjab National Bank", "Bank of Baroda", "Canara Bank", "Other Indian Bank"], "China": ["Industrial and Commercial Bank of China", "China Construction Bank", "Agricultural Bank of China", "Bank of China", "Bank of Communications", "China Merchants Bank", "Other Chinese Bank"], "Japan": ["MUFG Bank", "SMBC Bank", "Mizuho Bank", "Resona Bank", "Japan Post Bank", "Other Japanese Bank"], "Singapore": ["DBS Bank", "OCBC Bank", "United Overseas Bank", "Standard Chartered Singapore", "Citibank Singapore", "Other Singaporean Bank"], "South Africa": ["Standard Bank", "First National Bank", "Absa Bank", "Nedbank", "Capitec Bank", "Investec Bank", "Other South African Bank"], "Kenya": ["KCB Bank Kenya", "Equity Bank Kenya", "Co-operative Bank of Kenya", "Absa Bank Kenya", "Standard Chartered Bank Kenya", "NCBA Bank Kenya", "I&M Bank", "Stanbic Bank Kenya", "DTB Kenya", "Family Bank", "Other Kenyan Bank"], "Nigeria": ["Access Bank", "First Bank of Nigeria", "Guaranty Trust Bank", "United Bank for Africa", "Zenith Bank", "Fidelity Bank", "Stanbic IBTC Bank", "Ecobank Nigeria", "Other Nigerian Bank"], "Ghana": ["GCB Bank", "Ecobank Ghana", "Absa Bank Ghana", "Stanbic Bank Ghana", "Standard Chartered Bank Ghana", "Fidelity Bank Ghana", "CalBank", "Other Ghanaian Bank"], "United Arab Emirates": ["Emirates NBD", "First Abu Dhabi Bank", "Abu Dhabi Commercial Bank", "Dubai Islamic Bank", "Mashreq Bank", "RAKBANK", "Other UAE Bank"], "Saudi Arabia": ["Saudi National Bank", "Al Rajhi Bank", "Riyad Bank", "Saudi Awwal Bank", "Bank Albilad", "Bank AlJazira", "Other Saudi Bank"], "Qatar": ["Qatar National Bank", "Qatar Islamic Bank", "Commercial Bank of Qatar", "Doha Bank", "Masraf Al Rayan", "Other Qatari Bank"], "Brazil": ["Banco do Brasil", "Itaú Unibanco", "Bradesco", "Caixa Econômica Federal", "Santander Brasil", "BTG Pactual", "Other Brazilian Bank"], "Mexico": ["BBVA México", "Banorte", "Santander México", "Citibanamex", "HSBC México", "Scotiabank México", "Other Mexican Bank"]}, "currencies": [["GBP", "GBP — Pound Sterling"], ["EUR", "EUR — Euro"], ["USD", "USD — US Dollar"], ["CAD", "CAD — Canadian Dollar"], ["AUD", "AUD — Australian Dollar"], ["NZD", "NZD — New Zealand Dollar"], ["CHF", "CHF — Swiss Franc"], ["JPY", "JPY — Japanese Yen"], ["CNY", "CNY — Chinese Yuan"], ["HKD", "HKD — Hong Kong Dollar"], ["SGD", "SGD — Singapore Dollar"], ["INR", "INR — Indian Rupee"], ["AED", "AED — UAE Dirham"], ["SAR", "SAR — Saudi Riyal"], ["QAR", "QAR — Qatari Riyal"], ["ZAR", "ZAR — South African Rand"], ["KES", "KES — Kenyan Shilling"], ["NGN", "NGN — Nigerian Naira"], ["GHS", "GHS — Ghanaian Cedi"], ["TZS", "TZS — Tanzanian Shilling"], ["UGX", "UGX — Ugandan Shilling"], ["RWF", "RWF — Rwandan Franc"], ["BRL", "BRL — Brazilian Real"], ["MXN", "MXN — Mexican Peso"], ["ARS", "ARS — Argentine Peso"], ["SRD", "SRD — Surinamese Dollar"], ["THB", "THB — Thai Baht"], ["MYR", "MYR — Malaysian Ringgit"], ["IDR", "IDR — Indonesian Rupiah"], ["KRW", "KRW — South Korean Won"], ["TRY", "TRY — Turkish Lira"], ["PLN", "PLN — Polish Zloty"], ["SEK", "SEK — Swedish Krona"], ["NOK", "NOK — Norwegian Krone"], ["DKK", "DKK — Danish Krone"], ["CZK", "CZK — Czech Koruna"], ["HUF", "HUF — Hungarian Forint"], ["RON", "RON — Romanian Leu"], ["ILS", "ILS — Israeli New Shekel"]]};
+    var currentPopup = null;
+
+    function closePopup() {
+
+        if (currentPopup) {
+            currentPopup.remove();
+            currentPopup = null;
+        }
+    }
+
+
+    function positionPopup(button, popup) {
+
+        var rect = button.getBoundingClientRect();
+
+        var width = Math.min(
+            430,
+            window.innerWidth - 28
+        );
+
+        popup.style.width = width + "px";
+
+        var left = rect.left;
+
+        if (left + width > window.innerWidth - 14) {
+            left = window.innerWidth - width - 14;
+        }
+
+        if (left < 14) {
+            left = 14;
+        }
+
+        popup.style.left = left + "px";
+
+        var top = rect.bottom + 8;
+
+        var popupHeight = Math.min(
+            480,
+            window.innerHeight - 28
+        );
+
+        if (top + popupHeight > window.innerHeight - 14) {
+            top = rect.top - popupHeight - 8;
+        }
+
+        if (top < 14) {
+            top = 14;
+        }
+
+        popup.style.top = top + "px";
+    }
+
+
+    function getOptions(type, select) {
+
+        if (type === "country") {
+            return DATA.countries.map(function (value) {
+                return {
+                    value: value,
+                    label: value
+                };
+            });
+        }
+
+
+        if (type === "currency") {
+            return DATA.currencies.map(function (item) {
+                return {
+                    value: item[0],
+                    label: item[1]
+                };
+            });
+        }
+
+
+        if (type === "bank") {
+
+            var country =
+                document.getElementById(
+                    "internationalCountry"
+                ).value;
+
+            if (!country) {
+                return [];
+            }
+
+            var list = DATA.banks[country];
+
+            if (!list) {
+                list = [
+                    "Other bank or financial institution in " +
+                    country
+                ];
+            }
+
+            return list.map(function (value) {
+                return {
+                    value: value,
+                    label: value
+                };
+            });
+        }
+
+        return [];
+    }
+
+
+    function syncSelectOptions(select, options) {
+
+        var oldValue = select.value;
+
+        select.innerHTML = "";
+
+        var placeholder =
+            select.id === "internationalCountry"
+                ? "Select country"
+                : select.id === "internationalBank"
+                    ? "Select a bank"
+                    : "Select currency";
+
+        var first = document.createElement("option");
+
+        first.value = "";
+        first.textContent = placeholder;
+
+        select.appendChild(first);
+
+        options.forEach(function (item) {
+
+            var option =
+                document.createElement("option");
+
+            option.value = item.value;
+            option.textContent = item.label;
+
+            select.appendChild(option);
+        });
+
+        if (oldValue) {
+            select.value = oldValue;
+        }
+    }
+
+
+    function createPicker(type, selectId, placeholder, searchPlaceholder) {
+
+        var select =
+            document.getElementById(selectId);
+
+        if (!select) {
+            return;
+        }
+
+
+        var wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "fairmont-clean-field";
+
+
+        select.parentNode.insertBefore(
+            wrapper,
+            select
+        );
+
+        wrapper.appendChild(select);
+
+
+        var button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "fairmont-clean-trigger";
+
+
+        function updateButton() {
+
+            if (!select.value) {
+
+                button.textContent =
+                    placeholder;
+
+                button.classList.remove(
+                    "selected"
+                );
+
+                return;
+            }
+
+            var selected =
+                select.options[
+                    select.selectedIndex
+                ];
+
+            button.textContent =
+                selected.textContent;
+
+            button.classList.add(
+                "selected"
+            );
+        }
+
+
+        updateButton();
+
+
+        button.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                closePopup();
+
+
+                var popup =
+                    document.createElement("div");
+
+                popup.className =
+                    "fairmont-clean-popup open";
+
+
+                var search =
+                    document.createElement("input");
+
+                search.type = "search";
+
+                search.className =
+                    "fairmont-clean-search";
+
+                search.placeholder =
+                    searchPlaceholder;
+
+                search.autocomplete =
+                    "off";
+
+
+                var list =
+                    document.createElement("div");
+
+                list.className =
+                    "fairmont-clean-list";
+
+
+                popup.appendChild(search);
+                popup.appendChild(list);
+
+                document.body.appendChild(
+                    popup
+                );
+
+
+                function render() {
+
+                    list.innerHTML = "";
+
+                    var options =
+                        getOptions(
+                            type,
+                            select
+                        );
+
+                    var term =
+                        search.value
+                            .trim()
+                            .toLowerCase();
+
+
+                    options =
+                        options.filter(
+                            function (item) {
+
+                                return (
+                                    item.label
+                                        .toLowerCase()
+                                        .indexOf(
+                                            term
+                                        ) !== -1
+                                );
+                            }
+                        );
+
+
+                    if (!options.length) {
+
+                        var empty =
+                            document.createElement(
+                                "div"
+                            );
+
+                        empty.className =
+                            "fairmont-clean-empty";
+
+                        if (
+                            type === "bank" &&
+                            !document.getElementById(
+                                "internationalCountry"
+                            ).value
+                        ) {
+                            empty.textContent =
+                                "Select a country first.";
+                        } else {
+                            empty.textContent =
+                                "No matches found.";
+                        }
+
+                        list.appendChild(empty);
+
+                        return;
+                    }
+
+
+                    options.forEach(
+                        function (item) {
+
+                            var row =
+                                document.createElement(
+                                    "div"
+                                );
+
+                            row.className =
+                                "fairmont-clean-option";
+
+                            row.textContent =
+                                item.label;
+
+
+                            row.addEventListener(
+                                "click",
+                                function () {
+
+                                    select.value =
+                                        item.value;
+
+                                    select.dispatchEvent(
+                                        new Event(
+                                            "change",
+                                            {
+                                                bubbles: true
+                                            }
+                                        )
+                                    );
+
+                                    updateButton();
+
+                                    closePopup();
+                                }
+                            );
+
+                            list.appendChild(row);
+                        }
+                    );
+                }
+
+
+                search.addEventListener(
+                    "input",
+                    render
+                );
+
+
+                positionPopup(
+                    button,
+                    popup
+                );
+
+
+                render();
+
+
+                currentPopup =
+                    popup;
+
+
+                setTimeout(
+                    function () {
+                        search.focus();
+                    },
+                    10
+                );
+            }
+        );
+
+
+        select.addEventListener(
+            "change",
+            updateButton
+        );
+
+
+        wrapper.appendChild(button);
+    }
+
+
+    function initialize() {
+
+        var country =
+            document.getElementById(
+                "internationalCountry"
+            );
+
+        var bank =
+            document.getElementById(
+                "internationalBank"
+            );
+
+        var currency =
+            document.getElementById(
+                "internationalCurrency"
+            );
+
+
+        if (
+            !country ||
+            !bank ||
+            !currency
+        ) {
+            console.error(
+                "Fairmont dropdown fields not found."
+            );
+
+            return;
+        }
+
+
+        /*
+         * Populate the hidden real selects.
+         */
+
+        syncSelectOptions(
+            country,
+            DATA.countries.map(
+                function (item) {
+                    return {
+                        value: item,
+                        label: item
+                    };
+                }
+            )
+        );
+
+
+        syncSelectOptions(
+            currency,
+            DATA.currencies.map(
+                function (item) {
+                    return {
+                        value: item[0],
+                        label: item[1]
+                    };
+                }
+            )
+        );
+
+
+        syncSelectOptions(
+            bank,
+            []
+        );
+
+
+        /*
+         * Create exactly ONE visible control
+         * for each field.
+         */
+
+        createPicker(
+            "country",
+            "internationalCountry",
+            "Select country",
+            "Search country..."
+        );
+
+
+        createPicker(
+            "bank",
+            "internationalBank",
+            "Select a bank",
+            "Search bank..."
+        );
+
+
+        createPicker(
+            "currency",
+            "internationalCurrency",
+            "Select currency",
+            "Search currency..."
+        );
+
+
+        /*
+         * Country controls the available banks.
+         */
+
+        country.addEventListener(
+            "change",
+            function () {
+
+                syncSelectOptions(
+                    bank,
+                    getOptions(
+                        "bank",
+                        bank
+                    )
+                );
+
+                bank.value = "";
+
+                bank.dispatchEvent(
+                    new Event(
+                        "change",
+                        {
+                            bubbles: true
+                        }
+                    )
+                );
+            }
+        );
+
+
+        /*
+         * Close when clicking outside.
+         */
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    currentPopup &&
+                    !currentPopup.contains(
+                        event.target
+                    ) &&
+                    !event.target.classList.contains(
+                        "fairmont-clean-trigger"
+                    )
+                ) {
+                    closePopup();
+                }
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+                    closePopup();
+                }
+            }
+        );
+
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                if (
+                    currentPopup
+                ) {
+
+                    var buttons =
+                        document.querySelectorAll(
+                            ".fairmont-clean-trigger"
+                        );
+
+                    buttons.forEach(
+                        function (button) {
+
+                            if (
+                                currentPopup
+                                    .previousElementSibling
+                            ) {
+                                positionPopup(
+                                    button,
+                                    currentPopup
+                                );
+                            }
+                        }
+                    );
+                }
+            }
+        );
+
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initialize
+        );
+
+    } else {
+
+        initialize();
+
+    }
+
+})();
+
+</script>
+
+
+
+
+
+<script id="fairmont-clean-picker-js">
+(function () {
+    "use strict";
+
+    const COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mauritius", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Republic of the Congo", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+
+    const BANKS = {"United Kingdom": ["Allied Irish Bank (GB)", "Bank of Ireland UK", "Bank of Scotland", "Barclays Bank", "Birmingham Bank", "Card One Money", "Cashplus Bank", "Chase UK", "Citibank UK", "ClearBank", "C. Hoare & Co.", "Co-operative Bank", "Coutts", "Danske Bank", "First Direct", "Halifax", "Handelsbanken UK", "HSBC UK", "Investec Bank", "Lloyds Bank", "Metro Bank", "Monzo Bank", "Nationwide Building Society", "NatWest", "Revolut", "Royal Bank of Scotland", "Santander UK", "Skipton Building Society", "Starling Bank", "TSB Bank", "Ulster Bank", "Virgin Money", "Yorkshire Building Society", "Zopa Bank", "Other UK Bank or Building Society"], "Suriname": ["De Surinaamsche Bank", "Republic Bank Suriname", "Hakrinbank", "Surinaamse Volkscredietbank", "Finabank", "Surichange Bank", "GODO", "Trustbank Amanah", "Postspaarbank", "Other Surinamese Bank"], "United States": ["Bank of America", "JPMorgan Chase Bank", "Wells Fargo Bank", "Citibank", "U.S. Bank", "PNC Bank", "Truist Bank", "Capital One", "Goldman Sachs Bank USA", "Other US Bank"], "Canada": ["Royal Bank of Canada", "Toronto-Dominion Bank", "Bank of Montreal", "Canadian Imperial Bank of Commerce", "Bank of Nova Scotia", "National Bank of Canada", "Desjardins", "Other Canadian Bank"], "Australia": ["Commonwealth Bank", "Westpac", "Australia and New Zealand Banking Group", "National Australia Bank", "Macquarie Bank", "Other Australian Bank"], "Germany": ["Deutsche Bank", "Commerzbank", "DZ Bank", "KfW", "ING Germany", "Other German Bank"], "France": ["BNP Paribas", "Crédit Agricole", "Société Générale", "BPCE", "Crédit Mutuel", "Other French Bank"], "Ireland": ["AIB", "Bank of Ireland", "Permanent TSB", "Revolut Bank", "Other Irish Bank"], "Netherlands": ["ING Bank", "ABN AMRO", "Rabobank", "de Volksbank", "Other Dutch Bank"], "Switzerland": ["UBS", "Julius Baer", "Zürcher Kantonalbank", "Banque Cantonale Vaudoise", "Other Swiss Bank"], "India": ["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank", "IndusInd Bank", "Other Indian Bank"], "China": ["Bank of China", "Industrial and Commercial Bank of China", "China Construction Bank", "Agricultural Bank of China", "Bank of Communications", "Other Chinese Bank"], "Japan": ["MUFG Bank", "Sumitomo Mitsui Banking Corporation", "Mizuho Bank", "Resona Bank", "Other Japanese Bank"], "Singapore": ["DBS Bank", "OCBC Bank", "United Overseas Bank", "Standard Chartered Singapore", "Other Singaporean Bank"], "South Africa": ["Standard Bank", "First National Bank", "Absa Bank", "Nedbank", "Capitec Bank", "Investec Bank", "Other South African Bank"], "Kenya": ["KCB Bank Kenya", "Equity Bank Kenya", "Co-operative Bank of Kenya", "Absa Bank Kenya", "NCBA Bank Kenya", "Stanbic Bank Kenya", "I&M Bank", "DTB Bank Kenya", "Family Bank", "Other Kenyan Bank"], "Nigeria": ["Access Bank", "First Bank of Nigeria", "Guaranty Trust Bank", "Zenith Bank", "United Bank for Africa", "Fidelity Bank", "Other Nigerian Bank"], "Ghana": ["GCB Bank", "Ecobank Ghana", "Absa Bank Ghana", "Stanbic Bank Ghana", "Fidelity Bank Ghana", "Republic Bank Ghana", "Other Ghanaian Bank"], "United Arab Emirates": ["Emirates NBD", "First Abu Dhabi Bank", "Abu Dhabi Commercial Bank", "Mashreq Bank", "Dubai Islamic Bank", "RAKBANK", "Other UAE Bank"], "Saudi Arabia": ["Saudi National Bank", "Al Rajhi Bank", "Riyad Bank", "Alinma Bank", "Banque Saudi Fransi", "Arab National Bank", "Other Saudi Bank"], "Qatar": ["Qatar National Bank", "Qatar Islamic Bank", "Commercial Bank Qatar", "Doha Bank", "Masraf Al Rayan", "Other Qatari Bank"], "Brazil": ["Banco do Brasil", "Itaú Unibanco", "Bradesco", "Caixa Econômica Federal", "Santander Brasil", "Other Brazilian Bank"], "Mexico": ["BBVA México", "Banorte", "Santander México", "HSBC México", "Citibanamex", "Other Mexican Bank"]};
+
+    const CURRENCIES = [{"code": "GBP", "name": "Pound Sterling"}, {"code": "EUR", "name": "Euro"}, {"code": "USD", "name": "US Dollar"}, {"code": "CAD", "name": "Canadian Dollar"}, {"code": "AUD", "name": "Australian Dollar"}, {"code": "NZD", "name": "New Zealand Dollar"}, {"code": "CHF", "name": "Swiss Franc"}, {"code": "JPY", "name": "Japanese Yen"}, {"code": "CNY", "name": "Chinese Yuan"}, {"code": "SGD", "name": "Singapore Dollar"}, {"code": "INR", "name": "Indian Rupee"}, {"code": "AED", "name": "UAE Dirham"}, {"code": "SAR", "name": "Saudi Riyal"}, {"code": "QAR", "name": "Qatari Riyal"}, {"code": "ZAR", "name": "South African Rand"}, {"code": "KES", "name": "Kenyan Shilling"}, {"code": "NGN", "name": "Nigerian Naira"}, {"code": "GHS", "name": "Ghanaian Cedi"}, {"code": "TZS", "name": "Tanzanian Shilling"}, {"code": "UGX", "name": "Ugandan Shilling"}, {"code": "BRL", "name": "Brazilian Real"}, {"code": "MXN", "name": "Mexican Peso"}, {"code": "SRD", "name": "Surinamese Dollar"}, {"code": "THB", "name": "Thai Baht"}, {"code": "MYR", "name": "Malaysian Ringgit"}, {"code": "IDR", "name": "Indonesian Rupiah"}, {"code": "KRW", "name": "South Korean Won"}, {"code": "TRY", "name": "Turkish Lira"}, {"code": "PLN", "name": "Polish Zloty"}, {"code": "SEK", "name": "Swedish Krona"}, {"code": "NOK", "name": "Norwegian Krone"}, {"code": "DKK", "name": "Danish Krone"}, {"code": "CZK", "name": "Czech Koruna"}, {"code": "HUF", "name": "Hungarian Forint"}, {"code": "RON", "name": "Romanian Leu"}, {"code": "ILS", "name": "Israeli New Shekel"}];
+
+    const countrySelect = document.getElementById("internationalCountry");
+    const bankSelect = document.getElementById("internationalBank");
+    const currencySelect = document.getElementById("internationalCurrency");
+
+    if (!countrySelect || !bankSelect || !currencySelect) {
+        console.error("Fairmont clean picker: required select elements were not found.");
+        return;
+    }
+
+    /*
+     * ----------------------------------------------------------
+     * Populate real hidden selects
+     * ----------------------------------------------------------
+     */
+
+    function clearSelect(select) {
+        while (select.options.length > 0) {
+            select.remove(0);
+        }
+    }
+
+    function addOption(select, value, text) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = text;
+        select.appendChild(option);
+    }
+
+    clearSelect(countrySelect);
+    addOption(countrySelect, "", "Select country");
+
+    COUNTRIES.forEach(function (country) {
+        addOption(countrySelect, country, country);
+    });
+
+    clearSelect(bankSelect);
+    addOption(bankSelect, "", "Select a bank");
+
+    clearSelect(currencySelect);
+    addOption(currencySelect, "", "Select currency");
+
+    CURRENCIES.forEach(function (currency) {
+        addOption(
+            currencySelect,
+            currency.code,
+            currency.code + " — " + currency.name
+        );
+    });
+
+    /*
+     * ----------------------------------------------------------
+     * Bank list depends on selected country
+     * ----------------------------------------------------------
+     */
+
+    function populateBanks(country) {
+        clearSelect(bankSelect);
+
+        addOption(bankSelect, "", "Select a bank");
+
+        let list = BANKS[country];
+
+        if (!Array.isArray(list) || list.length === 0) {
+            if (country) {
+                list = ["Other bank in " + country];
+            } else {
+                list = [];
+            }
+        }
+
+        list.forEach(function (bank) {
+            addOption(bankSelect, bank, bank);
+        });
+
+        bankSelect.value = "";
+    }
+
+    countrySelect.addEventListener("change", function () {
+        populateBanks(countrySelect.value);
+    });
+
+    /*
+     * ----------------------------------------------------------
+     * Create one clean visible trigger for each select
+     * ----------------------------------------------------------
+     */
+
+    function createPicker(select, type, placeholder) {
+        const field = select.closest(".field");
+
+        if (!field) {
+            console.error(
+                "Fairmont clean picker: field wrapper not found for",
+                select.id
+            );
+            return;
+        }
+
+        field.classList.add("fairmont-clean-picker-select");
+
+        /*
+         * Remove only triggers generated by this clean picker.
+         * This prevents duplicates if the script is accidentally
+         * initialized twice.
+         */
+        field.querySelectorAll(
+            '[data-fairmont-clean-trigger="' + type + '"]'
+        ).forEach(function (node) {
+            node.remove();
+        });
+
+        select.classList.add("fairmont-clean-real-select");
+
+        const trigger = document.createElement("button");
+
+        trigger.type = "button";
+        trigger.className = "fairmont-clean-trigger";
+        trigger.setAttribute(
+            "data-fairmont-clean-trigger",
+            type
+        );
+        trigger.setAttribute("aria-expanded", "false");
+
+        const value = document.createElement("span");
+        value.className = "fairmont-clean-trigger-value";
+        value.textContent = placeholder;
+
+        const arrow = document.createElement("span");
+        arrow.className = "fairmont-clean-trigger-arrow";
+        arrow.textContent = "▾";
+
+        trigger.appendChild(value);
+        trigger.appendChild(arrow);
+
+        select.insertAdjacentElement("afterend", trigger);
+
+        select.addEventListener("change", function () {
+            const selected =
+                select.options[select.selectedIndex];
+
+            value.textContent =
+                selected && selected.value
+                    ? selected.textContent
+                    : placeholder;
+        });
+
+        return {
+            field: field,
+            select: select,
+            trigger: trigger,
+            value: value,
+            type: type,
+            placeholder: placeholder
+        };
+    }
+
+    const countryPicker = createPicker(
+        countrySelect,
+        "country",
+        "Select country"
+    );
+
+    const bankPicker = createPicker(
+        bankSelect,
+        "bank",
+        "Select a bank"
+    );
+
+    const currencyPicker = createPicker(
+        currencySelect,
+        "currency",
+        "Select currency"
+    );
+
+    /*
+     * ----------------------------------------------------------
+     * Popup
+     * ----------------------------------------------------------
+     */
+
+    let activePicker = null;
+    let popup = null;
+
+    function closePopup() {
+        if (popup) {
+            popup.remove();
+            popup = null;
+        }
+
+        if (activePicker) {
+            activePicker.trigger.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        activePicker = null;
+    }
+
+    function positionPopup() {
+        if (!popup || !activePicker) {
+            return;
+        }
+
+        const rect =
+            activePicker.trigger.getBoundingClientRect();
+
+        const popupWidth =
+            Math.min(420, window.innerWidth - 28);
+
+        let left =
+            rect.left + (rect.width / 2) - (popupWidth / 2);
+
+        left = Math.max(
+            14,
+            Math.min(
+                left,
+                window.innerWidth - popupWidth - 14
+            )
+        );
+
+        const popupHeight =
+            Math.min(
+                460,
+                window.innerHeight - 28
+            );
+
+        let top = rect.bottom + 8;
+
+        if (
+            top + popupHeight >
+            window.innerHeight - 14
+        ) {
+            top = rect.top - popupHeight - 8;
+        }
+
+        if (top < 14) {
+            top = 14;
+        }
+
+        popup.style.width = popupWidth + "px";
+        popup.style.left = left + "px";
+        popup.style.top = top + "px";
+    }
+
+    function getOptions(picker) {
+        const select = picker.select;
+
+        return Array.from(select.options)
+            .filter(function (option) {
+                return option.value !== "";
+            })
+            .map(function (option) {
+                return {
+                    value: option.value,
+                    text: option.textContent
+                };
+            });
+    }
+
+    function openPopup(picker) {
+        closePopup();
+
+        activePicker = picker;
+
+        picker.trigger.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        popup = document.createElement("div");
+        popup.className = "fairmont-clean-popup";
+
+        const search = document.createElement("input");
+
+        search.type = "search";
+        search.className = "fairmont-clean-search";
+        search.placeholder =
+            picker.type === "country"
+                ? "Search country..."
+                : picker.type === "bank"
+                    ? "Search bank..."
+                    : "Search currency...";
+
+        search.autocomplete = "off";
+        search.spellcheck = false;
+
+        const optionsBox = document.createElement("div");
+
+        optionsBox.className =
+            "fairmont-clean-options";
+
+        popup.appendChild(search);
+        popup.appendChild(optionsBox);
+
+        document.body.appendChild(popup);
+
+        function renderOptions(filterText) {
+            const query =
+                String(filterText || "")
+                    .trim()
+                    .toLowerCase();
+
+            optionsBox.innerHTML = "";
+
+            const options = getOptions(picker)
+                .filter(function (option) {
+                    return !query ||
+                        option.text
+                            .toLowerCase()
+                            .includes(query);
+                });
+
+            if (options.length === 0) {
+                const empty =
+                    document.createElement("div");
+
+                empty.className =
+                    "fairmont-clean-empty";
+
+                empty.textContent =
+                    "No matching results";
+
+                optionsBox.appendChild(empty);
+
+                return;
+            }
+
+            options.forEach(function (option) {
+                const button =
+                    document.createElement("button");
+
+                button.type = "button";
+                button.className =
+                    "fairmont-clean-option";
+
+                if (
+                    picker.select.value ===
+                    option.value
+                ) {
+                    button.classList.add("selected");
+                }
+
+                button.textContent = option.text;
+
+                button.addEventListener(
+                    "click",
+                    function (event) {
+                        event.stopPropagation();
+
+                        picker.select.value =
+                            option.value;
+
+                        picker.select.dispatchEvent(
+                            new Event("change", {
+                                bubbles: true
+                            })
+                        );
+
+                        closePopup();
+                    }
+                );
+
+                optionsBox.appendChild(button);
+            });
+        }
+
+        renderOptions("");
+
+        search.addEventListener(
+            "input",
+            function () {
+                renderOptions(search.value);
+            }
+        );
+
+        popup.addEventListener(
+            "click",
+            function (event) {
+                event.stopPropagation();
+            }
+        );
+
+        positionPopup();
+
+        setTimeout(function () {
+            search.focus();
+        }, 0);
+    }
+
+    [countryPicker, bankPicker, currencyPicker]
+        .filter(Boolean)
+        .forEach(function (picker) {
+            picker.trigger.addEventListener(
+                "click",
+                function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    if (
+                        activePicker === picker &&
+                        popup
+                    ) {
+                        closePopup();
+                    } else {
+                        openPopup(picker);
+                    }
+                }
+            );
+        });
+
+    /*
+     * Close when clicking outside.
+     */
+
+    document.addEventListener(
+        "click",
+        function () {
+            closePopup();
+        }
+    );
+
+    /*
+     * Close with Escape.
+     */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+            if (event.key === "Escape") {
+                closePopup();
+            }
+        }
+    );
+
+    /*
+     * Reposition on scroll/resize.
+     */
+
+    window.addEventListener(
+        "resize",
+        positionPopup
+    );
+
+    window.addEventListener(
+        "scroll",
+        positionPopup,
+        true
+    );
+
+    /*
+     * Initial bank state.
+     */
+
+    populateBanks(countrySelect.value);
+
+    /*
+     * Make absolutely sure the three original native selects
+     * cannot visually appear as duplicate controls.
+     */
+
+    [countrySelect, bankSelect, currencySelect]
+        .forEach(function (select) {
+            select.classList.add(
+                "fairmont-clean-real-select"
+            );
+        });
+
+    console.log(
+        "Fairmont clean transfer pickers initialized successfully."
+    );
+})();
+</script>
+
+</body>
+</html>
+
+
+
+
+
+

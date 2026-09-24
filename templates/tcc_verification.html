@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        TCC Verification | Fairmont Bank
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #071426;
+            color: #ffffff;
+        }
+
+
+        body {
+            min-height: 100vh;
+        }
+
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+
+        .panel {
+            width: 100%;
+            max-width: 560px;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.035);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+            overflow: hidden;
+        }
+
+
+        .top {
+            padding: 26px 28px 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+
+        .logo {
+            display: block;
+            width: 175px;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 22px;
+        }
+
+
+        .eyebrow {
+            color: #d8b96a;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+
+        h1 {
+            margin: 8px 0 0;
+            font-size: 23px;
+            line-height: 1.25;
+        }
+
+
+        .subtitle {
+            margin: 9px 0 0;
+            color: #8ea2b7;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+
+        .body {
+            padding: 26px 28px 30px;
+        }
+
+
+        .notice {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 11px;
+            border: 1px solid rgba(184,149,74,0.20);
+            background: rgba(184,149,74,0.055);
+            color: #b9c8d7;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+
+        .payment-summary {
+            margin-bottom: 22px;
+            padding: 16px;
+            border-radius: 11px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.045);
+        }
+
+
+        .summary-row:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+
+        .summary-label {
+            color: #71869e;
+            font-size: 10px;
+        }
+
+
+        .summary-value {
+            color: #dce6f2;
+            font-size: 10px;
+            font-weight: 700;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+
+        .amount {
+            color: #d8b96a;
+            font-size: 13px;
+        }
+
+
+        .error {
+            margin-bottom: 17px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #e0b6b6;
+            background: rgba(190,82,82,0.08);
+            border: 1px solid rgba(190,82,82,0.20);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+
+        .field-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9fb3cc;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+
+        .tcc-input {
+            width: 100%;
+            min-height: 54px;
+            padding: 0 15px;
+            border-radius: 11px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.045);
+            color: #ffffff;
+            outline: none;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 7px;
+        }
+
+
+        .tcc-input:focus {
+            border-color: rgba(216,185,106,0.55);
+            box-shadow: 0 0 0 3px rgba(216,185,106,0.07);
+        }
+
+
+        .tcc-input::placeholder {
+            color: #53677d;
+            letter-spacing: 4px;
+        }
+
+
+        .help {
+            margin-top: 9px;
+            color: #71869e;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+
+        .submit-button {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 20px;
+            border: 1px solid rgba(216,185,106,0.55);
+            border-radius: 10px;
+            background: linear-gradient(
+                135deg,
+                #b8954a,
+                #d8b96a
+            );
+            color: #071426;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+
+        .submit-button:hover {
+            filter: brightness(1.05);
+        }
+
+
+        .back {
+            display: inline-block;
+            margin-top: 18px;
+            color: #9fb3cc;
+            text-decoration: none;
+            font-size: 11px;
+        }
+
+
+        .back:hover {
+            color: #d8b96a;
+        }
+
+
+        .expired {
+            padding: 15px;
+            border-radius: 11px;
+            color: #e0b6b6;
+            background: rgba(190,82,82,0.08);
+            border: 1px solid rgba(190,82,82,0.20);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 12px;
+            }
+
+            .top,
+            .body {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .logo {
+                width: 155px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <section class="panel">
+
+
+        <div class="top">
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='images/fairmont-bank-logo.png'
+                ) }}"
+                alt="Fairmont Bank"
+                class="logo"
+            >
+
+
+            <div class="eyebrow">
+                Payment Security
+            </div>
+
+
+            <h1>
+                TCC Verification Required
+            </h1>
+
+
+            <p class="subtitle">
+
+                This payment requires an additional
+                verification step before it can proceed
+                to management approval.
+
+            </p>
+
+        </div>
+
+
+        <div class="body">
+
+
+            {% if expired %}
+
+
+                <div class="expired">
+
+                    {{ error }}
+
+                </div>
+
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="back"
+                >
+                    Return to Dashboard
+                </a>
+
+
+            {% else %}
+
+
+                <div class="notice">
+
+                    Please contact Fairmont Bank Support to
+                    obtain the TCC verification code for this
+                    payment.
+
+                    <br><br>
+
+                    For your security, the verification code
+                    is not displayed on this customer page.
+
+                </div>
+
+
+                <div class="payment-summary">
+
+
+                    <div class="summary-row">
+
+                        <span class="summary-label">
+                            Payment Reference
+                        </span>
+
+                        <span class="summary-value">
+                            {{ approval.payment_reference }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span class="summary-label">
+                            Payment Type
+                        </span>
+
+                        <span class="summary-value">
+                            {{ approval.payment_type }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span class="summary-label">
+                            Amount
+                        </span>
+
+                        <span class="summary-value amount">
+
+                            {{ customer.preferred_currency_display or "GBP" }}
+                            {{ "{:,.2f}".format(approval.amount or 0) }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span class="summary-label">
+                            Status
+                        </span>
+
+                        <span class="summary-value">
+                            TCC Verification Required
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                {% if error %}
+
+                    <div class="error">
+
+                        {{ error }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <form method="POST">
+
+
+                    <label
+                        for="tcc_code"
+                        class="field-label"
+                    >
+                        Enter TCC Verification Code
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="tcc_code"
+                        name="tcc_code"
+                        class="tcc-input"
+                        inputmode="numeric"
+                        pattern="[0-9]{6}"
+                        maxlength="6"
+                        minlength="6"
+                        autocomplete="one-time-code"
+                        placeholder="000000"
+                        required
+                    >
+
+
+                    <div class="help">
+
+                        Enter the six-digit code provided
+                        through the authorized Fairmont Bank
+                        support process.
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="submit-button"
+                    >
+                        Verify TCC & Continue
+                    </button>
+
+
+                </form>
+
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="back"
+                >
+                    Return to Dashboard
+                </a>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+</body>
+
+</html>

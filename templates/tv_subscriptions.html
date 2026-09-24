@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Subscriptions | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(30, 82, 150, .35), transparent 35%),
+                linear-gradient(145deg, #06152c, #0a2345 55%, #06152c);
+            color: #ffffff;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 24px 18px 50px;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #d8e8ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .card {
+            background: rgba(10, 31, 61, .78);
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 18px 50px rgba(0,0,0,.28);
+            backdrop-filter: blur(14px);
+        }
+
+        .brand {
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: #9fc7ff;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+
+        .intro {
+            margin: 0 0 22px;
+            color: #aebfd7;
+            line-height: 1.55;
+        }
+
+        .balance {
+            padding: 15px 16px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.055);
+            border: 1px solid rgba(255,255,255,.08);
+            margin-bottom: 22px;
+        }
+
+        .balance-label {
+            color: #aebfd7;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .balance-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .error {
+            background: rgba(180, 35, 55, .18);
+            border: 1px solid rgba(255, 90, 110, .30);
+            color: #ffd7dc;
+            border-radius: 13px;
+            padding: 13px 15px;
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #c9d9ee;
+            margin: 17px 0 8px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 13px;
+            border: 1px solid rgba(255,255,255,.11);
+            background: #0a1d39;
+            color: #ffffff;
+            outline: none;
+            font-size: 15px;
+        }
+
+        select:focus,
+        input:focus {
+            border-color: #5598ed;
+        }
+
+        option {
+            background: #0a1d39;
+            color: #ffffff;
+        }
+
+        .button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 15px;
+            border: 0;
+            border-radius: 14px;
+            background: #2e78d1;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #3d88e3;
+        }
+
+        .note {
+            margin-top: 15px;
+            color: #899db9;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 520px) {
+            .page {
+                padding: 18px 13px 40px;
+            }
+
+            .card {
+                padding: 20px 16px;
+                border-radius: 19px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <a class="back" href="/dashboard">← Back to Dashboard</a>
+
+    <div class="card">
+
+        <div class="brand">FAIRMONT BANK</div>
+
+        <h1>TV Subscriptions</h1>
+
+        <p class="intro">
+            Pay your TV subscription directly from your Fairmont Bank account.
+        </p>
+
+        <div class="balance">
+            <div class="balance-label">Available Balance</div>
+            <div class="balance-value">
+                £{{ "{:,.2f}".format(customer.account_balance|float) }}
+            </div>
+        </div>
+
+        {% if errors %}
+            <div class="error">
+                {% for error in errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+
+            <label for="provider">TV Provider</label>
+
+            <select name="provider" id="provider" required
+                    onchange="updatePackages()">
+
+                <option value="">Select TV provider</option>
+
+                {% for provider_name in providers %}
+                    <option value="{{ provider_name }}"
+                        {% if provider == provider_name %}selected{% endif %}>
+                        {{ provider_name }}
+                    </option>
+                {% endfor %}
+
+            </select>
+
+            <label for="package_name">Subscription Package</label>
+
+            <select name="package_name" id="package_name" required>
+                <option value="">Select subscription package</option>
+            </select>
+
+            <label for="account_reference">
+                TV Account / Customer Number
+            </label>
+
+            <input
+                type="text"
+                id="account_reference"
+                name="account_reference"
+                value="{{ account_reference or '' }}"
+                placeholder="Enter account or customer number"
+                maxlength="100"
+                required
+            >
+
+            <label for="payment_reference">
+                Payment Reference <span style="color:#8295af;">(Optional)</span>
+            </label>
+
+            <input
+                type="text"
+                id="payment_reference"
+                name="payment_reference"
+                value="{{ payment_reference or '' }}"
+                placeholder="Optional reference"
+                maxlength="100"
+            >
+
+            <button class="button" type="submit">
+                Pay TV Subscription
+            </button>
+
+        </form>
+
+        <div class="note">
+            The subscription amount will be deducted from your available
+            balance and recorded in your transaction history.
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const packages = {{ packages | tojson }};
+const selectedPackage = {{ (package_name or "") | tojson }};
+
+function updatePackages() {
+    const provider = document.getElementById("provider").value;
+    const packageSelect = document.getElementById("package_name");
+
+    packageSelect.innerHTML =
+        '<option value="">Select subscription package</option>';
+
+    if (!provider || !packages[provider]) {
+        return;
+    }
+
+    packages[provider].forEach(function(item) {
+        const option = document.createElement("option");
+
+        option.value = item.name;
+        option.textContent =
+            item.name + " — £" + Number(item.amount).toFixed(2);
+
+        if (item.name === selectedPackage) {
+            option.selected = true;
+        }
+
+        packageSelect.appendChild(option);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", updatePackages);
+</script>
+
+</body>
+</html>
