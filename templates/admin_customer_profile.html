@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fairmont Bank — Customer Profile</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #071426;
+            color: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        .header {
+            min-height: 76px;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: #08182b;
+            border-bottom: 1px solid rgba(184, 149, 74, 0.18);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .edit-customer-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 16px;
+            border-radius: 10px;
+            background: linear-gradient(
+                135deg,
+                #b8954a,
+                #d8b96a
+            );
+            color: #071426;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(216, 185, 106, 0.55);
+            white-space: nowrap;
+            transition: 0.2s ease;
+        }
+
+        .edit-customer-button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .back-link {
+            color: #9fb3cc;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            color: #d8b96a;
+        }
+
+        .logo {
+            display: block;
+            width: 175px;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 1px solid rgba(255, 255, 255, 0.10);
+            padding-left: 18px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .header-title p {
+            margin: 4px 0 0;
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .admin-info {
+            color: #9fb3cc;
+            font-size: 12px;
+        }
+
+        .admin-info strong {
+            color: #d8b96a;
+        }
+
+        /* CONTENT */
+
+        .content {
+            max-width: 1450px;
+            margin: 0 auto;
+            padding: 28px;
+        }
+
+        .profile-heading {
+            margin-bottom: 22px;
+        }
+
+        .profile-heading h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .profile-heading p {
+            margin: 7px 0 0;
+            color: #71869e;
+            font-size: 12px;
+        }
+
+        /* ACCOUNT SUMMARY */
+
+        .summary {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .summary-label {
+            color: #71869e;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            font-weight: 700;
+        }
+
+        .summary-value {
+            margin-top: 8px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .summary-value.gold {
+            color: #d8b96a;
+        }
+
+        .summary-small {
+            margin-top: 5px;
+            color: #71869e;
+            font-size: 10px;
+        }
+
+        /* PROFILE GRID */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.025);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .card-header p {
+            margin: 5px 0 0;
+            color: #71869e;
+            font-size: 10px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+        }
+
+        .detail:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail:first-child {
+            padding-top: 0;
+        }
+
+        .detail-label {
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .detail-value {
+            color: #d4dfeb;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .status-active {
+            color: #9bd5b4;
+            background: rgba(74, 180, 125, 0.09);
+            border: 1px solid rgba(74, 180, 125, 0.20);
+        }
+
+        .status-other {
+            color: #e0b6b6;
+            background: rgba(190, 82, 82, 0.08);
+            border: 1px solid rgba(190, 82, 82, 0.18);
+        }
+
+
+        /* TCC PAYMENT RESTRICTION */
+
+        .tcc-control-card {
+            margin-top: 18px;
+            border: 1px solid rgba(184, 149, 74, 0.18);
+            border-radius: 14px;
+            background: rgba(184, 149, 74, 0.035);
+            overflow: hidden;
+        }
+
+        .tcc-control-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid rgba(184, 149, 74, 0.14);
+        }
+
+        .tcc-control-header h3 {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .tcc-control-header p {
+            margin: 5px 0 0;
+            color: #71869e;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .tcc-control-body {
+            padding: 20px;
+        }
+
+        .tcc-status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .tcc-status-label {
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .tcc-status-value {
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tcc-enabled {
+            color: #9bd5b4;
+        }
+
+        .tcc-disabled {
+            color: #9fb3cc;
+        }
+
+        .tcc-description {
+            margin: 0 0 18px;
+            color: #8ea2b7;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .tcc-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tcc-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 15px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .tcc-enable-button {
+            color: #071426;
+            background: linear-gradient(
+                135deg,
+                #b8954a,
+                #d8b96a
+            );
+            border-color: rgba(216, 185, 106, 0.55);
+        }
+
+        .tcc-disable-button {
+            color: #dce6f2;
+            background: rgba(190, 82, 82, 0.10);
+            border-color: rgba(190, 82, 82, 0.25);
+        }
+
+        .tcc-button:hover {
+            filter: brightness(1.06);
+        }
+
+        .tcc-notice {
+            margin-top: 15px;
+            padding: 11px 13px;
+            border-radius: 9px;
+            color: #9fb3cc;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 9px;
+            line-height: 1.5;
+        }
+
+        /* FULL WIDTH SECTIONS */
+
+        .full {
+            margin-top: 18px;
+        }
+
+        .records {
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .record {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+        }
+
+        .record:last-child {
+            border-bottom: 0;
+        }
+
+        .record-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .record-title {
+            color: #dce6f2;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .record-date {
+            color: #637991;
+            font-size: 9px;
+            white-space: nowrap;
+        }
+
+        .sender-badge {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 7px;
+            border-radius: 20px;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .sender-customer {
+            color: #9fb3cc;
+            background: rgba(159, 179, 204, 0.08);
+            border: 1px solid rgba(159, 179, 204, 0.15);
+        }
+
+        .sender-support {
+            color: #d8b96a;
+            background: rgba(184, 149, 74, 0.08);
+            border: 1px solid rgba(184, 149, 74, 0.18);
+        }
+
+        .record-details {
+            margin-top: 6px;
+            color: #71869e;
+            font-size: 10px;
+            line-height: 1.55;
+        }
+
+        .record-amount {
+            margin-top: 6px;
+            color: #d8b96a;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .record-status {
+            margin-top: 6px;
+            color: #8ea2b7;
+            font-size: 9px;
+        }
+
+        .message-body {
+            margin-top: 8px;
+            color: #b7c6d5;
+            font-size: 11px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .conversation-link {
+            display: inline-block;
+            margin-top: 9px;
+            color: #d8b96a;
+            font-size: 10px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .conversation-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            padding: 30px 20px;
+            text-align: center;
+            color: #687e96;
+            font-size: 11px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 900px) {
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .header {
+                padding: 15px 17px;
+                align-items: flex-start;
+            }
+
+            .header-left {
+                gap: 12px;
+            }
+
+            .logo {
+                width: 145px;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .admin-info {
+                display: none;
+            }
+
+            .content {
+                padding: 18px 14px;
+            }
+
+            .profile-heading h2 {
+                font-size: 19px;
+            }
+
+            .detail {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+
+            .record-top {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <a
+                href="{{ url_for('admin_customers') }}"
+                class="back-link">
+                ← Customers
+            </a>
+
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank"
+                class="logo">
+
+            <div class="header-title">
+                <h1>Customer Profile</h1>
+                <p>Customer administration</p>
+            </div>
+
+            <a
+                href="{{ url_for('admin_edit_customer', customer_id=customer.id) }}"
+                class="edit-customer-button">
+                Edit Customer Details
+            </a>
+
+        </div>
+
+        <div class="admin-info">
+            Administrator:
+            <strong>{{ admin.username }}</strong>
+        </div>
+
+    </header>
+
+
+    <main class="content">
+
+        <section class="profile-heading">
+
+            <h2>
+                {{ customer.full_name }}
+            </h2>
+
+            <p>
+                Customer ID: {{ customer.customer_id }}
+            </p>
+
+        </section>
+
+
+        <!-- ACCOUNT SUMMARY -->
+
+        <section class="summary">
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Customer
+                </div>
+
+                <div class="summary-value">
+                    {{ customer.full_name }}
+                </div>
+
+                <div class="summary-small">
+                    {{ customer.email }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Account Status
+                </div>
+
+                <div class="summary-value">
+
+                    {% if customer.account_status == "Active" %}
+
+                        <span class="status status-active">
+                            Active
+                        </span>
+
+                    {% else %}
+
+                        <span class="status status-other">
+                            {{ customer.account_status }}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Account Balance
+                </div>
+
+                <div class="summary-value gold">
+                    {{ customer.preferred_currency_display or "GBP" }}
+                    {{ "{:,.2f}".format(customer.account_balance or 0) }}
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ACCOUNT DETAILS -->
+
+        <section class="grid">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h3>Personal & Account Information</h3>
+
+                    <p>
+                        Customer account details
+                    </p>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Customer ID
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.customer_id }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Full Name
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.full_name }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Account Number
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.account_number or "Not assigned" }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Account Type
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.account_type|title }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Country
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.country|title }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Status
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.account_status }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h3>Contact & Preferences</h3>
+
+                    <p>
+                        Customer communication and display preferences
+                    </p>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Email
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.email }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Phone
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.phone }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Language
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.preferred_language }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Currency
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.preferred_currency_display }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Date Format
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.preferred_date_format }}
+                        </span>
+                    </div>
+
+                    <div class="detail">
+                        <span class="detail-label">
+                            Account Display
+                        </span>
+                        <span class="detail-value">
+                            {{ customer.account_display_preference }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TCC PAYMENT RESTRICTION -->
+
+        <section class="tcc-control-card">
+
+            <div class="tcc-control-header">
+
+                <h3>
+                    TCC Payment Restriction
+                </h3>
+
+                <p>
+                    Control whether this customer must complete
+                    TCC verification before a payment can enter
+                    the approval process.
+                </p>
+
+            </div>
+
+
+            <div class="tcc-control-body">
+
+                <div class="tcc-status-row">
+
+                    <span class="tcc-status-label">
+                        Current Restriction Status
+                    </span>
+
+                    {% if customer.tcc_payment_restriction_enabled %}
+
+                        <span class="tcc-status-value tcc-enabled">
+                            ON
+                        </span>
+
+                    {% else %}
+
+                        <span class="tcc-status-value tcc-disabled">
+                            OFF
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <p class="tcc-description">
+
+                    When this restriction is ON, new customer
+                    payments will require a unique TCC verification
+                    code before they can proceed to Pending Approval.
+
+                    The generated TCC is available to authorized
+                    Fairmont Bank management through the TCC
+                    verification workflow.
+
+                </p>
+
+
+                <div class="tcc-actions">
+
+                    {% if customer.tcc_payment_restriction_enabled %}
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'admin_toggle_tcc_restriction',
+                                customer_id=customer.id
+                            ) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="tcc_action"
+                                value="disable"
+                            >
+
+                            <button
+                                type="submit"
+                                class="tcc-button tcc-disable-button"
+                            >
+                                Turn TCC Restriction OFF
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'admin_toggle_tcc_restriction',
+                                customer_id=customer.id
+                            ) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="tcc_action"
+                                value="enable"
+                            >
+
+                            <button
+                                type="submit"
+                                class="tcc-button tcc-enable-button"
+                            >
+                                Turn TCC Restriction ON
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="tcc-notice">
+
+                    This setting applies only to this customer.
+                    Existing TCC verification requests are not
+                    automatically cancelled when the restriction
+                    setting is changed.
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- TRANSACTIONS -->
+
+        <section class="card full">
+
+            <div class="card-header">
+
+                <h3>Transaction History</h3>
+
+                <p>
+                    Recent transactions for this customer
+                </p>
+
+            </div>
+
+            <div class="records">
+
+                {% if customer_transactions %}
+
+                    {% for transaction in customer_transactions %}
+
+                        <div class="record">
+
+                            <div class="record-top">
+
+                                <div class="record-title">
+                                    {{ transaction.description }}
+                                </div>
+
+                                <div class="record-date">
+                                    {{ transaction.created_at.strftime(
+                                        '%d %b %Y, %H:%M'
+                                    ) }}
+                                </div>
+
+                            </div>
+
+                            <div class="record-details">
+
+                                Reference:
+                                {{ transaction.reference }}
+
+                                {% if transaction.counterparty %}
+                                    ·
+                                    Counterparty:
+                                    {{ transaction.counterparty }}
+                                {% endif %}
+
+                                {% if transaction.type %}
+                                    ·
+                                    Type:
+                                    {{ transaction.type }}
+                                {% endif %}
+
+                            </div>
+
+                            <div class="record-amount">
+
+                                {% if transaction.direction == "Credit" %}
+                                    +{{ customer.preferred_currency_display or "GBP" }}
+                                {% else %}
+                                    -{{ customer.preferred_currency_display or "GBP" }}
+                                {% endif %}
+
+                                {{ "{:,.2f}".format(transaction.amount or 0) }}
+
+                            </div>
+
+                            <div class="record-status">
+                                Status: {{ transaction.status }}
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty">
+                        No transactions have been recorded for this customer.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- BANK MESSAGES -->
+
+        <section class="card full">
+
+            <div class="card-header">
+
+                <h3>Email the Bank Messages</h3>
+
+                <p>
+                    Customer correspondence sent through the bank mailbox
+                </p>
+
+            </div>
+
+            <div class="records">
+
+                {% if customer_bank_messages %}
+
+                    {% for message in customer_bank_messages %}
+
+                        <div class="record">
+
+                            <div class="record-top">
+
+                                <div>
+                                    <div class="record-title">
+                                        {{ message.subject }}
+                                    </div>
+
+                                    {% if message.sender_type == "support" %}
+
+                                        <div class="sender-badge sender-support">
+                                            FAIRMONT BANK SUPPORT
+                                        </div>
+
+                                    {% else %}
+
+                                        <div class="sender-badge sender-customer">
+                                            CUSTOMER
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="record-date">
+                                    {{ message.created_at.strftime(
+                                        '%d %b %Y, %H:%M'
+                                    ) }}
+                                </div>
+
+                            </div>
+
+                            <div class="message-body">
+                                {{ message.message }}
+                            </div>
+
+                            <div class="record-status">
+                                Status: {{ message.status }}
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty">
+                        This customer has not sent any bank messages.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- LIVE CHAT -->
+
+        <section class="card full">
+
+            <div class="card-header">
+
+                <h3>Live Chat Conversations</h3>
+
+                <p>
+                    Customer support conversations
+                </p>
+
+            </div>
+
+            <div class="records">
+
+                {% if customer_conversations %}
+
+                    {% for conversation in customer_conversations %}
+
+                        <div class="record">
+
+                            <div class="record-top">
+
+                                <div class="record-title">
+                                    {{ conversation.subject }}
+                                </div>
+
+                                <div class="record-date">
+                                    {{ conversation.updated_at.strftime(
+                                        '%d %b %Y, %H:%M'
+                                    ) }}
+                                </div>
+
+                            </div>
+
+                            <div class="record-details">
+                                Status: {{ conversation.status }}
+                            </div>
+
+                            <a
+                                href="{{ url_for(
+                                    'admin_live_chat',
+                                    conversation_id=conversation.id
+                                ) }}"
+                                class="conversation-link">
+                                Open Conversation →
+                            </a>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty">
+                        This customer has no Live Chat conversations.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

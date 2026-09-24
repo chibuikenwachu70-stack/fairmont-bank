@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fairmont Bank — Bank Email</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #071426;
+            color: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+
+        .header {
+            min-height: 76px;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: #08182b;
+            border-bottom: 1px solid rgba(184, 149, 74, 0.18);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .back-link {
+            color: #9fb3cc;
+            text-decoration: none;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .back-link:hover {
+            color: #d8b96a;
+        }
+
+        .logo {
+            display: block;
+            width: 175px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 1px solid rgba(255, 255, 255, 0.10);
+            padding-left: 20px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            margin: 4px 0 0;
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .admin-info {
+            color: #9fb3cc;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .admin-info strong {
+            color: #d8b96a;
+        }
+
+        /* LAYOUT */
+
+        .content {
+            flex: 1;
+            min-height: calc(100vh - 76px);
+            display: grid;
+            grid-template-columns: 350px minmax(0, 1fr);
+        }
+
+        /* MESSAGE LIST */
+
+        .message-list {
+            background: #091a2e;
+            border-right: 1px solid rgba(255, 255, 255, 0.065);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .list-header {
+            padding: 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .list-header h2 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .list-header p {
+            margin: 6px 0 0;
+            color: #71869e;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .message-items {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            display: block;
+            padding: 17px 18px;
+            text-decoration: none;
+            color: inherit;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+            transition: background 0.2s;
+        }
+
+        .message-item:hover {
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .message-item.selected {
+            background: rgba(184, 149, 74, 0.09);
+            border-left: 3px solid #b8954a;
+            padding-left: 15px;
+        }
+
+        .message-item.unread {
+            background: rgba(184, 149, 74, 0.055);
+        }
+
+        .message-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 7px;
+        }
+
+        .sender-name {
+            color: #dce6f2;
+            font-size: 13px;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .message-date {
+            color: #637991;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .message-subject {
+            color: #a9b9ca;
+            font-size: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .message-preview {
+            color: #687e96;
+            font-size: 11px;
+            line-height: 1.45;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .message-meta {
+            margin-top: 9px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .customer-id {
+            color: #5f758d;
+            font-size: 9px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 7px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-unread {
+            background: rgba(184, 149, 74, 0.12);
+            border: 1px solid rgba(184, 149, 74, 0.25);
+            color: #d8b96a;
+        }
+
+        .status-read {
+            background: rgba(150, 165, 180, 0.07);
+            border: 1px solid rgba(150, 165, 180, 0.13);
+            color: #8497aa;
+        }
+
+        .empty-list {
+            padding: 40px 22px;
+            text-align: center;
+            color: #6d8299;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* MESSAGE VIEW */
+
+        .message-view {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(184, 149, 74, 0.055),
+                    transparent 35%
+                ),
+                #071426;
+        }
+
+        .message-header {
+            padding: 23px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .message-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .subject {
+            margin: 0;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sender-details {
+            margin-top: 9px;
+            color: #71869e;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .sender-details strong {
+            color: #aebed0;
+            font-weight: 600;
+        }
+
+        .message-status {
+            white-space: nowrap;
+        }
+
+        .message-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 32px;
+        }
+
+        .message-card {
+            max-width: 850px;
+            padding: 22px;
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .message-card-label {
+            color: #d8b96a;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 13px;
+        }
+
+        .message-text {
+            color: #d5e0ec;
+            font-size: 14px;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        /* REPLY */
+
+        .reply-area {
+            padding: 18px 28px 22px;
+            border-top: 1px solid rgba(255, 255, 255, 0.065);
+            background: rgba(7, 20, 38, 0.96);
+        }
+
+        .reply-title {
+            margin-bottom: 10px;
+            color: #9fb3cc;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .reply-form {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .reply-form textarea {
+            flex: 1;
+            min-height: 52px;
+            max-height: 150px;
+            resize: vertical;
+            padding: 13px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(159, 179, 204, 0.18);
+            background: rgba(255, 255, 255, 0.045);
+            color: #ffffff;
+            outline: none;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .reply-form textarea::placeholder {
+            color: #637991;
+        }
+
+        .reply-form textarea:focus {
+            border-color: rgba(184, 149, 74, 0.65);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .reply-button {
+            height: 52px;
+            padding: 0 21px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(
+                135deg,
+                #b8954a,
+                #d8b96a
+            );
+            color: #081426;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .reply-button:hover {
+            opacity: 0.93;
+        }
+
+        .reply-note {
+            margin-top: 7px;
+            color: #566c83;
+            font-size: 9px;
+        }
+
+        /* EMPTY VIEW */
+
+        .empty-view {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-view-inner {
+            max-width: 390px;
+        }
+
+        .empty-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(184, 149, 74, 0.09);
+            border: 1px solid rgba(184, 149, 74, 0.18);
+            color: #d8b96a;
+            font-size: 21px;
+        }
+
+        .empty-view h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .empty-view p {
+            margin: 9px 0 0;
+            color: #71869e;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 900px) {
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .message-list {
+                max-height: 320px;
+                border-right: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+            }
+
+            .message-items {
+                max-height: 230px;
+            }
+
+            .message-view {
+                min-height: 600px;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .header {
+                padding: 15px 17px;
+                flex-wrap: wrap;
+            }
+
+            .header-left {
+                gap: 12px;
+            }
+
+            .logo {
+                width: 145px;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .admin-info {
+                display: none;
+            }
+
+            .list-header {
+                padding: 17px;
+            }
+
+            .message-header {
+                padding: 18px 16px;
+            }
+
+            .message-header-top {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .message-body {
+                padding: 20px 15px;
+            }
+
+            .message-card {
+                padding: 18px;
+            }
+
+            .reply-area {
+                padding: 14px 15px 17px;
+            }
+
+            .reply-form {
+                align-items: stretch;
+            }
+
+            .reply-button {
+                padding: 0 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="back-link">
+                ← Dashboard
+            </a>
+
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank"
+                class="logo">
+
+            <div class="header-title">
+                <h1>Bank Email</h1>
+                <p>Customer correspondence</p>
+            </div>
+
+        </div>
+
+        <div class="admin-info">
+            Administrator:
+            <strong>{{ admin.username }}</strong>
+        </div>
+
+    </header>
+
+
+    <div class="content">
+
+        <!-- MESSAGE LIST -->
+
+        <aside class="message-list">
+
+            <div class="list-header">
+
+                <h2>
+                    Customer Messages
+                </h2>
+
+                <p>
+                    Messages sent to Fairmont Bank through
+                    Email the Bank.
+                </p>
+
+            </div>
+
+
+            <div class="message-items">
+
+                {% if messages %}
+
+                    {% for bank_message in messages %}
+
+                        {% set customer = customers.get(bank_message.id) %}
+
+                        <a
+                            href="{{ url_for(
+                                'admin_bank_email',
+                                message_id=bank_message.id
+                            ) }}"
+                            class="message-item
+                                {% if selected_message and
+                                selected_message.id == bank_message.id %}
+                                selected
+                                {% endif %}
+                                {% if bank_message.status == 'Unread' %}
+                                unread
+                                {% endif %}">
+
+                            <div class="message-top">
+
+                                <div class="sender-name">
+
+                                    {% if customer %}
+                                        {{ customer.full_name }}
+                                    {% else %}
+                                        Customer
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="message-date">
+                                    {{ bank_message.created_at.strftime(
+                                        '%d %b %H:%M'
+                                    ) }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="message-subject">
+                                {{ bank_message.subject }}
+                            </div>
+
+
+                            <div class="message-preview">
+                                {{ bank_message.message }}
+                            </div>
+
+
+                            <div class="message-meta">
+
+                                <span class="customer-id">
+
+                                    {% if customer %}
+                                        {{ customer.customer_id }}
+                                    {% else %}
+                                        Customer unavailable
+                                    {% endif %}
+
+                                </span>
+
+
+                                {% if bank_message.status == "Unread" %}
+
+                                    <span class="status status-unread">
+                                        Unread
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status status-read">
+                                        Read
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </a>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-list">
+                        No customer messages have been received yet.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </aside>
+
+
+        <!-- MESSAGE VIEW -->
+
+        <main class="message-view">
+
+            {% if selected_message %}
+
+                <div class="message-header">
+
+                    <div class="message-header-top">
+
+                        <div>
+
+                            <h2 class="subject">
+                                {{ selected_message.subject }}
+                            </h2>
+
+                            <div class="sender-details">
+
+                                From:
+                                <strong>
+                                    {% if selected_customer %}
+                                        {{ selected_customer.full_name }}
+                                    {% else %}
+                                        Customer
+                                    {% endif %}
+                                </strong>
+
+                                &nbsp;·&nbsp;
+
+                                Customer ID:
+                                <strong>
+                                    {% if selected_customer %}
+                                        {{ selected_customer.customer_id }}
+                                    {% else %}
+                                        Unavailable
+                                    {% endif %}
+                                </strong>
+
+                                <br>
+
+                                Received:
+                                <strong>
+                                    {{ selected_message.created_at.strftime(
+                                        '%d %B %Y at %H:%M'
+                                    ) }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="message-status">
+
+                            {% if selected_message.status == "Unread" %}
+
+                                <span class="status status-unread">
+                                    Unread
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-read">
+                                    Read
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="message-body">
+
+                    <div class="message-card">
+
+                        <div class="message-card-label">
+                            Customer Message
+                        </div>
+
+                        <div class="message-text">
+                            {{ selected_message.message }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="reply-area">
+
+                    <div class="reply-title">
+                        Reply to Customer
+                    </div>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('admin_bank_email') }}"
+                        class="reply-form">
+
+                        <input
+                            type="hidden"
+                            name="message_id"
+                            value="{{ selected_message.id }}">
+
+                        <textarea
+                            name="reply"
+                            maxlength="5000"
+                            placeholder="Write a response to the customer..."
+                            required></textarea>
+
+                        <button
+                            type="submit"
+                            class="reply-button">
+                            Send Reply
+                        </button>
+
+                    </form>
+
+                    <div class="reply-note">
+                        Maximum 5,000 characters.
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-view">
+
+                    <div class="empty-view-inner">
+
+                        <div class="empty-icon">
+                            ✉
+                        </div>
+
+                        <h2>
+                            Select a Customer Message
+                        </h2>
+
+                        <p>
+                            Choose a message from the left panel
+                            to read the customer's correspondence
+                            and send a reply.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </main>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+
+/* =========================================================
+   FAIRMONT BANK LOGIN
+   FINAL SINGLE-COLUMN LAYOUT
+   Remove duplicate outer branding
+   ========================================================= */
+
+/*
+   The existing login HTML already contains the Fairmont
+   branding inside the main login content.
+
+   Hide only the separate outer branding block so the bank
+   name does not appear twice.
+*/
+
+.login-page .login-shell > :first-child {
+    display: none !important;
+}
+
+/*
+   The remaining login content becomes the complete
+   centered login interface.
+*/
+
+.login-page .login-shell {
+    width: 100%;
+    max-width: 620px;
+
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    margin: 0;
+    padding: 42px 24px 28px;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/*
+   Main login content.
+*/
+
+.login-page .login-shell > :last-child {
+    width: 100%;
+    max-width: 480px;
+
+    margin: 0 auto;
+
+    padding: 0;
+
+    background: transparent !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    text-align: left;
+}
+
+/*
+   Fairmont branding already contained in the login content.
+*/
+
+.login-page .login-shell > :last-child .logo,
+.login-page .login-shell > :last-child .brand-logo,
+.login-page .login-shell > :last-child .login-logo,
+.login-page .login-shell > :last-child .logo-mark {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/*
+   Keep the customer-banking heading and welcome message
+   visually prominent.
+*/
+
+.login-page .login-shell > :last-child h1,
+.login-page .login-shell > :last-child h2 {
+    color: #ffffff !important;
+}
+
+/*
+   Inputs.
+*/
+
+.login-page .login-shell > :last-child input,
+.login-page .login-shell > :last-child select,
+.login-page .login-shell > :last-child textarea {
+    width: 100%;
+
+    min-height: 53px;
+
+    padding: 14px 15px;
+
+    border: 1px solid rgba(160, 205, 245, 0.28);
+
+    border-radius: 14px;
+
+    background: rgba(15, 52, 94, 0.58);
+
+    color: #ffffff;
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.login-page .login-shell > :last-child input::placeholder {
+    color: rgba(230, 241, 255, 0.70);
+}
+
+.login-page .login-shell > :last-child input:focus {
+    border-color: rgba(96, 180, 255, 0.90);
+
+    background: rgba(10, 43, 82, 0.78);
+
+    box-shadow:
+        0 0 0 3px rgba(50, 140, 230, 0.14);
+}
+
+/*
+   Login buttons.
+*/
+
+.login-page .login-shell > :last-child button,
+.login-page .login-shell > :last-child input[type="submit"] {
+    width: 100%;
+
+    min-height: 55px;
+
+    border: 0;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2d9fe8,
+            #48c4ef
+        );
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 12px 30px rgba(30, 145, 220, 0.25);
+}
+
+/*
+   Links.
+*/
+
+.login-page .login-shell > :last-child a {
+    color: #a8d8ff;
+    text-decoration: none;
+}
+
+.login-page .login-shell > :last-child a:hover {
+    color: #ffffff;
+}
+
+/*
+   Security notice.
+*/
+
+.login-page .login-shell > :last-child .security,
+.login-page .login-shell > :last-child .secure,
+.login-page .login-shell > :last-child .security-notice {
+    border-radius: 18px;
+
+    color: #a9c5e2;
+
+    background: rgba(8, 32, 61, 0.42);
+
+    border: 1px solid rgba(145, 190, 230, 0.12);
+
+    padding: 14px 16px;
+
+    text-align: center;
+}
+
+/*
+   Mobile.
+*/
+
+@media (max-width: 600px) {
+
+    .login-page .login-shell {
+        min-height: 100dvh;
+
+        padding:
+            30px
+            18px
+            22px;
+    }
+
+    .login-page .login-shell > :last-child {
+        max-width: 100%;
+    }
+}
+
+/*
+   Small phones.
+*/
+
+@media (max-width: 390px) {
+
+    .login-page .login-shell {
+        padding:
+            22px
+            14px
+            18px;
+    }
+}

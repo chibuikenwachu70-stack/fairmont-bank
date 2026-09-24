@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Email the Bank | Fairmont Bank</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(70, 150, 220, 0.22),
+                    transparent 38%
+                ),
+                linear-gradient(
+                    135deg,
+                    #061a38,
+                    #0b2d5b 55%,
+                    #092247
+                );
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .email-page {
+            width: 100%;
+            min-height: 100vh;
+            padding: 34px 20px 60px;
+        }
+
+        .email-shell {
+            width: min(900px, 100%);
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 30px;
+            color: rgba(255,255,255,0.78);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: #d8b85a;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 4px;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(38px, 7vw, 62px);
+            line-height: 1.05;
+        }
+
+        .intro {
+            margin: 18px 0 32px;
+            max-width: 720px;
+            color: rgba(255,255,255,0.72);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .panel {
+            padding: 28px;
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 26px;
+            background: rgba(72, 151, 210, 0.18);
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.20),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+            backdrop-filter: blur(16px);
+        }
+
+        .panel-title {
+            margin: 0 0 20px;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            color: rgba(255,255,255,0.86);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 15px;
+            outline: none;
+            background: rgba(255,255,255,0.075);
+            color: #ffffff;
+            font: inherit;
+        }
+
+        input {
+            min-height: 54px;
+            padding: 0 16px;
+        }
+
+        textarea {
+            min-height: 180px;
+            padding: 16px;
+            resize: vertical;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(255,255,255,0.48);
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: rgba(150,210,255,0.65);
+            background: rgba(255,255,255,0.10);
+        }
+
+        .error {
+            margin-bottom: 18px;
+            padding: 13px 15px;
+            border-radius: 13px;
+            background: rgba(190,55,65,0.18);
+            border: 1px solid rgba(255,120,130,0.30);
+            color: #ffd9dc;
+        }
+
+        .flash {
+            margin-bottom: 18px;
+            padding: 13px 15px;
+            border-radius: 13px;
+            background: rgba(70,190,135,0.16);
+            border: 1px solid rgba(100,230,175,0.30);
+            color: #d9ffed;
+        }
+
+        .send-button {
+            width: 100%;
+            min-height: 56px;
+            border: 0;
+            border-radius: 16px;
+            cursor: pointer;
+            background: linear-gradient(
+                135deg,
+                #d8b85a,
+                #f1d27b
+            );
+            color: #102441;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .send-button:hover {
+            filter: brightness(1.05);
+        }
+
+        .messages-section {
+            margin-top: 34px;
+        }
+
+        .messages-title {
+            margin: 0 0 16px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 28px;
+        }
+
+        .message-card {
+            margin-bottom: 14px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.055);
+        }
+
+        .message-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .message-subject {
+            font-weight: 800;
+            font-size: 17px;
+        }
+
+        .message-status {
+            color: #d8b85a;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .message-body {
+            margin: 12px 0 0;
+            color: rgba(255,255,255,0.72);
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+        .message-date {
+            margin-top: 13px;
+            color: rgba(255,255,255,0.42);
+            font-size: 12px;
+        }
+
+        .empty {
+            color: rgba(255,255,255,0.52);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+
+            .email-page {
+                padding: 25px 15px 45px;
+            }
+
+            .panel {
+                padding: 20px;
+                border-radius: 21px;
+            }
+
+            h1 {
+                font-size: 42px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<main class="email-page">
+
+    <div class="email-shell">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="back-link">
+
+            ← Back to Dashboard
+
+        </a>
+
+        <p class="eyebrow">
+            FAIRMONT BANK
+        </p>
+
+        <h1>
+            Email the Bank
+        </h1>
+
+        <p class="intro">
+            Send a secure message to Fairmont Bank.
+            Your message is saved to your banking account
+            for review by bank staff.
+        </p>
+
+
+        {% with flashed_messages = get_flashed_messages() %}
+
+            {% if flashed_messages %}
+
+                {% for message in flashed_messages %}
+
+                    <div class="flash">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <section class="panel">
+
+            <h2 class="panel-title">
+                Send a Message
+            </h2>
+
+            {% if error %}
+
+                <div class="error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+            <form
+                method="POST"
+                action="{{ url_for('email_bank') }}">
+
+                <div class="field">
+
+                    <label for="subject">
+                        Subject
+                    </label>
+
+                    <input
+                        id="subject"
+                        name="subject"
+                        type="text"
+                        maxlength="200"
+                        placeholder="What would you like help with?"
+                        required>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="message">
+                        Message
+                    </label>
+
+                    <textarea
+                        id="message"
+                        name="message"
+                        maxlength="5000"
+                        placeholder="Write your message to Fairmont Bank..."
+                        required></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="send-button">
+
+                    Send Message
+
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <section class="messages-section">
+
+            <h2 class="messages-title">
+                Your Messages
+            </h2>
+
+            {% if messages %}
+
+                {% for item in messages %}
+
+                    <article class="message-card">
+
+                        <div class="message-top">
+
+                            <div class="message-subject">
+                                {{ item.subject }}
+                            </div>
+
+                            <div class="message-status">
+                                {{ item.status }}
+                            </div>
+
+                        </div>
+
+                        <div class="message-body">
+                            {{ item.message }}
+                        </div>
+
+                        <div class="message-date">
+                            {{ item.created_at.strftime("%d %b %Y, %H:%M") }}
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p class="empty">
+                    You have not sent any messages to Fairmont Bank yet.
+                </p>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</main>
+
+</body>
+
+</html>

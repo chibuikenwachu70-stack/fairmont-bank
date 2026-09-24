@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Open an Account | Fairmont Bank</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <main class="open-account-page">
+
+        <div class="open-account-shell">
+
+            <a href="/" class="back-button" aria-label="Go back">
+                ←
+            </a>
+
+            <div class="login-brand">
+
+                <div class="brand-mark">
+                    F
+                </div>
+
+                <div class="brand-name">
+                    <strong>FAIRMONT</strong>
+                    <span>BANK</span>
+                </div>
+
+            </div>
+
+            <section class="account-intro">
+
+                <p class="eyebrow">
+                    NEW CUSTOMER
+                </p>
+
+                <h1>
+                    Open your<br>
+                    account.
+                </h1>
+
+                <p>
+                    Complete the application below to begin your Fairmont Bank account opening process.
+                </p>
+
+            </section>
+
+            <form class="account-form" method="POST" action="/open-account">
+
+                <div class="form-section-title">
+                    Personal information
+                </div>
+
+                <div class="form-group">
+                    <label for="full-name">
+                        Full name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="full-name"
+                        name="full_name"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        Email address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">
+                        Phone number
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        placeholder="Enter your phone number"
+                        autocomplete="tel"
+                        required>
+                </div>
+
+                <div class="form-section-title account-details-title">
+                    Account details
+                </div>
+
+                <div class="form-group">
+                    <label for="account-type">
+                        Account type
+                    </label>
+
+                    <select
+                        id="account-type"
+                        name="account_type"
+                        required>
+
+                        <option value="" selected disabled>
+                            Select account type
+                        </option>
+
+                        <option value="personal">
+                            Personal Account
+                        </option>
+
+                        <option value="savings">
+                            Savings Account
+                        </option>
+
+                        <option value="current">
+                            Current Account
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="country">
+                        Country of residence
+                    </label>
+
+                    <input
+                        type="text"
+                        id="country"
+                        name="country"
+                        placeholder="Enter your country"
+                        autocomplete="country-name"
+                        required>
+                </div>
+
+                <div class="form-section-title account-details-title">
+                    Security
+                </div>
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Create password
+                    </label>
+
+                    <div class="password-field">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a secure password"
+                            autocomplete="new-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="toggleAccountPassword()"
+                            aria-label="Show password">
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <label class="terms-option">
+
+                    <input
+                        type="checkbox"
+                        name="terms"
+                        required>
+
+                    <span>
+                        I confirm that the information provided is accurate and I agree to Fairmont Bank's account terms and privacy policy.
+                    </span>
+
+                </label>
+
+                <button
+                    type="submit"
+                    class="login-button account-submit">
+                    Submit application
+                </button>
+
+            </form>
+
+            <div class="existing-customer">
+
+                <span>Already have a Fairmont account?</span>
+
+                <a href="/login">
+                    Sign in
+                </a>
+
+            </div>
+
+            <div class="security-note">
+
+                <span class="security-icon">✓</span>
+
+                <span>
+                    Your information is transmitted using secure encryption.
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+
+        function toggleAccountPassword() {
+
+            const password =
+                document.getElementById("password");
+
+            const button =
+                document.querySelector(".password-toggle");
+
+            if (password.type === "password") {
+
+                password.type = "text";
+                button.textContent = "Hide";
+
+            } else {
+
+                password.type = "password";
+                button.textContent = "Show";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>

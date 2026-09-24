@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Transfer | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(42, 90, 150, 0.28), transparent 35%),
+                linear-gradient(145deg, #06111f, #0a1727 55%, #071321);
+            color: #eef5ff;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 650px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: rgba(10, 25, 43, 0.86);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+        }
+
+        .icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(66, 143, 224, 0.15);
+            border: 1px solid rgba(93, 160, 232, 0.2);
+            font-size: 25px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 26px;
+        }
+
+        .intro {
+            color: #94aac3;
+            line-height: 1.55;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .details {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 13px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+        }
+
+        .label {
+            color: #8299b2;
+            font-size: 12px;
+        }
+
+        .value {
+            text-align: right;
+            color: #edf5ff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .pending {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: rgba(213, 160, 58, 0.13);
+            color: #e9c77d;
+            font-size: 12px;
+        }
+
+        .note {
+            color: #8299b2;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, #2f73c7, #3c8ce0);
+            padding: 14px;
+            border-radius: 13px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .page {
+                margin: 15px auto;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 20px;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="card">
+
+        <div class="icon">✓</div>
+
+        <h1>International Transfer Submitted</h1>
+
+        <div class="intro">
+            Your international transfer instruction has been recorded
+            and is currently pending processing.
+        </div>
+
+        <div class="details">
+
+            <div class="row">
+                <div class="label">Status</div>
+                <div class="value">
+                    <span class="pending">Pending</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="label">Reference</div>
+                <div class="value">
+                    {{ transfer_reference }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="label">Recipient</div>
+                <div class="value">
+                    {{ transfer.recipient_name or "—" }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="label">Country</div>
+                <div class="value">
+                    {{ transfer.country or "—" }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="label">Bank</div>
+                <div class="value">
+                    {{ transfer.bank_name or "—" }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="label">Currency</div>
+                <div class="value">
+                    {{ transfer.currency or "—" }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="label">Amount</div>
+                <div class="value">
+                    {{ transfer.amount }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="note">
+            The submission step does not debit your available balance.
+            The transfer remains pending until it is processed.
+        </div>
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="button"
+        >
+            Return to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

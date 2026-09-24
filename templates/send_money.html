@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>UK Bank Payment</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            background: #071a33;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(52, 105, 170, 0.30), transparent 38%),
+                linear-gradient(145deg, #06172e, #0b2749 55%, #071a33);
+            color: white;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 760px;
+            margin: auto;
+            padding: 22px 16px 50px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .account-card,
+        .payment-card {
+            background: rgba(20, 55, 92, 0.76);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.24);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 24px;
+        }
+
+        .account-card {
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        .account-label {
+            color: rgba(255,255,255,0.68);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .account-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .account-number {
+            color: rgba(255,255,255,0.78);
+            font-size: 15px;
+        }
+
+        .payment-card {
+            padding: 24px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            margin: 0 0 28px;
+            color: rgba(255,255,255,0.70);
+            line-height: 1.5;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.15);
+            outline: none;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.12);
+            color: white;
+            padding: 15px 16px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            border-color: rgba(130,190,255,0.72);
+            background: rgba(255,255,255,0.16);
+        }
+
+        input::placeholder {
+            color: rgba(255,255,255,0.52);
+        }
+
+        /* Hidden real select used only for form submission */
+        .real-select {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ONE visible bank control */
+        .picker-trigger {
+            width: 100%;
+            min-height: 54px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 15px;
+            background: rgba(255,255,255,0.12);
+            color: white;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .picker-trigger:hover {
+            background: rgba(255,255,255,0.16);
+        }
+
+        .arrow {
+            opacity: .75;
+            transition: transform .2s;
+        }
+
+        .picker-trigger.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        /*
+         * ONE shared popup.
+         * The popup itself does not scroll.
+         */
+        .picker-popup {
+            position: fixed;
+            z-index: 99999;
+            display: none;
+
+            width: min(520px, calc(100vw - 28px));
+
+            background: rgba(11,35,65,0.99);
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 18px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.45);
+
+            overflow: hidden;
+        }
+
+        .picker-popup.visible {
+            display: block;
+        }
+
+        /*
+         * SEARCH NEVER SCROLLS.
+         * It is a fixed header inside the popup.
+         */
+        .picker-search-area {
+            padding: 12px;
+            background: rgba(11,35,65,1);
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+        }
+
+        .picker-search {
+            width: 100%;
+            height: 48px;
+            margin: 0;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: white;
+            padding: 0 14px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .picker-search:focus {
+            border-color: rgba(130,190,255,0.72);
+        }
+
+        .picker-search::placeholder {
+            color: rgba(255,255,255,0.52);
+        }
+
+        /*
+         * ONLY THE BANK LIST SCROLLS.
+         */
+        .picker-options {
+            height: 360px;
+            max-height: 55vh;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px;
+        }
+
+        .picker-options::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .picker-options::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.22);
+            border-radius: 20px;
+        }
+
+        .picker-option {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: white;
+            text-align: left;
+            padding: 13px 14px;
+            border-radius: 11px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .picker-option:hover,
+        .picker-option:focus {
+            background: rgba(255,255,255,0.11);
+            outline: none;
+        }
+
+        .picker-empty {
+            padding: 25px 14px;
+            color: rgba(255,255,255,0.62);
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .balance-box {
+            margin-bottom: 22px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(0,0,0,0.14);
+            color: rgba(255,255,255,0.76);
+            font-size: 14px;
+        }
+
+        .balance-box strong {
+            color: white;
+            font-size: 16px;
+        }
+
+        .submit-button {
+            width: 100%;
+            border: 0;
+            border-radius: 15px;
+            padding: 16px;
+            margin-top: 5px;
+            background: linear-gradient(135deg, #3e8edb, #2568b4);
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .notice {
+            margin-top: 18px;
+            padding: 13px 15px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.60);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                padding: 16px 12px 40px;
+            }
+
+            .payment-card,
+            .account-card {
+                border-radius: 20px;
+            }
+
+            .payment-card {
+                padding: 19px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <a href="{{ url_for('dashboard') }}" class="back-button">
+        ← Back to Dashboard
+    </a>
+
+    <div class="account-card">
+        <div class="account-label">Pay from account</div>
+
+        <div class="account-name">
+            {{ customer.full_name }}
+        </div>
+
+        <div class="account-number">
+            Account Number {{ customer.account_number }}
+        </div>
+    </div>
+
+    <div class="payment-card">
+
+        <h1>Bank Payment</h1>
+
+        <p class="subtitle">
+            Enter the recipient's UK bank details and payment amount.
+        </p>
+
+        <div class="balance-box">
+            Available Balance:
+            <strong>
+                £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+            </strong>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('send_money') }}"
+              id="ukPaymentForm">
+
+            <div class="field">
+                <label for="recipientName">Recipient Name</label>
+
+                <input
+                    type="text"
+                    id="recipientName"
+                    name="recipient_name"
+                    placeholder="Enter recipient name"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <div class="field">
+
+                <label for="bankTrigger">Bank</label>
+
+                <select
+                    id="bankSelect"
+                    name="bank_name"
+                    class="real-select"
+                    tabindex="-1"
+                    aria-hidden="true"
+                >
+                    <option value="">Select a bank</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="picker-trigger"
+                    id="bankTrigger"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                >
+                    <span id="bankTriggerText">Select a bank</span>
+                    <span class="arrow">▼</span>
+                </button>
+
+            </div>
+
+            <div class="field">
+                <label for="accountNumber">Account Number</label>
+
+                <input
+                    type="text"
+                    id="accountNumber"
+                    name="account_number"
+                    placeholder="8-digit account number"
+                    inputmode="numeric"
+                    maxlength="8"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <div class="field">
+                <label for="sortCode">Sort Code</label>
+
+                <input
+                    type="text"
+                    id="sortCode"
+                    name="sort_code"
+                    placeholder="6-digit sort code"
+                    inputmode="numeric"
+                    maxlength="6"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <div class="field">
+                <label for="amount">Amount</label>
+
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    placeholder="0.00"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+            </div>
+
+            <div class="field">
+                <label for="reference">Payment Reference</label>
+
+                <input
+                    type="text"
+                    id="reference"
+                    name="reference"
+                    placeholder="Optional payment reference"
+                    maxlength="140"
+                    autocomplete="off"
+                >
+            </div>
+
+            <button type="submit" class="submit-button">
+                Submit Payment
+            </button>
+
+        </form>
+
+        <div class="notice">
+            Review the recipient details carefully before submitting.
+            Payments created outside Fairmont customer accounts are recorded
+            as pending external transfers in this local application.
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ONE shared picker -->
+<div class="picker-popup" id="pickerPopup">
+
+    <div class="picker-search-area">
+
+        <input
+            type="search"
+            class="picker-search"
+            id="pickerSearch"
+            placeholder="Search bank"
+            autocomplete="off"
+        >
+
+    </div>
+
+    <div
+        class="picker-options"
+        id="pickerOptions"
+        role="listbox"
+    ></div>
+
+</div>
+
+
+<script>
+
+(function () {
+
+    const UK_BANKS = [
+            'Allied Irish Bank (GB)',,
+            'Bank of Ireland UK',,
+            'Bank of Scotland',,
+            'Barclays Bank',,
+            'Birmingham Bank',,
+            'Card One Money',,
+            'Cashplus Bank',,
+            'Chase UK',,
+            'Citibank UK',,
+            'ClearBank',,
+            'C. Hoare & Co.',,
+            'Co-operative Bank',,
+            'Coutts',,
+            'Danske Bank',
+            'Fairmont Bank',,
+            'First Direct',,
+            'Halifax',,
+            'Handelsbanken UK',,
+            'HSBC UK',,
+            'Investec Bank',,
+            'Lloyds Bank',,
+            'Metro Bank',,
+            'Monzo Bank',,
+            'Nationwide Building Society',,
+            'NatWest',,
+            'Revolut',,
+            'Royal Bank of Scotland',,
+            'Santander UK',,
+            'Skipton Building Society',,
+            'Starling Bank',,
+            'TSB Bank',,
+            'Ulster Bank',,
+            'Virgin Money',,
+            'Yorkshire Building Society',,
+            'Zopa Bank',,
+            'Other UK Bank or Building Society',
+    ];
+
+    const popup = document.getElementById("pickerPopup");
+    const searchInput = document.getElementById("pickerSearch");
+    const options = document.getElementById("pickerOptions");
+
+    const trigger = document.getElementById("bankTrigger");
+    const triggerText = document.getElementById("bankTriggerText");
+    const bankSelect = document.getElementById("bankSelect");
+
+    let open = false;
+
+    function renderBanks(searchTerm) {
+
+        const query = (searchTerm || "").trim().toLowerCase();
+
+        const filteredBanks = UK_BANKS.filter(function (bank) {
+            return bank.toLowerCase().includes(query);
+        });
+
+        options.innerHTML = "";
+
+        if (filteredBanks.length === 0) {
+
+            const empty = document.createElement("div");
+
+            empty.className = "picker-empty";
+            empty.textContent = "No banks found.";
+
+            options.appendChild(empty);
+
+            return;
+        }
+
+        filteredBanks.forEach(function (bank) {
+
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "picker-option";
+            button.setAttribute("role", "option");
+            button.textContent = bank;
+
+            button.addEventListener("click", function () {
+
+                /*
+                 * The visible picker contains the full UK bank list,
+                 * while the real form select initially contains only
+                 * the placeholder option. Add the selected bank as a
+                 * real option before assigning its value.
+                 */
+
+                let existingOption = Array.from(
+                    bankSelect.options
+                ).find(function (option) {
+                    return option.value === bank;
+                });
+
+                if (!existingOption) {
+
+                    existingOption =
+                        document.createElement("option");
+
+                    existingOption.value = bank;
+                    existingOption.textContent = bank;
+
+                    bankSelect.appendChild(
+                        existingOption
+                    );
+                }
+
+                bankSelect.value = bank;
+
+                triggerText.textContent = bank;
+
+                closePicker();
+
+            });
+
+            options.appendChild(button);
+        });
+    }
+
+
+    function positionPicker() {
+
+        const rect = trigger.getBoundingClientRect();
+
+        const width = Math.min(
+            520,
+            window.innerWidth - 28
+        );
+
+        popup.style.width = width + "px";
+
+        let left = rect.left;
+
+        if (left + width > window.innerWidth - 14) {
+            left = window.innerWidth - width - 14;
+        }
+
+        if (left < 14) {
+            left = 14;
+        }
+
+        popup.style.left = left + "px";
+
+        const popupHeight = Math.min(
+            500,
+            window.innerHeight - 40
+        );
+
+        let top = rect.bottom + 8;
+
+        if (top + popupHeight > window.innerHeight - 14) {
+            top = rect.top - popupHeight - 8;
+        }
+
+        if (top < 14) {
+            top = 14;
+        }
+
+        popup.style.top = top + "px";
+    }
+
+
+    function openPicker() {
+
+        renderBanks("");
+
+        positionPicker();
+
+        popup.classList.add("visible");
+        trigger.classList.add("open");
+        trigger.setAttribute("aria-expanded", "true");
+
+        open = true;
+
+        searchInput.value = "";
+
+        /*
+         * Focus the search field WITHOUT scrolling the page.
+         */
+        requestAnimationFrame(function () {
+
+            searchInput.focus({
+                preventScroll: true
+            });
+
+        });
+    }
+
+
+    function closePicker() {
+
+        popup.classList.remove("visible");
+
+        trigger.classList.remove("open");
+
+        trigger.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        open = false;
+    }
+
+
+    trigger.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
+        if (open) {
+            closePicker();
+        } else {
+            openPicker();
+        }
+
+    });
+
+
+    searchInput.addEventListener("input", function () {
+
+        renderBanks(searchInput.value);
+
+    });
+
+
+    document.addEventListener("click", function (event) {
+
+        if (
+            !popup.contains(event.target) &&
+            !trigger.contains(event.target)
+        ) {
+            closePicker();
+        }
+
+    });
+
+
+    window.addEventListener("resize", function () {
+
+        if (open) {
+            positionPicker();
+        }
+
+    });
+
+
+    window.addEventListener("scroll", function () {
+
+        if (open) {
+            positionPicker();
+        }
+
+    }, true);
+
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape" && open) {
+
+            closePicker();
+
+            trigger.focus();
+
+        }
+
+    });
+
+
+    document
+        .getElementById("ukPaymentForm")
+        .addEventListener("submit", function (event) {
+
+            if (!bankSelect.value) {
+
+                event.preventDefault();
+
+                alert("Please select a bank.");
+
+                openPicker();
+
+            }
+
+        });
+
+
+    /*
+     * Populate the list immediately.
+     * Searching is optional.
+     */
+    renderBanks("");
+
+})();
+
+</script>
+
+</body>
+</html>

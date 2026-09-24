@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fairmont Bank</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+</head>
+
+<body>
+
+    <main class="welcome-page">
+
+        <div class="welcome-overlay"></div>
+
+        <section class="welcome-content">
+
+            <div class="brand">
+                <div class="brand-mark">F</div>
+
+                <div class="brand-name">
+                    <strong>FAIRMONT</strong>
+                    <span>BANK</span>
+                </div>
+            </div>
+
+            <div class="welcome-message">
+                <p class="eyebrow">WELCOME TO FAIRMONT</p>
+
+                <h1>
+                    Banking made<br>
+                    simple.
+                </h1>
+
+                <p class="welcome-text">
+                    Secure, convenient banking designed around you.
+                </p>
+            </div>
+
+            <div class="welcome-actions">
+
+                <a href="/login" class="primary-button">
+                    Sign in
+                </a>
+
+                <a href="/open-account" class="secondary-button">
+                    Open an account
+                </a>
+
+            </div>
+
+            <div class="welcome-footer">
+                <span>Secure banking</span>
+                <span class="footer-dot">•</span>
+                <span>Fairmont Bank</span>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

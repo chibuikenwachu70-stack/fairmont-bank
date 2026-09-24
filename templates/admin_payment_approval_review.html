@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Payment - Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(184,149,74,0.10), transparent 30%),
+                #07111f;
+            color: #eef3f8;
+        }
+
+        .page {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 28px 20px 50px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .logo img {
+            width: 185px;
+            max-width: 100%;
+        }
+
+        .back {
+            color: #d8b96a;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 29px;
+        }
+
+        .subtitle {
+            color: #9fb0c2;
+            margin: 0 0 25px;
+            font-size: 14px;
+        }
+
+        .status-banner {
+            margin-bottom: 20px;
+            padding: 15px 17px;
+            border-radius: 12px;
+            background: rgba(184,149,74,0.08);
+            border: 1px solid rgba(184,149,74,0.25);
+            color: #d8b96a;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: rgba(10,24,39,0.92);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 24px;
+        }
+
+        .card h2 {
+            margin: 0 0 18px;
+            font-size: 17px;
+        }
+
+        .details {
+            display: grid;
+            gap: 13px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .label {
+            color: #8193a7;
+            font-size: 12px;
+        }
+
+        .value {
+            color: #eef3f8;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .amount {
+            color: #d8b96a;
+            font-size: 22px;
+        }
+
+        .action-box {
+            margin-top: 20px;
+        }
+
+        .action-box form {
+            margin: 0;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 90px;
+            resize: vertical;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.035);
+            color: #eef3f8;
+            outline: none;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            border-color: rgba(216,185,106,0.55);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 10px;
+            padding: 13px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .approve {
+            background: #d8b96a;
+            color: #07111f;
+        }
+
+        .reject {
+            background: rgba(210,80,80,0.12);
+            color: #e8a0a0;
+            border: 1px solid rgba(210,80,80,0.28);
+        }
+
+        .warning {
+            margin-top: 15px;
+            color: #8799ac;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 780px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="page">
+
+        <div class="topbar">
+            <div class="logo">
+                <img
+                    src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                    alt="Fairmont Bank">
+            </div>
+
+            <a
+                href="{{ url_for('admin_payment_approvals') }}"
+                class="back">
+                Back to Payment Approvals
+            </a>
+        </div>
+
+        <h1>Review Payment</h1>
+
+        <p class="subtitle">
+            Review the payment details carefully before approving or rejecting
+            the request.
+        </p>
+
+        {% if approval.status == "Pending Approval" %}
+
+        <div class="status-banner">
+            This payment is awaiting administrative approval.
+        </div>
+
+        {% endif %}
+
+        <div class="grid">
+
+            <section class="card">
+
+                <h2>Payment Details</h2>
+
+                <div class="details">
+
+                    <div class="row">
+                        <span class="label">Payment Reference</span>
+                        <span class="value">
+                            {{ approval.payment_reference }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Payment Type</span>
+                        <span class="value">
+                            {{ approval.payment_type }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Amount</span>
+                        <span class="value amount">
+                            £{{ "{:,.2f}".format(approval.amount) }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Direction</span>
+                        <span class="value">
+                            {{ approval.direction }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Description</span>
+                        <span class="value">
+                            {{ approval.description }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Counterparty</span>
+                        <span class="value">
+                            {{ approval.counterparty or "—" }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Submitted</span>
+                        <span class="value">
+                            {{ approval.created_at.strftime("%d %b %Y, %H:%M") }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Current Status</span>
+                        <span class="value">
+                            {{ approval.status }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="card">
+
+                <h2>Customer</h2>
+
+                <div class="details">
+
+                    <div class="row">
+                        <span class="label">Customer ID</span>
+                        <span class="value">
+                            {{ customer.customer_id if customer else approval.customer_id }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Full Name</span>
+                        <span class="value">
+                            {{ customer.full_name if customer else "Customer not found" }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Account Number</span>
+                        <span class="value">
+                            {{ customer.account_number if customer and customer.account_number else "—" }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Account Status</span>
+                        <span class="value">
+                            {{ customer.account_status if customer else "—" }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Available Balance</span>
+                        <span class="value amount">
+                            £{{ "{:,.2f}".format(customer.account_balance or 0) if customer else "0.00" }}
+                        </span>
+                    </div>
+
+                </div>
+
+                {% if recipient %}
+
+                <h2 style="margin-top:28px;">Recipient</h2>
+
+                <div class="details">
+
+                    <div class="row">
+                        <span class="label">Name</span>
+                        <span class="value">
+                            {{ recipient.full_name }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Customer ID</span>
+                        <span class="value">
+                            {{ recipient.customer_id }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span class="label">Account Number</span>
+                        <span class="value">
+                            {{ recipient.account_number or "—" }}
+                        </span>
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+                {% if approval.status == "Pending Approval" %}
+
+                <div class="action-box">
+
+                    <h2>Approval Decision</h2>
+
+                    <form method="POST">
+
+                        <textarea
+                            name="rejection_reason"
+                            placeholder="Optional rejection reason. This is only used if you reject the payment."></textarea>
+
+                        <div class="buttons">
+
+                            <button
+                                type="submit"
+                                name="action"
+                                value="approve"
+                                class="approve"
+                                onclick="return confirm('Approve this payment? The account balance will be updated.');">
+                                Approve Payment
+                            </button>
+
+                            <button
+                                type="submit"
+                                name="action"
+                                value="reject"
+                                class="reject"
+                                onclick="return confirm('Reject this payment? No account balance will be changed.');">
+                                Reject Payment
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <div class="warning">
+                        Approval will immediately post the payment and update
+                        the applicable account balance. Rejection will not
+                        change any account balance.
+                    </div>
+
+                </div>
+
+                {% else %}
+
+                <div class="status-banner" style="margin-top:24px;">
+                    This payment has already been reviewed and cannot be
+                    processed again.
+                </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

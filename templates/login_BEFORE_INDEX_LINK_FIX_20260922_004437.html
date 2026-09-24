@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sign In | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            background: #071426;
+            color: #f7f9fc;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            background: rgba(50, 111, 255, 0.18);
+            filter: blur(80px);
+            top: -180px;
+            right: -150px;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 430px;
+            height: 430px;
+            border-radius: 50%;
+            background: rgba(20, 184, 166, 0.10);
+            filter: blur(80px);
+            bottom: -170px;
+            left: -140px;
+            pointer-events: none;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 1120px;
+            min-height: 680px;
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 30px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(18, 35, 61, 0.96),
+                    rgba(8, 20, 38, 0.98)
+                );
+            box-shadow:
+                0 35px 90px rgba(0,0,0,0.40);
+        }
+
+        .brand-panel {
+            padding: 52px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(20, 54, 101, 0.88),
+                    rgba(7, 25, 48, 0.96)
+                );
+            border-right: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Georgia, serif;
+            font-size: 25px;
+            font-weight: 700;
+            color: #ffffff;
+            background:
+                linear-gradient(145deg, #174b91, #0c2e5b);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.22);
+        }
+
+        .brand-name {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 23px;
+            letter-spacing: 0.03em;
+        }
+
+        .brand-subtitle {
+            margin-top: 3px;
+            color: rgba(255,255,255,0.58);
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .welcome-copy {
+            max-width: 440px;
+        }
+
+        .eyebrow {
+            color: #9ebbe7;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .welcome-copy h1 {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(42px, 5vw, 64px);
+            line-height: 0.98;
+            font-weight: 500;
+            letter-spacing: -0.035em;
+        }
+
+        .welcome-copy p {
+            margin: 24px 0 0;
+            max-width: 400px;
+            color: rgba(255,255,255,0.68);
+            font-size: 16px;
+            line-height: 1.75;
+        }
+
+        .security-note {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            max-width: 390px;
+            color: rgba(255,255,255,0.58);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .security-icon {
+            width: 30px;
+            height: 30px;
+            flex: 0 0 30px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.07);
+            color: #b8d0f5;
+        }
+
+        .login-panel {
+            padding: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .mobile-brand {
+            display: none;
+        }
+
+        .login-heading {
+            margin-bottom: 30px;
+        }
+
+        .login-heading h2 {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 35px;
+            font-weight: 500;
+        }
+
+        .login-heading p {
+            margin: 10px 0 0;
+            color: rgba(255,255,255,0.58);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .error {
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            border-radius: 13px;
+            border: 1px solid rgba(248,113,113,0.28);
+            background: rgba(127,29,29,0.24);
+            color: #fecaca;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.82);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input {
+            width: 100%;
+            height: 54px;
+            padding: 0 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.12);
+            outline: none;
+            background: rgba(255,255,255,0.055);
+            color: #ffffff;
+            font-size: 15px;
+            transition: 0.2s ease;
+        }
+
+        .input::placeholder {
+            color: rgba(255,255,255,0.32);
+        }
+
+        .input:focus {
+            border-color: rgba(112,157,224,0.75);
+            background: rgba(255,255,255,0.075);
+            box-shadow: 0 0 0 4px rgba(60,110,180,0.12);
+        }
+
+        .password-input {
+            padding-right: 70px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 10px;
+            top: 7px;
+            height: 40px;
+            padding: 0 11px;
+            border: 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.07);
+            color: #b9cbe6;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .show-password:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .login-button {
+            width: 100%;
+            height: 56px;
+            margin-top: 8px;
+            border: 0;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #2d67b8, #174785);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 14px 28px rgba(18,67,125,0.28);
+            transition: 0.2s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 34px rgba(18,67,125,0.36);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            margin-top: 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.48);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .form-footer a {
+            color: #a9c9f4;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .account-links {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .account-links a {
+            color: rgba(255,255,255,0.68);
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .account-links a:hover {
+            color: #ffffff;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 3px 0 18px;
+            color: rgba(255,255,255,0.56);
+            font-size: 12px;
+        }
+
+        .remember input {
+            accent-color: #4e83ca;
+        }
+
+        @media (max-width: 850px) {
+
+            body {
+                padding: 14px;
+                align-items: flex-start;
+            }
+
+            .page {
+                min-height: auto;
+                margin: 12px 0;
+                grid-template-columns: 1fr;
+                border-radius: 24px;
+            }
+
+            .brand-panel {
+                display: none;
+            }
+
+            .login-panel {
+                padding: 30px 22px 28px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 34px;
+            }
+
+            .mobile-brand .brand-mark {
+                width: 42px;
+                height: 42px;
+                border-radius: 13px;
+                font-size: 22px;
+            }
+
+            .mobile-brand .brand-name {
+                font-size: 20px;
+            }
+
+            .login-heading h2 {
+                font-size: 31px;
+            }
+        }
+
+        @media (max-width: 430px) {
+
+            .login-panel {
+                padding: 24px 17px;
+            }
+
+            .account-links {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <section class="brand-panel">
+
+        <div class="brand">
+            <div class="brand-mark">F</div>
+
+            <div>
+                <div class="brand-name">FAIRMONT BANK</div>
+                <div class="brand-subtitle">Customer Banking</div>
+            </div>
+        </div>
+
+        <div class="welcome-copy">
+            <div class="eyebrow">Private banking access</div>
+
+            <h1>
+                Welcome<br>
+                back.
+            </h1>
+
+            <p>
+                Sign in securely to access your Fairmont Bank
+                account and manage your banking services.
+            </p>
+        </div>
+
+        <div class="security-note">
+            <div class="security-icon">✓</div>
+
+            <div>
+                Your connection is protected by secure encryption.
+                Never share your password or authentication details
+                with anyone.
+            </div>
+        </div>
+
+    </section>
+
+
+    <section class="login-panel">
+
+        <div class="login-card">
+
+            <div class="mobile-brand">
+
+                <div class="brand-mark">F</div>
+
+                <div>
+                    <div class="brand-name">FAIRMONT BANK</div>
+                    <div class="brand-subtitle">Customer Banking</div>
+                </div>
+
+            </div>
+
+
+            <div class="login-heading">
+
+                <div class="eyebrow">Customer access</div>
+
+                <h2>Sign in</h2>
+
+                <p>
+                    Enter your customer credentials to continue.
+                </p>
+
+            </div>
+
+
+            {% if error %}
+                <div class="error">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="error">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+
+            <form method="POST" action="{{ url_for('login') }}">
+
+                {% if request.args.get('next') %}
+                    <input
+                        type="hidden"
+                        name="next"
+                        value="{{ request.args.get('next') }}"
+                    >
+                {% endif %}
+
+
+                <div class="field">
+
+                    <label for="customer_id">
+                        Customer ID
+                    </label>
+
+                    <input
+                        id="customer_id"
+                        name="customer_id"
+                        class="input"
+                        type="text"
+                        placeholder="Enter your Customer ID"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="input-wrap">
+
+                        <input
+                            id="password"
+                            name="password"
+                            class="input password-input"
+                            type="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            onclick="togglePassword()"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <label class="remember">
+                    <input type="checkbox" name="remember">
+                    Remember me on this device
+                </label>
+
+
+                <button
+                    class="login-button"
+                    type="submit"
+                >
+                    Sign in securely
+                </button>
+
+            </form>
+
+
+            <div class="account-links">
+
+                <a href="{{ url_for('index') }}">
+                    ← Back to Fairmont Bank
+                </a>
+
+                <a href="{{ url_for('open_account') }}">
+                    Open an account
+                </a>
+
+            </div>
+
+
+            <div class="form-footer">
+                Protected customer access · Fairmont Bank
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+function togglePassword() {
+
+    const input = document.getElementById("password");
+    const button = document.querySelector(".show-password");
+
+    if (input.type === "password") {
+        input.type = "text";
+        button.textContent = "Hide";
+    } else {
+        input.type = "password";
+        button.textContent = "Show";
+    }
+}
+</script>
+
+</body>
+</html>

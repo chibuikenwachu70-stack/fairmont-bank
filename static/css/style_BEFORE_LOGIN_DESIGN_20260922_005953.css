@@ -1,0 +1,1958 @@
+/* =========================================================
+   FAIRMONT BANK - NEW DASHBOARD SERVICES
+   ========================================================= */
+
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.dashboard-top-left {
+    display: flex;
+    align-items: center;
+}
+
+.my-profile-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 40px;
+    padding: 0 13px;
+
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    color: rgba(255, 255, 255, 0.88);
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.my-profile-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.my-profile-icon {
+    width: 21px;
+    height: 21px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-size: 14px;
+}
+
+.dashboard-greeting {
+    margin-bottom: 25px;
+}
+
+.services-section {
+    margin-top: 28px;
+}
+
+.services-scroll {
+    display: flex;
+
+    gap: 12px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 3px 2px 12px;
+
+    scroll-behavior: smooth;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: none;
+}
+
+.services-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.service-item {
+    flex: 0 0 88px;
+
+    min-height: 104px;
+
+    padding: 13px 9px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 11px;
+
+    border-radius: 17px;
+
+    background: rgba(255, 255, 255, 0.055);
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.service-item:active {
+    transform: scale(0.96);
+}
+
+.service-item:hover {
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.service-icon {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, 0.09);
+
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.service-name {
+    font-size: 10px;
+
+    line-height: 1.35;
+
+    color: rgba(255, 255, 255, 0.78);
+}
+
+@media (min-width: 700px) {
+
+    .services-scroll {
+        gap: 14px;
+    }
+
+    .service-item {
+        flex-basis: 100px;
+    }
+
+}/* =========================================================
+   FAIRMONT BANK - POLISHED CUSTOMER DASHBOARD
+   ========================================================= */
+
+.dashboard-page {
+    min-height: 100vh;
+    min-height: 100svh;
+
+    background:
+        radial-gradient(
+            circle at 90% 0%,
+            rgba(72, 143, 173, 0.16),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #071d30 0%,
+            #092a3f 50%,
+            #061523 100%
+        );
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   DASHBOARD CONTAINER
+   ========================================================= */
+
+.dashboard-shell {
+    width: 100%;
+    max-width: 620px;
+
+    margin: 0 auto;
+
+    padding: 24px 20px 110px;
+}
+
+
+/* =========================================================
+   TOP HEADER
+   ========================================================= */
+
+.dashboard-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+
+.dashboard-top-left {
+    display: flex;
+
+    align-items: center;
+}
+
+
+.my-profile-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding: 0 14px;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.12),
+            rgba(255, 255, 255, 0.055)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    color: rgba(255, 255, 255, 0.92);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.12);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.my-profile-button:hover {
+    background:
+        rgba(255, 255, 255, 0.14);
+
+    transform: translateY(-1px);
+}
+
+
+.my-profile-button:active {
+    transform: scale(0.97);
+}
+
+
+.my-profile-icon {
+    width: 23px;
+    height: 23px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.10);
+
+    border: 1px solid rgba(255, 255, 255, 0.13);
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   PROFILE AVATAR
+   ========================================================= */
+
+.profile-button {
+    width: 45px;
+    height: 45px;
+
+    flex: 0 0 45px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.16),
+            rgba(255, 255, 255, 0.07)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.16);
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   GREETING
+   ========================================================= */
+
+.dashboard-greeting {
+    margin-bottom: 25px;
+}
+
+
+.dashboard-eyebrow {
+    margin-bottom: 7px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.8px;
+
+    color: rgba(255, 255, 255, 0.45);
+}
+
+
+.dashboard-greeting h1 {
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 31px;
+
+    line-height: 1.1;
+
+    font-weight: 500;
+
+    letter-spacing: -0.8px;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   BALANCE CARD
+   ========================================================= */
+
+.balance-card {
+    padding: 24px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.14),
+            rgba(255, 255, 255, 0.055)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.13);
+
+    box-shadow:
+        0 20px 55px rgba(0, 0, 0, 0.20);
+}
+
+
+.balance-top {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+
+.balance-label {
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.7px;
+
+    color: rgba(255, 255, 255, 0.50);
+}
+
+
+.balance-toggle {
+    border: 0;
+
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.65);
+
+    font-size: 11px;
+
+    cursor: pointer;
+
+    padding: 4px 0;
+}
+
+
+.balance-card h2 {
+    margin-top: 10px;
+
+    font-size: 37px;
+
+    line-height: 1.1;
+
+    font-weight: 500;
+
+    letter-spacing: -1px;
+
+    color: #ffffff;
+}
+
+
+.customer-reference {
+    margin-top: 10px;
+
+    font-size: 11px;
+
+    color: rgba(255, 255, 255, 0.45);
+}
+
+
+/* =========================================================
+   GENERAL SECTIONS
+   ========================================================= */
+
+.dashboard-section {
+    margin-top: 30px;
+}
+
+
+.section-heading {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 14px;
+}
+
+
+.section-heading h2 {
+    font-size: 17px;
+
+    font-weight: 600;
+
+    color: #ffffff;
+}
+
+
+.section-heading a {
+    font-size: 11px;
+
+    color: rgba(255, 255, 255, 0.58);
+
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   SERVICES HORIZONTAL SCROLLER
+   ========================================================= */
+
+.services-section {
+    margin-top: 30px;
+}
+
+
+.services-scroll {
+    display: flex;
+
+    gap: 12px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 3px 2px 13px;
+
+    scroll-behavior: smooth;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: none;
+}
+
+
+.services-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   SERVICE CARDS
+   ========================================================= */
+
+.service-item {
+    flex: 0 0 91px;
+
+    min-height: 108px;
+
+    padding: 13px 8px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    gap: 11px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.085),
+            rgba(255, 255, 255, 0.045)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 28px rgba(0, 0, 0, 0.10);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.service-item:hover {
+    background:
+        rgba(255, 255, 255, 0.11);
+
+    border-color:
+        rgba(255, 255, 255, 0.16);
+}
+
+
+.service-item:active {
+    transform: scale(0.95);
+}
+
+
+.service-icon {
+    width: 43px;
+    height: 43px;
+
+    flex: 0 0 43px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.13),
+            rgba(255, 255, 255, 0.06)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: rgba(255, 255, 255, 0.92);
+}
+
+
+.service-name {
+    font-size: 10px;
+
+    line-height: 1.35;
+
+    font-weight: 500;
+
+    color: rgba(255, 255, 255, 0.76);
+}
+
+
+/* =========================================================
+   RECENT ACTIVITY
+   ========================================================= */
+
+.empty-activity {
+    padding: 30px 20px;
+
+    border-radius: 19px;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    border: 1px dashed rgba(255, 255, 255, 0.13);
+
+    text-align: center;
+}
+
+
+.empty-activity-icon {
+    margin-bottom: 10px;
+
+    font-size: 20px;
+
+    color: rgba(255, 255, 255, 0.35);
+}
+
+
+.empty-activity h3 {
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: rgba(255, 255, 255, 0.90);
+}
+
+
+.empty-activity p {
+    max-width: 270px;
+
+    margin: 8px auto 0;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+
+/* =========================================================
+   SIGN OUT
+   ========================================================= */
+
+.dashboard-logout {
+    display: block;
+
+    width: fit-content;
+
+    margin: 28px auto 0;
+
+    padding: 9px 14px;
+
+    border-radius: 10px;
+
+    color: rgba(255, 255, 255, 0.48);
+
+    font-size: 11px;
+
+    text-decoration: none;
+
+    background: rgba(255, 255, 255, 0.035);
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+/* =========================================================
+   BOTTOM NAVIGATION
+   ========================================================= */
+
+.bottom-navigation {
+    position: fixed;
+
+    z-index: 20;
+
+    left: 50%;
+
+    bottom: 12px;
+
+    transform: translateX(-50%);
+
+    width: calc(100% - 24px);
+
+    max-width: 580px;
+
+    min-height: 68px;
+
+    padding: 8px 5px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    border-radius: 21px;
+
+    background:
+        rgba(7, 27, 45, 0.94);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.30);
+
+    backdrop-filter: blur(18px);
+}
+
+
+.bottom-navigation a {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+
+    border-radius: 15px;
+
+    color: rgba(255, 255, 255, 0.40);
+
+    font-size: 9px;
+
+    text-decoration: none;
+}
+
+
+.bottom-navigation a.active {
+    color: #ffffff;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+}
+
+
+.nav-icon {
+    font-size: 13px;
+
+    line-height: 1;
+}
+
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 700px) {
+
+    .dashboard-shell {
+        padding-top: 42px;
+    }
+
+    .service-item {
+        flex-basis: 100px;
+    }
+
+}
+
+/* =========================================================
+   FAIRMONT BANK - MY PROFILE
+   ========================================================= */
+
+.profile-page {
+    min-height: 100vh;
+    min-height: 100svh;
+
+    background:
+        radial-gradient(
+            circle at 90% 0%,
+            rgba(72, 143, 173, 0.16),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #071d30 0%,
+            #092a3f 50%,
+            #061523 100%
+        );
+
+    color: #ffffff;
+}
+
+
+.profile-shell {
+    width: 100%;
+    max-width: 620px;
+
+    margin: 0 auto;
+
+    padding: 24px 20px 50px;
+}
+
+
+.profile-page-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+
+.profile-back-button {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    text-decoration: none;
+}
+
+
+.profile-page-title p {
+    margin-bottom: 4px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.8px;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+
+.profile-page-title h1 {
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 25px;
+
+    font-weight: 500;
+
+    letter-spacing: -0.4px;
+}
+
+
+.profile-identity-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 17px;
+
+    padding: 21px;
+
+    border-radius: 21px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.13),
+            rgba(255, 255, 255, 0.055)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.18);
+}
+
+
+.large-profile-avatar {
+    width: 66px;
+    height: 66px;
+
+    flex: 0 0 66px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.18),
+            rgba(255, 255, 255, 0.07)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    font-size: 24px;
+
+    font-weight: 600;
+}
+
+
+.profile-identity-details h2 {
+    font-size: 18px;
+
+    font-weight: 600;
+
+    color: #ffffff;
+}
+
+
+.profile-identity-details p {
+    margin-top: 5px;
+
+    font-size: 10px;
+
+    color: rgba(255, 255, 255, 0.43);
+}
+
+
+.profile-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 9px;
+
+    padding: 5px 9px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(183, 228, 199, 0.08);
+
+    color: #b7e4c7;
+
+    font-size: 9px;
+
+    font-weight: 600;
+}
+
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #b7e4c7;
+}
+
+
+.profile-section {
+    margin-top: 28px;
+}
+
+
+.profile-section-heading {
+    margin-bottom: 12px;
+}
+
+
+.profile-section-heading p {
+    margin-bottom: 4px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+
+    color: rgba(255, 255, 255, 0.40);
+}
+
+
+.profile-section-heading h2 {
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #ffffff;
+}
+
+
+.profile-details-card {
+    padding: 4px 17px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+
+.profile-detail-row {
+    min-height: 61px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+
+.profile-detail-row:last-child {
+    border-bottom: 0;
+}
+
+
+.profile-detail-label {
+    flex: 0 0 auto;
+
+    font-size: 11px;
+
+    color: rgba(255, 255, 255, 0.45);
+}
+
+
+.profile-detail-value {
+    max-width: 60%;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    line-height: 1.35;
+
+    text-align: right;
+
+    color: rgba(255, 255, 255, 0.90);
+
+    overflow-wrap: anywhere;
+}
+
+
+.account-type-value {
+    text-transform: capitalize;
+}
+
+
+.profile-active-status {
+    color: #b7e4c7;
+}
+
+
+.profile-balance-value {
+    font-size: 14px;
+
+    color: #ffffff;
+}
+
+
+.profile-security-card {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 13px;
+
+    padding: 17px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.security-check {
+    width: 31px;
+    height: 31px;
+
+    flex: 0 0 31px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        rgba(183, 228, 199, 0.10);
+
+    color: #b7e4c7;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.profile-security-card strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 12px;
+
+    color: rgba(255, 255, 255, 0.88);
+}
+
+
+.profile-security-card p {
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+
+.profile-dashboard-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    min-height: 50px;
+
+    margin-top: 30px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.15),
+            rgba(255, 255, 255, 0.07)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.profile-logout {
+    display: block;
+
+    width: fit-content;
+
+    margin: 18px auto 0;
+
+    padding: 8px 12px;
+
+    border-radius: 9px;
+
+    color: rgba(255, 255, 255, 0.45);
+
+    font-size: 11px;
+
+    text-decoration: none;
+
+    background:
+        rgba(255, 255, 255, 0.035);
+}
+
+
+@media (max-width: 430px) {
+
+    .profile-shell {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .profile-identity-card {
+        padding: 17px;
+    }
+
+    .large-profile-avatar {
+        width: 58px;
+        height: 58px;
+
+        flex-basis: 58px;
+    }
+
+}
+
+
+/* =========================================================
+   FAIRMONT BANK - TRANSACTIONS
+   ========================================================= */
+
+.transaction-page {
+    min-height: 100vh;
+    min-height: 100svh;
+
+    background:
+        radial-gradient(
+            circle at 90% 0%,
+            rgba(72, 143, 173, 0.16),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #071d30 0%,
+            #092a3f 50%,
+            #061523 100%
+        );
+
+    color: #ffffff;
+}
+
+.transaction-shell {
+    width: 100%;
+    max-width: 620px;
+
+    margin: 0 auto;
+
+    padding: 24px 20px 50px;
+}
+
+.transaction-header {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+.transaction-back-button {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    text-decoration: none;
+}
+
+.transaction-eyebrow {
+    margin-bottom: 4px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.8px;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+.transaction-header h1 {
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 25px;
+
+    font-weight: 500;
+
+    letter-spacing: -0.4px;
+}
+
+.transaction-account-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 21px;
+
+    border-radius: 21px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.13),
+            rgba(255, 255, 255, 0.055)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.18);
+}
+
+.transaction-account-card p {
+    margin-bottom: 7px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+.transaction-account-card h2 {
+    font-size: 27px;
+
+    font-weight: 500;
+
+    letter-spacing: -0.6px;
+}
+
+.transaction-customer-reference {
+    font-size: 10px;
+
+    color: rgba(255, 255, 255, 0.42);
+
+    text-align: right;
+}
+
+.transaction-list-section {
+    margin-top: 28px;
+}
+
+.transaction-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+.transaction-section-heading h2 {
+    font-size: 16px;
+
+    font-weight: 600;
+}
+
+.transaction-section-heading span {
+    min-width: 25px;
+
+    padding: 4px 7px;
+
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    color: rgba(255, 255, 255, 0.55);
+
+    font-size: 9px;
+
+    text-align: center;
+}
+
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 76px;
+
+    padding: 12px 13px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.transaction-item:hover {
+    background: rgba(255, 255, 255, 0.085);
+}
+
+.transaction-item:active {
+    transform: scale(0.985);
+}
+
+.transaction-icon {
+    width: 40px;
+    height: 40px;
+
+    flex: 0 0 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.transaction-credit {
+    background: rgba(183, 228, 199, 0.10);
+
+    color: #b7e4c7;
+}
+
+.transaction-debit {
+    background: rgba(255, 255, 255, 0.07);
+
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.transaction-main {
+    min-width: 0;
+
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.transaction-main strong {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+.transaction-main span {
+    font-size: 9px;
+
+    color: rgba(255, 255, 255, 0.40);
+}
+
+.transaction-main small {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 9px;
+
+    color: rgba(255, 255, 255, 0.32);
+}
+
+.transaction-amount {
+    flex: 0 0 auto;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    text-align: right;
+}
+
+.amount-credit {
+    color: #b7e4c7;
+}
+
+.amount-debit {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.transaction-empty {
+    padding: 35px 20px;
+
+    border-radius: 19px;
+
+    background: rgba(255, 255, 255, 0.045);
+
+    border: 1px dashed rgba(255, 255, 255, 0.13);
+
+    text-align: center;
+}
+
+.transaction-empty-icon {
+    margin-bottom: 10px;
+
+    font-size: 20px;
+
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.transaction-empty h3 {
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.transaction-empty p {
+    max-width: 280px;
+
+    margin: 8px auto 0;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+.transaction-dashboard-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    min-height: 50px;
+
+    margin-top: 30px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.15),
+            rgba(255, 255, 255, 0.07)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   TRANSACTION DETAILS
+   ========================================================= */
+
+.transaction-detail-card {
+    padding: 24px 18px;
+
+    border-radius: 21px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.11),
+            rgba(255, 255, 255, 0.05)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.transaction-detail-status {
+    padding-bottom: 24px;
+
+    text-align: center;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.transaction-large-icon {
+    width: 52px;
+    height: 52px;
+
+    margin: 0 auto 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    font-size: 21px;
+}
+
+.transaction-detail-label {
+    margin-bottom: 7px;
+
+    font-size: 9px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1.2px;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+.transaction-detail-status h2 {
+    font-size: 31px;
+
+    font-weight: 500;
+
+    letter-spacing: -0.7px;
+}
+
+.transaction-detail-status > span {
+    display: block;
+
+    margin-top: 6px;
+
+    font-size: 11px;
+
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.transaction-detail-list {
+    margin-top: 5px;
+}
+
+.transaction-detail-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    min-height: 58px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.transaction-detail-row:last-child {
+    border-bottom: 0;
+}
+
+.transaction-detail-row span {
+    font-size: 10px;
+
+    color: rgba(255, 255, 255, 0.42);
+}
+
+.transaction-detail-row strong {
+    max-width: 60%;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+
+    text-align: right;
+
+    overflow-wrap: anywhere;
+
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.transaction-status-value {
+    color: #b7e4c7 !important;
+}
+
+
+@media (max-width: 430px) {
+
+    .transaction-shell {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .transaction-account-card {
+        padding: 17px;
+    }
+
+    .transaction-account-card h2 {
+        font-size: 24px;
+    }
+
+}
+
+
+/* =========================================================
+   FAIRMONT BANK - SEND MONEY
+   ========================================================= */
+
+.send-money-form {
+    margin-top: 25px;
+}
+
+.send-money-field {
+    margin-bottom: 19px;
+}
+
+.send-money-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.send-money-field label span {
+    color: rgba(255, 255, 255, 0.35);
+
+    font-weight: 400;
+}
+
+.send-money-field input {
+    width: 100%;
+
+    min-height: 51px;
+
+    padding: 0 15px;
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    outline: none;
+
+    background: rgba(255, 255, 255, 0.055);
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.send-money-field input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.send-money-field input:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.send-money-field small {
+    display: block;
+
+    margin-top: 7px;
+
+    font-size: 9px;
+
+    line-height: 1.45;
+
+    color: rgba(255, 255, 255, 0.34);
+}
+
+.send-money-amount {
+    position: relative;
+}
+
+.send-money-amount > span {
+    position: absolute;
+
+    left: 15px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    font-size: 14px;
+
+    color: rgba(255, 255, 255, 0.55);
+
+    pointer-events: none;
+}
+
+.send-money-amount input {
+    padding-left: 34px;
+}
+
+.send-money-error {
+    margin-top: 18px;
+
+    padding: 13px 14px;
+
+    border-radius: 13px;
+
+    background: rgba(150, 50, 50, 0.14);
+
+    border: 1px solid rgba(255, 120, 120, 0.14);
+
+    color: rgba(255, 220, 220, 0.90);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+.send-money-notice {
+    margin: 23px 0 18px;
+
+    padding: 16px;
+
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.045);
+
+    border: 1px solid rgba(255, 255, 255, 0.075);
+}
+
+.send-money-notice strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 10px;
+
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.send-money-notice p {
+    margin: 0;
+
+    font-size: 9px;
+
+    line-height: 1.55;
+
+    color: rgba(255, 255, 255, 0.40);
+}
+
+.send-money-button {
+    width: 100%;
+
+    min-height: 52px;
+
+    border: 0;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.17),
+            rgba(255, 255, 255, 0.08)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.send-money-button:hover {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.22),
+            rgba(255, 255, 255, 0.10)
+        );
+}
+
+.send-money-button:active {
+    transform: scale(0.985);
+}
+

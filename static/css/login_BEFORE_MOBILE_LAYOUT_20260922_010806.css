@@ -1,0 +1,371 @@
+
+/* =========================================================
+   FAIRMONT BANK - CUSTOMER LOGIN
+   Dedicated login-page stylesheet
+   ========================================================= */
+
+.login-page {
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 40px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(37, 99, 235, 0.18), transparent 32%),
+        radial-gradient(circle at 85% 80%, rgba(14, 165, 233, 0.12), transparent 30%),
+        linear-gradient(135deg, #061226 0%, #081a35 48%, #0b2344 100%);
+    color: #eaf2ff;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+.login-page *,
+.login-page *::before,
+.login-page *::after {
+    box-sizing: border-box;
+}
+
+.login-page::before {
+    content: "";
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    top: -260px;
+    right: -180px;
+    pointer-events: none;
+}
+
+.login-page::after {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    border: 1px solid rgba(96, 165, 250, 0.07);
+    bottom: -230px;
+    left: -170px;
+    pointer-events: none;
+}
+
+.login-shell {
+    width: min(1080px, 100%);
+    min-height: 650px;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(390px, 1.08fr);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 28px;
+    background: rgba(8, 25, 49, 0.78);
+    box-shadow:
+        0 35px 90px rgba(0, 0, 0, 0.42),
+        0 8px 30px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+.login-shell > * {
+    min-width: 0;
+}
+
+/* General typography */
+
+.login-page h1,
+.login-page h2,
+.login-page h3,
+.login-page h4,
+.login-page p {
+    margin-top: 0;
+}
+
+.login-page a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.login-page a:hover {
+    text-decoration: none;
+}
+
+/* Branding / first panel */
+
+.login-shell > :first-child {
+    position: relative;
+}
+
+.login-shell > :first-child::after {
+    content: "";
+    position: absolute;
+    top: 12%;
+    right: 0;
+    width: 1px;
+    height: 76%;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255, 255, 255, 0.12),
+        transparent
+    );
+}
+
+/* Logo letters / brand mark */
+
+.login-page .logo,
+.login-page .brand-logo,
+.login-page .login-logo,
+.login-page .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.30);
+}
+
+/* Brand headings */
+
+.login-page .brand-name,
+.login-page .bank-name,
+.login-page .brand-title {
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.login-page .brand-subtitle,
+.login-page .brand-tagline {
+    color: #8fb0d8;
+}
+
+/* Form/card area */
+
+.login-page form {
+    width: 100%;
+}
+
+.login-page label {
+    display: block;
+    margin: 0 0 8px;
+    color: #dbeafe;
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+}
+
+.login-page input,
+.login-page select,
+.login-page textarea {
+    width: 100%;
+    min-height: 52px;
+    border: 1px solid rgba(148, 163, 184, 0.20);
+    border-radius: 13px;
+    outline: none;
+    padding: 13px 15px;
+    background: rgba(3, 15, 31, 0.60);
+    color: #f8fbff;
+    font-family: inherit;
+    font-size: 15px;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+.login-page input::placeholder,
+.login-page textarea::placeholder {
+    color: #6682a7;
+}
+
+.login-page input:focus,
+.login-page select:focus,
+.login-page textarea:focus {
+    border-color: rgba(59, 130, 246, 0.75);
+    background: rgba(3, 15, 31, 0.78);
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.13),
+        0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Password / show-password areas */
+
+.login-page input[type="password"],
+.login-page input[type="text"] {
+    color: #f8fbff;
+}
+
+.login-page button,
+.login-page input[type="submit"] {
+    min-height: 52px;
+    border: 0;
+    border-radius: 13px;
+    padding: 13px 20px;
+    background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
+    transition:
+        transform 0.16s ease,
+        box-shadow 0.16s ease,
+        filter 0.16s ease;
+}
+
+.login-page button:hover,
+.login-page input[type="submit"]:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.32);
+}
+
+.login-page button:active,
+.login-page input[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* Checkboxes */
+
+.login-page input[type="checkbox"] {
+    width: 16px;
+    min-height: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0;
+    accent-color: #3b82f6;
+}
+
+/* Links */
+
+.login-page a {
+    color: #75b9ff;
+    transition: color 0.16s ease;
+}
+
+.login-page a:hover {
+    color: #b7ddff;
+}
+
+/* Welcome heading */
+
+.login-page .welcome,
+.login-page .login-title {
+    color: #ffffff;
+}
+
+/* Error / success messages */
+
+.login-page .error,
+.login-page .alert-error {
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    border-radius: 12px;
+    background: rgba(127, 29, 29, 0.20);
+    color: #fecaca;
+    padding: 12px 14px;
+}
+
+.login-page .success,
+.login-page .alert-success {
+    border: 1px solid rgba(74, 222, 128, 0.22);
+    border-radius: 12px;
+    background: rgba(20, 83, 45, 0.20);
+    color: #bbf7d0;
+    padding: 12px 14px;
+}
+
+/* Security notice */
+
+.login-page .security,
+.login-page .secure,
+.login-page .security-notice {
+    color: #8ca9ca;
+    font-size: 12px;
+}
+
+/* Generic content spacing */
+
+.login-page .login-card,
+.login-page .login-form,
+.login-page .login-content,
+.login-page .login-container {
+    color: #eaf2ff;
+}
+
+/* Make common containers look polished without requiring
+   exact old class names. */
+
+.login-page .login-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+/* Mobile */
+
+@media (max-width: 850px) {
+    .login-page {
+        min-height: 100vh;
+        padding: 20px 14px;
+        align-items: flex-start;
+    }
+
+    .login-shell {
+        width: 100%;
+        min-height: auto;
+        margin: 10px 0;
+        grid-template-columns: 1fr;
+        border-radius: 22px;
+    }
+
+    .login-shell > :first-child::after {
+        display: none;
+    }
+
+    .login-page input,
+    .login-page select,
+    .login-page textarea,
+    .login-page button,
+    .login-page input[type="submit"] {
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-page {
+        padding: 12px 10px;
+    }
+
+    .login-shell {
+        border-radius: 18px;
+    }
+
+    .login-page input,
+    .login-page select,
+    .login-page textarea {
+        font-size: 16px;
+    }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .login-page *,
+    .login-page *::before,
+    .login-page *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Customer Details | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(184,149,74,.12), transparent 35%),
+                #071426;
+            color: #eef3f8;
+        }
+
+        .page {
+            width: min(900px, calc(100% - 32px));
+            margin: 40px auto;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .brand {
+            color: #d8b96a;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+        }
+
+        .back {
+            color: #b8c7d8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back:hover {
+            color: #ffffff;
+        }
+
+        .card {
+            background: rgba(14, 31, 53, .94);
+            border: 1px solid rgba(184,149,74,.22);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 24px 70px rgba(0,0,0,.28);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 27px;
+        }
+
+        .subtitle {
+            margin: 0 0 28px;
+            color: #9fb1c5;
+            line-height: 1.6;
+        }
+
+        .protected {
+            margin-bottom: 25px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(184,149,74,.07);
+            border: 1px solid rgba(184,149,74,.2);
+            color: #cbd7e4;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #cbd7e4;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid rgba(159,179,204,.22);
+            border-radius: 10px;
+            background: #091a2d;
+            color: #ffffff;
+            padding: 13px 14px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #b8954a;
+            box-shadow: 0 0 0 3px rgba(184,149,74,.10);
+        }
+
+        .readonly {
+            background: #0c2036;
+            color: #8498ae;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .button {
+            border: 0;
+            border-radius: 10px;
+            padding: 13px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .cancel {
+            color: #c5d1de;
+            background: rgba(159,179,204,.10);
+        }
+
+        .save {
+            color: #071426;
+            background: #d8b96a;
+        }
+
+        .save:hover {
+            background: #e3c77e;
+        }
+
+        .flash {
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            background: rgba(198,70,70,.12);
+            border: 1px solid rgba(198,70,70,.3);
+            color: #f2b5b5;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .button {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="topbar">
+        <div class="brand">FAIRMONT BANK</div>
+
+        <a
+            href="{{ url_for('admin_customer_profile', customer_id=customer.id) }}"
+            class="back"
+        >
+            ← Back to Customer Profile
+        </a>
+    </div>
+
+    <div class="card">
+
+        <h1>Edit Customer Details</h1>
+
+        <p class="subtitle">
+            Update the customer's registered information and account status.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="protected">
+            Customer ID, account number, account balance, and transaction
+            history are protected and will not be changed by this form.
+        </div>
+
+        <form method="POST">
+
+            <div class="grid">
+
+                <div class="field full">
+                    <label>Customer ID</label>
+
+                    <input
+                        type="text"
+                        value="{{ customer.customer_id }}"
+                        class="readonly"
+                        readonly
+                    >
+                </div>
+
+                <div class="field full">
+                    <label>Account Number</label>
+
+                    <input
+                        type="text"
+                        value="{{ customer.account_number or 'Not assigned' }}"
+                        class="readonly"
+                        readonly
+                    >
+                </div>
+
+                <div class="field full">
+                    <label for="full_name">Full Name</label>
+
+                    <input
+                        id="full_name"
+                        name="full_name"
+                        type="text"
+                        value="{{ customer.full_name or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="email">Email Address</label>
+
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value="{{ customer.email or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="phone">Phone Number</label>
+
+                    <input
+                        id="phone"
+                        name="phone"
+                        type="text"
+                        value="{{ customer.phone or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="country">Country</label>
+
+                    <input
+                        id="country"
+                        name="country"
+                        type="text"
+                        value="{{ customer.country or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="account_type">Account Type</label>
+
+                    <select
+                        id="account_type"
+                        name="account_type"
+                        required
+                    >
+                        <option
+                            value="savings"
+                            {% if customer.account_type == "savings" %}selected{% endif %}
+                        >
+                            Savings
+                        </option>
+
+                        <option
+                            value="current"
+                            {% if customer.account_type == "current" %}selected{% endif %}
+                        >
+                            Current
+                        </option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="account_status">Account Status</label>
+
+                    <select
+                        id="account_status"
+                        name="account_status"
+                        required
+                    >
+                        <option
+                            value="Active"
+                            {% if customer.account_status == "Active" %}selected{% endif %}
+                        >
+                            Active
+                        </option>
+
+                        <option
+                            value="Restricted"
+                            {% if customer.account_status == "Restricted" %}selected{% endif %}
+                        >
+                            Restricted
+                        </option>
+
+                        <option
+                            value="Suspended"
+                            {% if customer.account_status == "Suspended" %}selected{% endif %}
+                        >
+                            Suspended
+                        </option>
+
+                        <option
+                            value="Closed"
+                            {% if customer.account_status == "Closed" %}selected{% endif %}
+                        >
+                            Closed
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="actions">
+
+                <a
+                    href="{{ url_for('admin_customer_profile', customer_id=customer.id) }}"
+                    class="button cancel"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="button save"
+                >
+                    Save Customer Details
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1003 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+
+<style id="fairmont-services-scroll-fix">
+
+/* ========================================================
+   FAIRMONT BANK SERVICES HORIZONTAL SCROLLER
+   ======================================================== */
+
+.fairmont-services-scroll {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    gap: 12px !important;
+
+    padding: 4px 4px 14px 4px !important;
+
+    scroll-behavior: smooth !important;
+    scroll-snap-type: x proximity !important;
+
+    -webkit-overflow-scrolling: touch !important;
+
+    scrollbar-width: thin !important;
+
+    touch-action: pan-x !important;
+
+    box-sizing: border-box !important;
+}
+
+/* Each service stays its own card */
+.fairmont-services-scroll > * {
+    flex: 0 0 auto !important;
+    scroll-snap-align: start !important;
+}
+
+/* Do not allow service links to shrink */
+.fairmont-services-scroll a {
+    flex-shrink: 0 !important;
+}
+
+/* Make the scrollbar usable on desktop */
+.fairmont-services-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.fairmont-services-scroll::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+}
+
+/* ========================================================
+   SCROLL ARROWS
+   ======================================================== */
+
+.fairmont-services-wrapper {
+    position: relative !important;
+    width: 100% !important;
+}
+
+.fairmont-services-arrow {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    width: 34px !important;
+    height: 34px !important;
+
+    border: 0 !important;
+    border-radius: 50% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    cursor: pointer !important;
+    z-index: 20 !important;
+
+    font-size: 18px !important;
+    line-height: 1 !important;
+
+    box-shadow: 0 5px 18px rgba(0,0,0,.25) !important;
+
+    opacity: .95 !important;
+}
+
+.fairmont-services-arrow-left {
+    left: 3px !important;
+}
+
+.fairmont-services-arrow-right {
+    right: 3px !important;
+}
+
+.fairmont-services-arrow:hover {
+    transform: translateY(-50%) scale(1.05) !important;
+}
+
+.fairmont-services-arrow:active {
+    transform: translateY(-50%) scale(.96) !important;
+}
+
+/* On small screens, keep arrows subtle */
+@media (max-width: 600px) {
+
+    .fairmont-services-arrow {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 16px !important;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+    <main class="dashboard-page">
+
+        <div class="dashboard-shell">
+
+            <!-- =====================================================
+                 TOP HEADER
+                 ===================================================== -->
+
+            <header class="dashboard-header">
+
+                <div class="dashboard-top-left">
+
+                    <a
+                        href="/my-profile"
+                        class="my-profile-button">
+
+                        <span class="my-profile-icon">
+                            â—¯
+                        </span>
+
+                        <span>
+                            My Profile
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <div class="profile-button">
+
+                    {{ customer.full_name[0].upper() }}
+
+                </div>
+
+            </header>
+
+
+            <!-- =====================================================
+                 CUSTOMER GREETING
+                 ===================================================== -->
+
+            <section class="dashboard-greeting">
+
+                <p class="dashboard-eyebrow">
+                    FAIRMONT BANK
+                </p>
+
+                <h1>
+                    Hello, {{ customer.full_name.split()[0] }}.
+                </h1>
+
+            </section>
+
+
+            <!-- =====================================================
+                 AVAILABLE BALANCE
+                 ===================================================== -->
+
+            <section class="balance-card">
+
+                <div class="balance-top">
+
+                    <p class="balance-label">
+                        AVAILABLE BALANCE
+                    </p>
+
+                    <button
+                        type="button"
+                        class="balance-toggle"
+                        onclick="toggleBalance()">
+
+                        Hide
+
+                    </button>
+
+                </div>
+
+
+                <h2 id="balance">
+
+                    Â£{{ "{:,.2f}".format(customer.account_balance) }}
+
+                </h2>
+
+
+                <p class="customer-reference">
+
+                    Customer ID Â· {{ customer.customer_id }}
+
+                </p>
+
+            </section>
+
+
+            <!-- =====================================================
+                 SERVICES
+                 ===================================================== -->
+
+            <section class="dashboard-section services-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Services
+                    </h2>
+
+                </div>
+
+
+                <div class="services-scroll">
+
+
+                    <!-- Send Money -->
+
+                    <a
+                        href="/send-money"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            â†‘
+                        </span>
+
+                        <span class="service-name">
+                            Send Money
+                        </span>
+
+                    </a>
+
+
+                    <!-- Transaction History -->
+
+                    <a
+                        href="/transactions"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            â‰¡
+                        </span>
+
+                        <span class="service-name">
+                            Transaction<br>
+                            History
+                        </span>
+
+                    </a>
+
+
+                    <!-- Pay Bills -->
+
+                    <a
+                        href="/pay-bills"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            Â£
+                        </span>
+
+                        <span class="service-name">
+                            Pay Bills
+                        </span>
+
+                    </a>
+
+
+                    </a>
+
+
+
+                                        <!-- Bank Statement -->
+
+                    <a
+                        href="/bank-statements"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            â–¡
+                        </span>
+
+                        <span class="service-name">
+                            Bank<br>
+                            Statement
+                        </span>
+
+                    </a>
+
+
+<!-- Flights and Travels -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            âœˆ
+                        </span>
+
+                        <span class="service-name">
+                            Flights &<br>
+                            Travels
+                        </span>
+
+                    </a>
+
+
+                    <!-- Lifestyles -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            â—†
+                        </span>
+
+                        <span class="service-name">
+                            Lifestyles
+                        </span>
+
+                    </a>
+
+
+                    <!-- TV Subscriptions -->
+
+                    <a
+                        href="/tv-subscriptions"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            TV
+                        </span>
+
+                        <span class="service-name">
+                            TV<br>
+                            Subscriptions
+                        </span>
+
+                    </a>
+
+
+                    <!-- Data Bundles -->
+
+                    <a
+                        href="/data-bundles"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            â—‡
+                        </span>
+
+                        <span class="service-name">
+                            Data<br>
+                            Bundles
+                        </span>
+
+                    </a>
+
+
+                    <!-- Airtime -->
+
+                    <a
+                        href="/airtime"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            â˜Ž
+                        </span>
+
+                        <span class="service-name">
+                              Airtime
+                          </span>
+
+                    </a>
+
+
+                    <!-- International Transfer -->
+
+                    <a
+                        href="/international-transfer"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            â‡„
+                        </span>
+
+                        <span class="service-name">
+                            International<br>
+                            Transfer
+                        </span>
+
+                    </a>
+
+
+                    <!-- Electric Bills -->
+
+                    <a
+                        href="#"
+                        class="service-item">
+
+                        <span class="service-icon">
+                            âš¡
+                        </span>
+
+                        <span class="service-name">
+                            Electric<br>
+                            Bills
+                        </span>
+
+                    </a>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 RECENT ACTIVITY
+                 ===================================================== -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Recent Activity
+                    </h2>
+
+                    <a href="#">
+                        View all
+                    </a>
+
+                </div>
+
+
+                <div class="empty-activity">
+
+                    <div class="empty-activity-icon">
+                        â€”
+                    </div>
+
+                    <h3>
+                        No transactions yet
+                    </h3>
+
+                    <p>
+                        Your recent banking activity will appear here.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 SIGN OUT
+                 ===================================================== -->
+
+            <a
+                href="/logout"
+                class="dashboard-logout">
+
+                Sign out
+
+            </a>
+
+
+            <!-- =====================================================
+                 BOTTOM NAVIGATION
+                 ===================================================== -->
+
+            <nav class="bottom-navigation">
+
+
+                <a
+                    href="#"
+                    class="active">
+
+                    <span class="nav-icon">
+                        â—
+                    </span>
+
+                    <span>
+                        Home
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        â–¡
+                    </span>
+
+                    <span>
+                        Accounts
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        â†‘
+                    </span>
+
+                    <span>
+                        Payments
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        â‰¡
+                    </span>
+
+                    <span>
+                        Activity
+                    </span>
+
+                </a>
+
+
+                <a href="#">
+
+                    <span class="nav-icon">
+                        â€¢â€¢â€¢
+                    </span>
+
+                    <span>
+                        More
+                    </span>
+
+                </a>
+
+
+            </nav>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         BALANCE VISIBILITY
+         ========================================================= -->
+
+    <script>
+
+        function toggleBalance() {
+
+            const balance =
+                document.getElementById("balance");
+
+            const button =
+                document.querySelector(".balance-toggle");
+
+
+            if (balance.dataset.hidden === "true") {
+
+                balance.textContent =
+                    "Â£" +
+                    Number(
+                        {{ customer.account_balance }}
+                    ).toLocaleString(
+                        "en-GB",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    );
+
+                balance.dataset.hidden = "false";
+
+                button.textContent = "Hide";
+
+            } else {
+
+                balance.textContent = "â€¢â€¢â€¢â€¢â€¢â€¢";
+
+                balance.dataset.hidden = "true";
+
+                button.textContent = "Show";
+
+            }
+
+        }
+
+    </script>
+
+
+
+<script id="fairmont-services-scroll-fix-js">
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /*
+     * Find the Services heading.
+     */
+    const headings = Array.from(
+        document.querySelectorAll("h1, h2, h3, h4")
+    );
+
+    const servicesHeading = headings.find(function (heading) {
+        return heading.textContent.trim().toLowerCase() === "services";
+    });
+
+    if (!servicesHeading) {
+        console.log("Fairmont Services: heading not found.");
+        return;
+    }
+
+    /*
+     * Find the section containing Services.
+     */
+    const servicesSection =
+        servicesHeading.closest("section") ||
+        servicesHeading.parentElement;
+
+    if (!servicesSection) {
+        console.log("Fairmont Services: section not found.");
+        return;
+    }
+
+    /*
+     * Find links belonging to the Services area.
+     */
+    const serviceLinks =
+        Array.from(servicesSection.querySelectorAll("a"));
+
+    if (!serviceLinks.length) {
+        console.log("Fairmont Services: service links not found.");
+        return;
+    }
+
+    /*
+     * Find the common parent containing the service cards.
+     */
+    let serviceContainer = null;
+
+    for (const link of serviceLinks) {
+
+        let parent = link.parentElement;
+
+        while (
+            parent &&
+            parent !== servicesSection
+        ) {
+
+            const linksInside =
+                parent.querySelectorAll("a");
+
+            if (
+                linksInside.length >= 3 &&
+                linksInside.length <= serviceLinks.length
+            ) {
+                serviceContainer = parent;
+                break;
+            }
+
+            parent = parent.parentElement;
+        }
+
+        if (serviceContainer) {
+            break;
+        }
+    }
+
+    /*
+     * Fallback: use the first element after the Services heading.
+     */
+    if (!serviceContainer) {
+
+        serviceContainer =
+            servicesHeading.nextElementSibling;
+
+    }
+
+    if (!serviceContainer) {
+        console.log("Fairmont Services: container not found.");
+        return;
+    }
+
+    /*
+     * Apply the scrolling class.
+     */
+    serviceContainer.classList.add(
+        "fairmont-services-scroll"
+    );
+
+    /*
+     * Prevent nested scrolling containers.
+     */
+    serviceContainer.style.overflowX = "auto";
+    serviceContainer.style.overflowY = "hidden";
+
+    /*
+     * Wrap the services container.
+     */
+    let wrapper = serviceContainer.parentElement;
+
+    if (!wrapper.classList.contains(
+        "fairmont-services-wrapper"
+    )) {
+
+        const newWrapper =
+            document.createElement("div");
+
+        newWrapper.className =
+            "fairmont-services-wrapper";
+
+        serviceContainer.parentNode.insertBefore(
+            newWrapper,
+            serviceContainer
+        );
+
+        newWrapper.appendChild(
+            serviceContainer
+        );
+
+        wrapper = newWrapper;
+    }
+
+    /*
+     * Avoid creating duplicate arrows.
+     */
+    if (
+        !wrapper.querySelector(
+            ".fairmont-services-arrow-left"
+        )
+    ) {
+
+        const leftButton =
+            document.createElement("button");
+
+        leftButton.type = "button";
+
+        leftButton.className =
+            "fairmont-services-arrow " +
+            "fairmont-services-arrow-left";
+
+        leftButton.setAttribute(
+            "aria-label",
+            "Scroll services left"
+        );
+
+        leftButton.innerHTML = "â€¹";
+
+        wrapper.appendChild(leftButton);
+
+
+        const rightButton =
+            document.createElement("button");
+
+        rightButton.type = "button";
+
+        rightButton.className =
+            "fairmont-services-arrow " +
+            "fairmont-services-arrow-right";
+
+        rightButton.setAttribute(
+            "aria-label",
+            "Scroll services right"
+        );
+
+        rightButton.innerHTML = "â€º";
+
+        wrapper.appendChild(rightButton);
+
+
+        /*
+         * Scroll left.
+         */
+        leftButton.addEventListener(
+            "click",
+            function () {
+
+                serviceContainer.scrollBy({
+                    left: -300,
+                    behavior: "smooth"
+                });
+
+            }
+        );
+
+
+        /*
+         * Scroll right.
+         */
+        rightButton.addEventListener(
+            "click",
+            function () {
+
+                serviceContainer.scrollBy({
+                    left: 300,
+                    behavior: "smooth"
+                });
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Mouse wheel support on desktop.
+     * Scrolling the mouse wheel while over
+     * Services moves horizontally.
+     */
+    serviceContainer.addEventListener(
+        "wheel",
+        function (event) {
+
+            if (Math.abs(event.deltaY) >
+                Math.abs(event.deltaX)) {
+
+                event.preventDefault();
+
+                serviceContainer.scrollLeft +=
+                    event.deltaY;
+
+            }
+
+        },
+        { passive: false }
+    );
+
+
+    /*
+     * Mouse drag support.
+     */
+    let isDragging = false;
+    let startX = 0;
+    let startScrollLeft = 0;
+
+    serviceContainer.addEventListener(
+        "mousedown",
+        function (event) {
+
+            isDragging = true;
+
+            startX = event.pageX;
+
+            startScrollLeft =
+                serviceContainer.scrollLeft;
+
+            serviceContainer.style.cursor =
+                "grabbing";
+
+        }
+    );
+
+    document.addEventListener(
+        "mouseup",
+        function () {
+
+            isDragging = false;
+
+            serviceContainer.style.cursor =
+                "";
+
+        }
+    );
+
+    serviceContainer.addEventListener(
+        "mousemove",
+        function (event) {
+
+            if (!isDragging) {
+                return;
+            }
+
+            const distance =
+                event.pageX - startX;
+
+            serviceContainer.scrollLeft =
+                startScrollLeft - distance;
+
+        }
+    );
+
+
+    /*
+     * Keyboard accessibility.
+     */
+    serviceContainer.setAttribute(
+        "tabindex",
+        "0"
+    );
+
+    serviceContainer.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "ArrowRight") {
+
+                event.preventDefault();
+
+                serviceContainer.scrollBy({
+                    left: 250,
+                    behavior: "smooth"
+                });
+
+            }
+
+            if (event.key === "ArrowLeft") {
+
+                event.preventDefault();
+
+                serviceContainer.scrollBy({
+                    left: -250,
+                    behavior: "smooth"
+                });
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Make sure International Transfer remains
+     * reachable and clickable.
+     */
+    const internationalLink =
+        Array.from(
+            serviceContainer.querySelectorAll("a")
+        ).find(function (link) {
+
+            return link.textContent
+                .toLowerCase()
+                .includes("international");
+
+        });
+
+    if (internationalLink) {
+
+        internationalLink.href =
+            "/international-transfer";
+
+        internationalLink.style.pointerEvents =
+            "auto";
+
+        internationalLink.style.cursor =
+            "pointer";
+
+    }
+
+
+    console.log(
+        "Fairmont Services: horizontal scrolling enabled."
+    );
+
+});
+
+</script>
+
+</body>
+
+</html>
+

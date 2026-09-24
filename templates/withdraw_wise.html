@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wise Withdrawal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system,
+                         BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f4f7fb;
+            color: #182230;
+        }
+
+        .wrap {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 28px 18px 50px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #40556f;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e3e9f1;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(20,40,70,.08);
+            overflow: hidden;
+        }
+
+        .head {
+            padding: 28px 28px 22px;
+            border-bottom: 1px solid #edf1f5;
+        }
+
+        .icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e9fff6;
+            color: #15966b;
+            font-size: 25px;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 26px;
+        }
+
+        .sub {
+            margin: 0;
+            color: #66758a;
+            line-height: 1.5;
+        }
+
+        .body {
+            padding: 28px;
+        }
+
+        .balance {
+            padding: 15px 16px;
+            margin-bottom: 22px;
+            background: #f7f9fc;
+            border: 1px solid #e7edf4;
+            border-radius: 12px;
+        }
+
+        .balance span {
+            display: block;
+            color: #718096;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .balance strong {
+            font-size: 21px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            margin: 17px 0 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #cfd8e3;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #15966b;
+            box-shadow: 0 0 0 3px rgba(21,150,107,.10);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px 18px;
+            border: 0;
+            border-radius: 11px;
+            background: #15966b;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #117b58;
+        }
+
+        .notice {
+            margin-top: 17px;
+            padding: 13px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #66758a;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .flash {
+            margin-bottom: 16px;
+            padding: 13px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .flash.error {
+            background: #fff1f1;
+            color: #a12626;
+            border: 1px solid #f2cccc;
+        }
+
+        .flash.success {
+            background: #effaf3;
+            color: #176b3a;
+            border: 1px solid #ccebd7;
+        }
+
+        @media(max-width:560px) {
+            .head,
+            .body {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+    <a class="back" href="{{ url_for('withdraw') }}">
+        ← Back to withdrawal methods
+    </a>
+
+    <div class="card">
+
+        <div class="head">
+            <div class="icon">W</div>
+
+            <h1>Withdraw to Wise</h1>
+
+            <p class="sub">
+                Enter your Wise account details and the amount you would
+                like to withdraw.
+            </p>
+        </div>
+
+        <div class="body">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="balance">
+                <span>Available balance</span>
+
+                <strong>
+                    £{{ "%.2f"|format(customer.account_balance or 0) }}
+                </strong>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('withdraw_wise') }}">
+
+                <label for="wise_email">
+                    Wise account email
+                </label>
+
+                <input
+                    id="wise_email"
+                    name="wise_email"
+                    type="email"
+                    value="{{ request.form.get('wise_email','') }}"
+                    autocomplete="email"
+                    required
+                >
+
+                <label for="amount">
+                    Withdrawal amount
+                </label>
+
+                <input
+                    id="amount"
+                    name="amount"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value="{{ request.form.get('amount','') }}"
+                    inputmode="decimal"
+                    required
+                >
+
+                <label for="reference">
+                    Reference
+                    <span style="font-weight:400;color:#78879a">
+                        (optional)
+                    </span>
+                </label>
+
+                <input
+                    id="reference"
+                    name="reference"
+                    type="text"
+                    value="{{ request.form.get('reference','') }}"
+                    maxlength="120"
+                >
+
+                <button type="submit">
+                    Submit Wise Withdrawal Request
+                </button>
+
+            </form>
+
+            <div class="notice">
+                Your request will be submitted for review. A pending request
+                does not reduce the account balance until it is approved
+                through the bank's approval workflow.
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

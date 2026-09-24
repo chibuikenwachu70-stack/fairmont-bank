@@ -1,0 +1,586 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top right, rgba(40, 85, 150, .25), transparent 35%),
+        #071426;
+    color: #f5f8ff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.transfer-page {
+    width: min(100%, 760px);
+    margin: 0 auto;
+    padding: 24px 18px 50px;
+}
+
+.transfer-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.back-button {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    color: white;
+    text-decoration: none;
+    font-size: 34px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: #8ea7c8;
+    margin-bottom: 4px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 29px;
+}
+
+h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+}
+
+p {
+    color: #9eb0c9;
+    line-height: 1.55;
+}
+
+.balance-card {
+    padding: 23px;
+    border-radius: 22px;
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, #102b4d, #0a1d35);
+    border: 1px solid rgba(255,255,255,.09);
+    box-shadow: 0 20px 50px rgba(0,0,0,.22);
+}
+
+.balance-card > span {
+    display: block;
+    color: #93a9c4;
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    font-weight: 700;
+}
+
+.balance-card > strong {
+    display: block;
+    font-size: 31px;
+    margin-top: 7px;
+}
+
+.account-reference {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.account-reference div {
+    padding: 13px;
+    border-radius: 14px;
+    background: rgba(0,0,0,.16);
+}
+
+.account-reference small {
+    display: block;
+    color: #8097b5;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.account-reference b {
+    font-size: 13px;
+    word-break: break-all;
+}
+
+.panel {
+    background: rgba(13, 32, 57, .84);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 22px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 18px 45px rgba(0,0,0,.18);
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.section-heading p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.section-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    background: rgba(78, 139, 214, .16);
+    color: #9fc8ff;
+    font-weight: 800;
+}
+
+.transfer-types {
+    display: grid;
+    gap: 10px;
+}
+
+.transfer-type {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.025);
+    color: white;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.transfer-type.active {
+    border-color: rgba(111, 173, 245, .65);
+    background: rgba(67, 125, 194, .15);
+}
+
+.type-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: #173b63;
+    color: #b8d8ff;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.transfer-type strong,
+.transfer-type small {
+    display: block;
+}
+
+.transfer-type small {
+    margin-top: 4px;
+    color: #8ea2bc;
+}
+
+.field {
+    margin-bottom: 17px;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #dce7f6;
+}
+
+label span {
+    color: #7188a4;
+    font-weight: 400;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 13px;
+    background: #091a2e;
+    color: #f5f8ff;
+    padding: 13px 14px;
+    font-size: 14px;
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: rgba(111, 173, 245, .75);
+}
+
+.field > small {
+    display: block;
+    margin-top: 7px;
+    color: #7188a4;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.money-input {
+    display: flex;
+    align-items: center;
+    background: #091a2e;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.money-input span {
+    padding-left: 15px;
+    color: #9bb4d1;
+    font-weight: 700;
+}
+
+.money-input input {
+    border: 0;
+    background: transparent;
+}
+
+.notice {
+    padding: 15px;
+    border-radius: 15px;
+    background: rgba(62, 110, 164, .10);
+    border: 1px solid rgba(99, 155, 215, .15);
+    margin: 20px 0;
+}
+
+.notice strong {
+    display: block;
+    font-size: 13px;
+}
+
+.notice p {
+    margin: 7px 0 0;
+    font-size: 12px;
+}
+
+.primary-button,
+.secondary-button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.primary-button {
+    border: 0;
+    color: white;
+    background: linear-gradient(135deg, #2d71bd, #3f91df);
+}
+
+.secondary-button {
+    color: #b8d2ef;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    margin-bottom: 16px;
+}
+
+.alert {
+    padding: 14px 16px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    font-size: 13px;
+}
+
+.alert.error {
+    background: rgba(180, 53, 53, .15);
+    border: 1px solid rgba(239, 104, 104, .25);
+    color: #ffb1b1;
+}
+
+.security-note {
+    display: flex;
+    gap: 11px;
+    padding: 13px;
+    color: #7f96b3;
+    font-size: 11px;
+}
+
+.security-note p {
+    margin: 3px 0 0;
+    font-size: 11px;
+}
+
+.hidden {
+    display: none;
+}
+
+.confirmation-page {
+    padding-top: 70px;
+    text-align: center;
+}
+
+.success-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 20px;
+    background: rgba(62, 178, 116, .15);
+    border: 1px solid rgba(62, 178, 116, .35);
+    color: #7be0a4;
+    font-size: 32px;
+}
+
+.confirmation-text {
+    max-width: 520px;
+    margin: 10px auto 24px;
+}
+
+.confirmation-card {
+    text-align: left;
+    background: rgba(13, 32, 57, .84);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.status-pill {
+    display: inline-block;
+    border-radius: 30px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.status-pill.pending {
+    color: #f3d58a;
+    background: rgba(202, 157, 45, .14);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.detail-row:last-child {
+    border-bottom: 0;
+}
+
+.detail-row span {
+    color: #8298b4;
+    font-size: 12px;
+}
+
+.detail-row strong {
+    text-align: right;
+    font-size: 13px;
+    word-break: break-word;
+}
+
+@media (max-width: 560px) {
+
+    .transfer-page {
+        padding: 18px 13px 40px;
+    }
+
+    .field-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .account-reference {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+}
+
+
+
+/* =========================================================
+   Fairmont Bank - Transfer Quick Search
+   ========================================================= */
+
+.quick-search-select {
+    position: relative;
+    width: 100%;
+}
+
+.quick-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+}
+
+.quick-search-native-select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.quick-search-results {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% - 2px);
+    z-index: 1000;
+    display: none;
+    max-height: 240px;
+    overflow-y: auto;
+    border-radius: 14px;
+    padding: 6px;
+    background: rgba(16, 27, 48, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(18px);
+}
+
+.quick-search-option {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    padding: 11px 12px;
+    margin: 2px 0;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+}
+
+.quick-search-option:hover,
+.quick-search-option:focus {
+    background: rgba(255, 255, 255, 0.08);
+    outline: none;
+}
+
+.quick-search-empty {
+    padding: 12px;
+    text-align: center;
+    opacity: 0.65;
+}
+
+.quick-search-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+
+/* =========================================================
+   Fairmont Bank - Transfer Search Controls
+   ========================================================= */
+
+.quick-select-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.search-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.transfer-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 48px;
+    padding: 13px 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.055);
+    color: inherit;
+    font: inherit;
+    outline: none;
+}
+
+.transfer-search-input:focus {
+    border-color: rgba(255,255,255,0.30);
+    background: rgba(255,255,255,0.075);
+}
+
+.transfer-search-input::placeholder {
+    color: rgba(255,255,255,0.52);
+}
+
+.transfer-search-input:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+}
+
+.transfer-search-results {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 5px);
+    z-index: 5000;
+    display: none;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(12, 24, 45, 0.98);
+    border: 1px solid rgba(255,255,255,0.13);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.40);
+    backdrop-filter: blur(18px);
+}
+
+.transfer-search-option {
+    display: block;
+    width: 100%;
+    padding: 12px 13px;
+    margin: 2px 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.transfer-search-option:hover,
+.transfer-search-option:focus {
+    background: rgba(255,255,255,0.09);
+    outline: none;
+}
+
+.transfer-search-empty {
+    padding: 13px;
+    text-align: center;
+    opacity: 0.60;
+}

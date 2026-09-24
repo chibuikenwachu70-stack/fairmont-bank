@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .notifications-page {
+            min-height: 100vh;
+            padding: 24px 18px 50px;
+        }
+
+        .notifications-shell {
+            width: min(780px, 100%);
+            margin: 0 auto;
+        }
+
+        /* =====================================================
+           HEADER
+           ===================================================== */
+
+        .notifications-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 26px;
+        }
+
+        .notifications-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .notifications-back {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 13px;
+            text-decoration: none;
+            font-size: 21px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: inherit;
+            transition: .2s ease;
+        }
+
+        .notifications-back:hover {
+            background: rgba(255,255,255,0.11);
+            transform: translateX(-2px);
+        }
+
+        .notifications-eyebrow {
+            margin: 0 0 4px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            opacity: .55;
+        }
+
+        .notifications-header h1 {
+            margin: 0;
+            font-size: clamp(25px, 5vw, 34px);
+            letter-spacing: -0.5px;
+        }
+
+        .notifications-header-icon {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.11);
+            font-size: 22px;
+        }
+
+
+        /* =====================================================
+           ACCOUNT / SUMMARY CARD
+           ===================================================== */
+
+        .notifications-summary {
+            position: relative;
+            overflow: hidden;
+            padding: 22px;
+            margin-bottom: 18px;
+            border-radius: 20px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,0.09),
+                    rgba(255,255,255,0.035)
+                );
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+        }
+
+        .notifications-summary::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -90px;
+            top: -100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+
+        .notifications-summary-label {
+            margin: 0 0 7px;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            opacity: .55;
+        }
+
+        .notifications-summary-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .notifications-summary-id {
+            margin: 6px 0 0;
+            font-size: 13px;
+            opacity: .55;
+        }
+
+
+        /* =====================================================
+           TOOLBAR
+           ===================================================== */
+
+        .notifications-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 24px 2px 14px;
+        }
+
+        .notifications-status {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            opacity: .72;
+        }
+
+        .notifications-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: .8;
+        }
+
+        .notifications-mark-all {
+            border: 0;
+            padding: 9px 13px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: inherit;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.09);
+            font-size: 12px;
+            font-weight: 600;
+            transition: .2s ease;
+        }
+
+        .notifications-mark-all:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+
+        /* =====================================================
+           NOTIFICATION CARDS
+           ===================================================== */
+
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+        }
+
+        .notification-card {
+            position: relative;
+            display: grid;
+            grid-template-columns: 46px minmax(0, 1fr);
+            gap: 14px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.045);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: .2s ease;
+        }
+
+        .notification-card:hover {
+            background: rgba(255,255,255,0.065);
+            border-color: rgba(255,255,255,0.13);
+        }
+
+        .notification-card.unread {
+            background: rgba(255,255,255,0.075);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .notification-card.unread::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 18px;
+            bottom: 18px;
+            width: 3px;
+            border-radius: 0 4px 4px 0;
+            background: currentColor;
+            opacity: .8;
+        }
+
+        .notification-card-icon {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 20px;
+        }
+
+        .notification-card-content {
+            min-width: 0;
+        }
+
+        .notification-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .notification-card-title {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.35;
+        }
+
+        .notification-card-date {
+            flex-shrink: 0;
+            font-size: 11px;
+            opacity: .45;
+            white-space: nowrap;
+        }
+
+        .notification-card-type {
+            display: inline-flex;
+            margin-top: 6px;
+            padding: 4px 8px;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.055);
+            font-size: 10px;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            opacity: .62;
+        }
+
+        .notification-card-message {
+            margin: 10px 0 11px;
+            font-size: 13px;
+            line-height: 1.55;
+            opacity: .68;
+        }
+
+        .notification-read-button {
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            opacity: .65;
+        }
+
+        .notification-read-button:hover {
+            opacity: 1;
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+           ===================================================== */
+
+        .notifications-empty {
+            padding: 55px 24px;
+            text-align: center;
+            border-radius: 20px;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.065),
+                    rgba(255,255,255,0.03)
+                );
+            border: 1px solid rgba(255,255,255,0.09);
+        }
+
+        .notifications-empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.09);
+            font-size: 27px;
+            opacity: .8;
+        }
+
+        .notifications-empty h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .notifications-empty p {
+            max-width: 420px;
+            margin: 0 auto;
+            font-size: 13px;
+            line-height: 1.6;
+            opacity: .55;
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+
+        @media (max-width: 600px) {
+
+            .notifications-page {
+                padding: 18px 13px 40px;
+            }
+
+            .notifications-header {
+                margin-bottom: 20px;
+            }
+
+            .notifications-header-icon {
+                width: 43px;
+                height: 43px;
+            }
+
+            .notifications-summary {
+                padding: 18px;
+                border-radius: 17px;
+            }
+
+            .notifications-toolbar {
+                align-items: flex-start;
+                flex-direction: column;
+                margin-top: 20px;
+            }
+
+            .notification-card {
+                grid-template-columns: 40px minmax(0, 1fr);
+                gap: 11px;
+                padding: 15px;
+            }
+
+            .notification-card-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 12px;
+            }
+
+            .notification-card-top {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .notification-card-date {
+                white-space: normal;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="notifications-page">
+
+        <div class="notifications-shell">
+
+
+            <!-- HEADER -->
+
+            <header class="notifications-header">
+
+                <div class="notifications-header-left">
+
+                    <a
+                        href="/dashboard"
+                        class="notifications-back"
+                        aria-label="Back to dashboard">
+
+                        ←
+
+                    </a>
+
+                    <div>
+
+                        <p class="notifications-eyebrow">
+                            FAIRMONT BANK
+                        </p>
+
+                        <h1>
+                            Notifications
+                        </h1>
+
+                    </div>
+
+                </div>
+
+
+                <div class="notifications-header-icon">
+                    ♢
+                </div>
+
+            </header>
+
+
+            <!-- TOOLBAR -->
+
+            <div class="notifications-toolbar">
+
+                <div class="notifications-status">
+
+                    <span class="notifications-status-dot"></span>
+
+                    {% if unread_count %}
+
+                        {{ unread_count }}
+                        unread notification{% if unread_count != 1 %}s{% endif %}
+
+                    {% else %}
+
+                        All notifications are read
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if unread_count %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('mark_all_notifications_read') }}">
+
+                        <button
+                            type="submit"
+                            class="notifications-mark-all">
+
+                            Mark all as read
+
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- NOTIFICATIONS -->
+
+            {% if notifications %}
+
+                <section class="notifications-list">
+
+                    {% for notification in notifications %}
+
+                        <article
+                            class="notification-card
+                            {% if not notification.is_read %}unread{% endif %}">
+
+                            <div class="notification-card-icon">
+
+                                {% if notification.notification_type == "Account" %}
+                                    ◇
+                                {% elif notification.notification_type == "Payment" %}
+                                    £
+                                {% elif notification.notification_type == "Transfer" %}
+                                    ↔
+                                {% elif notification.notification_type == "Security" %}
+                                    ◆
+                                {% else %}
+                                    ●
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="notification-card-content">
+
+                                <div class="notification-card-top">
+
+                                    <h3 class="notification-card-title">
+                                        {{ notification.title }}
+                                    </h3>
+
+                                    <span class="notification-card-date">
+
+                                        {{ notification.created_at.strftime("%d %b %Y, %H:%M") }}
+
+                                    </span>
+
+                                </div>
+
+
+                                <span class="notification-card-type">
+                                    {{ notification.notification_type }}
+                                </span>
+
+
+                                <p class="notification-card-message">
+
+                                    {{ notification.message }}
+
+                                </p>
+
+
+                                {% if not notification.is_read %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('mark_notification_read', notification_id=notification.id) }}">
+
+                                        <button
+                                            type="submit"
+                                            class="notification-read-button">
+
+                                            Mark as read
+
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </section>
+
+            {% else %}
+
+                <section class="notifications-empty">
+
+                    <div class="notifications-empty-icon">
+                        ♢
+                    </div>
+
+                    <h2>
+                        You're all caught up
+                    </h2>
+
+                    <p>
+                        Important account activity, payment updates,
+                        security notices and messages from Fairmont Bank
+                        will appear here.
+                    </p>
+
+                </section>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmed | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(40, 83, 145, 0.28), transparent 40%),
+                linear-gradient(145deg, #061426, #0a1d34 55%, #07111f);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 28px 16px 40px;
+        }
+
+        .card {
+            background: rgba(11, 31, 55, 0.86);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 24px;
+            padding: 25px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .success {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 17px;
+            background: rgba(48, 175, 112, 0.18);
+            border: 1px solid rgba(91, 221, 153, 0.35);
+            color: #75e0a8;
+            font-size: 28px;
+        }
+
+        .eyebrow {
+            color: #8fb7ed;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 7px 0;
+            font-size: 27px;
+        }
+
+        .intro {
+            color: #aebed2;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .details {
+            border-top: 1px solid rgba(255,255,255,0.09);
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 13px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            font-size: 13px;
+        }
+
+        .label {
+            color: #91a5bc;
+        }
+
+        .value {
+            text-align: right;
+            color: #f3f7fc;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .status {
+            color: #75e0a8;
+        }
+
+        .amount {
+            font-size: 19px;
+        }
+
+        .actions {
+            display: grid;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .button {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            padding: 13px;
+            border-radius: 13px;
+            font-size: 14px;
+            font-weight: 700;
+            background: #2f70c9;
+            color: #ffffff;
+        }
+
+        .secondary {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+    <div class="card">
+
+        <div class="success">✓</div>
+
+        <div class="eyebrow">Fairmont Bank</div>
+
+        <h1>Payment Completed</h1>
+
+        <div class="intro">
+            Your lifestyle payment has been successfully processed and recorded in your transaction history.
+        </div>
+
+        <div class="details">
+
+            <div class="row">
+                <div class="label">Category</div>
+                <div class="value">{{ category }}</div>
+            </div>
+
+            <div class="row">
+                <div class="label">Merchant / Service</div>
+                <div class="value">{{ merchant }}</div>
+            </div>
+
+            <div class="row">
+                <div class="label">Customer / Order Reference</div>
+                <div class="value">{{ account_reference }}</div>
+            </div>
+
+            <div class="row">
+                <div class="label">Amount</div>
+                <div class="value amount">
+                    £{{ "{:,.2f}".format(amount) }}
+                </div>
+            </div>
+
+            {% if payment_reference %}
+            <div class="row">
+                <div class="label">Payment Reference</div>
+                <div class="value">{{ payment_reference }}</div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="label">Transaction Reference</div>
+                <div class="value">{{ transaction_reference }}</div>
+            </div>
+
+            <div class="row">
+                <div class="label">Status</div>
+                <div class="value status">Completed</div>
+            </div>
+
+            <div class="row">
+                <div class="label">New Balance</div>
+                <div class="value">
+                    £{{ "{:,.2f}".format(new_balance) }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="actions">
+            <a href="{{ url_for('transactions') }}" class="button">
+                View Transactions
+            </a>
+
+            <a href="{{ url_for('dashboard') }}" class="button secondary">
+                Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

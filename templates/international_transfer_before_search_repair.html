@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Transfer | Fairmont Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transfer.css') }}">
+</head>
+
+<body>
+
+<div class="transfer-page">
+
+    <header class="transfer-header">
+        <a href="{{ url_for('dashboard') }}" class="back-button">‹</a>
+
+        <div>
+            <div class="eyebrow">GLOBAL PAYMENTS</div>
+            <h1>International Transfer</h1>
+        </div>
+    </header>
+
+
+    <section class="balance-card">
+
+        <span>AVAILABLE BALANCE</span>
+
+        <strong>
+            £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+        </strong>
+
+        <div class="account-reference">
+
+            <div>
+                <small>Account Number</small>
+                <b>{{ customer.account_number or "Not assigned" }}</b>
+            </div>
+
+            <div>
+                <small>Currency</small>
+                <b>GBP</b>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    {% if error %}
+    <div class="alert error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+
+    <section class="panel">
+
+        <div class="section-heading">
+
+            <span class="section-icon">◎</span>
+
+            <div>
+                <h2>Beneficiary details</h2>
+                <p>Enter the destination bank information.</p>
+            </div>
+
+        </div>
+
+
+        <form method="POST" action="{{ url_for('international_transfer') }}">
+
+            <div class="field">
+
+                <label>Destination Country</label>
+
+                
+<div class="quick-search-select" data-search-select>
+    <input
+        type="text"
+        class="quick-search-input"
+        id="countrySearch"
+        placeholder="Search country..."
+        autocomplete="off"
+        aria-label="Search country"
+    >
+
+    <select
+        name="country"
+        id="internationalCountry"
+        class="quick-search-native-select"
+        required
+    >
+        <option value="">Select country</option>
+    </select>
+
+    <div class="quick-search-results" id="countrySearchResults"></div>
+</div>
+
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Beneficiary Name</label>
+
+                <input
+                    type="text"
+                    name="recipient_name"
+                    placeholder="Full legal name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Beneficiary Address <span>Optional</span></label>
+
+                <textarea
+                    name="recipient_address"
+                    rows="3"
+                    placeholder="Street, city, postal code and country"
+                ></textarea>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Bank Name</label>
+
+                
+
+<div class="quick-search-select" data-search-select>
+    <input
+        type="text"
+        class="quick-search-input"
+        id="internationalBankSearch"
+        placeholder="Search bank..."
+        autocomplete="off"
+        aria-label="Search bank"
+    >
+
+    <select
+        name="bank_name"
+        id="internationalBank"
+        class="quick-search-native-select"
+        required
+        disabled
+    >
+        <option value="">Select country first</option>
+    </select>
+
+    <div class="quick-search-results" id="internationalBankSearchResults"></div>
+</div>
+
+
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Account Number</label>
+
+                <input
+                    type="text"
+                    name="account_number"
+                    placeholder="Local bank account number"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>IBAN <span>Where applicable</span></label>
+
+                <input
+                    type="text"
+                    name="iban"
+                    placeholder="International Bank Account Number"
+                >
+
+            </div>
+
+
+            <div class="field-row">
+
+                <div class="field">
+
+                    <label>SWIFT / BIC</label>
+
+                    <input
+                        type="text"
+                        name="bic"
+                        maxlength="11"
+                        placeholder="AAAA BB CC 123"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Local Bank Code <span>Optional</span></label>
+
+                    <input
+                        type="text"
+                        name="local_bank_code"
+                        placeholder="Routing / clearing code"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Currency</label>
+
+                
+<div class="quick-search-select" data-search-select>
+    <input
+        type="text"
+        class="quick-search-input"
+        id="currencySearch"
+        placeholder="Search currency..."
+        autocomplete="off"
+        aria-label="Search currency"
+    >
+
+    <select
+        name="currency"
+        id="internationalCurrency"
+        class="quick-search-native-select"
+        required
+    >
+        <option value="">Select currency</option>
+        <option value="GBP">GBP — British Pound</option>
+        <option value="EUR">EUR — Euro</option>
+        <option value="USD">USD — US Dollar</option>
+        <option value="CAD">CAD — Canadian Dollar</option>
+        <option value="AUD">AUD — Australian Dollar</option>
+        <option value="NZD">NZD — New Zealand Dollar</option>
+        <option value="CHF">CHF — Swiss Franc</option>
+        <option value="JPY">JPY — Japanese Yen</option>
+        <option value="CNY">CNY — Chinese Yuan</option>
+        <option value="HKD">HKD — Hong Kong Dollar</option>
+        <option value="SGD">SGD — Singapore Dollar</option>
+        <option value="ZAR">ZAR — South African Rand</option>
+        <option value="KES">KES — Kenyan Shilling</option>
+        <option value="NGN">NGN — Nigerian Naira</option>
+        <option value="GHS">GHS — Ghanaian Cedi</option>
+        <option value="TZS">TZS — Tanzanian Shilling</option>
+        <option value="UGX">UGX — Ugandan Shilling</option>
+        <option value="INR">INR — Indian Rupee</option>
+        <option value="AED">AED — UAE Dirham</option>
+        <option value="SAR">SAR — Saudi Riyal</option>
+        <option value="QAR">QAR — Qatari Riyal</option>
+        <option value="BHD">BHD — Bahraini Dinar</option>
+        <option value="KWD">KWD — Kuwaiti Dinar</option>
+        <option value="OMR">OMR — Omani Rial</option>
+        <option value="SGD">SGD — Singapore Dollar</option>
+        <option value="BRL">BRL — Brazilian Real</option>
+        <option value="MXN">MXN — Mexican Peso</option>
+        <option value="ARS">ARS — Argentine Peso</option>
+        <option value="CLP">CLP — Chilean Peso</option>
+        <option value="COP">COP — Colombian Peso</option>
+        <option value="SRD">SRD — Surinamese Dollar</option>
+    </select>
+
+    <div class="quick-search-results" id="currencySearchResults"></div>
+</div>
+
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Amount</label>
+
+                <div class="money-input">
+
+                    <span>¤</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Payment Reference <span>Optional</span></label>
+
+                <input
+                    type="text"
+                    name="payment_reference"
+                    maxlength="255"
+                    placeholder="Reason or reference"
+                >
+
+            </div>
+
+
+            <div class="notice international-notice">
+
+                <strong>International payment information</strong>
+
+                <p>
+                    International payments require accurate beneficiary and
+                    bank information. The local Fairmont prototype records
+                    external transfer requests; it does not claim that funds
+                    have been delivered through an external payment network.
+                </p>
+
+            </div>
+
+
+            <button type="submit" class="primary-button">
+                Continue
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <a href="{{ url_for('transactions') }}" class="secondary-button">
+        View Transaction History
+    </a>
+
+</div>
+
+
+<script id="fairmont-country-bank-selector">
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const countrySelect =
+        document.getElementById("internationalCountry");
+
+    const bankSelect =
+        document.getElementById("internationalBank");
+
+    if (!countrySelect || !bankSelect) {
+        console.log(
+            "Fairmont International Transfer: "
+            + "country/bank selectors not found."
+        );
+        return;
+    }
+
+    const countryBanks = {
+    "United Kingdom": [
+        "Barclays Bank",
+        "HSBC UK",
+        "Lloyds Bank",
+        "NatWest",
+        "Royal Bank of Scotland",
+        "Santander UK",
+        "Halifax",
+        "Nationwide Building Society",
+        "TSB Bank",
+        "Metro Bank",
+        "Monzo Bank",
+        "Starling Bank",
+        "Virgin Money",
+        "First Direct",
+        "Bank of Scotland",
+        "Other UK Bank"
+    ],
+    "United States": [
+        "JPMorgan Chase Bank",
+        "Bank of America",
+        "Wells Fargo Bank",
+        "Citibank",
+        "U.S. Bank",
+        "PNC Bank",
+        "Truist Bank",
+        "Capital One",
+        "TD Bank",
+        "Charles Schwab Bank",
+        "Other US Bank"
+    ],
+    "Canada": [
+        "Royal Bank of Canada",
+        "Toronto-Dominion Bank",
+        "Bank of Montreal",
+        "Bank of Nova Scotia",
+        "Canadian Imperial Bank of Commerce",
+        "National Bank of Canada",
+        "Desjardins",
+        "Other Canadian Bank"
+    ],
+    "Australia": [
+        "Commonwealth Bank",
+        "Westpac",
+        "ANZ Bank",
+        "National Australia Bank",
+        "Macquarie Bank",
+        "Bendigo Bank",
+        "Bank of Queensland",
+        "Other Australian Bank"
+    ],
+    "New Zealand": [
+        "ANZ New Zealand",
+        "ASB Bank",
+        "Bank of New Zealand",
+        "Westpac New Zealand",
+        "Kiwibank",
+        "Heartland Bank",
+        "Other New Zealand Bank"
+    ],
+    "Germany": [
+        "Deutsche Bank",
+        "Commerzbank",
+        "DZ Bank",
+        "KfW",
+        "ING Germany",
+        "N26",
+        "DKB",
+        "Other German Bank"
+    ],
+    "France": [
+        "BNP Paribas",
+        "Crédit Agricole",
+        "Société Générale",
+        "BPCE",
+        "Crédit Mutuel",
+        "La Banque Postale",
+        "HSBC Continental Europe",
+        "Other French Bank"
+    ],
+    "Netherlands": [
+        "ING Bank",
+        "ABN AMRO",
+        "Rabobank",
+        "de Volksbank",
+        "Triodos Bank",
+        "Other Dutch Bank"
+    ],
+    "Belgium": [
+        "KBC Bank",
+        "Belfius Bank",
+        "BNP Paribas Fortis",
+        "ING Belgium",
+        "Argenta",
+        "Other Belgian Bank"
+    ],
+    "Switzerland": [
+        "UBS",
+        "Zürcher Kantonalbank",
+        "Banque Cantonale Vaudoise",
+        "Raiffeisen Switzerland",
+        "PostFinance",
+        "Julius Baer",
+        "Other Swiss Bank"
+    ],
+    "Ireland": [
+        "AIB",
+        "Bank of Ireland",
+        "Permanent TSB",
+        "EBS",
+        "Revolut Bank Ireland",
+        "Other Irish Bank"
+    ],
+    "Spain": [
+        "Banco Santander",
+        "BBVA",
+        "CaixaBank",
+        "Banco Sabadell",
+        "Bankinter",
+        "Unicaja Banco",
+        "Abanca",
+        "Other Spanish Bank"
+    ],
+    "Portugal": [
+        "Caixa Geral de Depósitos",
+        "Millennium bcp",
+        "Novo Banco",
+        "Banco Santander Totta",
+        "Banco BPI",
+        "Other Portuguese Bank"
+    ],
+    "Italy": [
+        "Intesa Sanpaolo",
+        "UniCredit",
+        "Banco BPM",
+        "BPER Banca",
+        "Mediobanca",
+        "Monte dei Paschi di Siena",
+        "Other Italian Bank"
+    ],
+    "Sweden": [
+        "Swedbank",
+        "SEB",
+        "Handelsbanken",
+        "Nordea",
+        "Danske Bank Sweden",
+        "Other Swedish Bank"
+    ],
+    "Norway": [
+        "DNB Bank",
+        "SpareBank 1",
+        "Nordea Norway",
+        "Danske Bank Norway",
+        "Handelsbanken Norway",
+        "Other Norwegian Bank"
+    ],
+    "Denmark": [
+        "Danske Bank",
+        "Jyske Bank",
+        "Sydbank",
+        "Nordea Denmark",
+        "Nykredit Bank",
+        "Other Danish Bank"
+    ],
+    "Finland": [
+        "Nordea Bank",
+        "OP Financial Group",
+        "Danske Bank Finland",
+        "S-Bank",
+        "Ålandsbanken",
+        "Other Finnish Bank"
+    ],
+    "South Africa": [
+        "Standard Bank",
+        "First National Bank",
+        "Absa Bank",
+        "Nedbank",
+        "Capitec Bank",
+        "Investec Bank",
+        "African Bank",
+        "Other South African Bank"
+    ],
+    "Kenya": [
+        "KCB Bank Kenya",
+        "Equity Bank Kenya",
+        "Co-operative Bank of Kenya",
+        "Absa Bank Kenya",
+        "NCBA Bank Kenya",
+        "Stanbic Bank Kenya",
+        "I&M Bank",
+        "DTB Kenya",
+        "Standard Chartered Kenya",
+        "Family Bank",
+        "Other Kenyan Bank"
+    ],
+    "Nigeria": [
+        "Access Bank",
+        "First Bank of Nigeria",
+        "United Bank for Africa",
+        "Guaranty Trust Bank",
+        "Zenith Bank",
+        "Fidelity Bank",
+        "Ecobank Nigeria",
+        "Stanbic IBTC Bank",
+        "Union Bank of Nigeria",
+        "Other Nigerian Bank"
+    ],
+    "Ghana": [
+        "GCB Bank",
+        "Ecobank Ghana",
+        "Absa Bank Ghana",
+        "Stanbic Bank Ghana",
+        "Standard Chartered Ghana",
+        "Fidelity Bank Ghana",
+        "CalBank",
+        "Republic Bank Ghana",
+        "Other Ghanaian Bank"
+    ],
+    "Uganda": [
+        "Stanbic Bank Uganda",
+        "Centenary Bank",
+        "Absa Bank Uganda",
+        "Bank of Baroda Uganda",
+        "DFCU Bank",
+        "Standard Chartered Uganda",
+        "Equity Bank Uganda",
+        "Other Ugandan Bank"
+    ],
+    "Tanzania": [
+        "CRDB Bank",
+        "NMB Bank",
+        "NBC Tanzania",
+        "Stanbic Bank Tanzania",
+        "Absa Bank Tanzania",
+        "Standard Chartered Tanzania",
+        "Exim Bank Tanzania",
+        "Equity Bank Tanzania",
+        "Other Tanzanian Bank"
+    ],
+    "Rwanda": [
+        "Bank of Kigali",
+        "I&M Bank Rwanda",
+        "Equity Bank Rwanda",
+        "KCB Bank Rwanda",
+        "Access Bank Rwanda",
+        "Ecobank Rwanda",
+        "Other Rwandan Bank"
+    ],
+    "United Arab Emirates": [
+        "Emirates NBD",
+        "First Abu Dhabi Bank",
+        "Abu Dhabi Commercial Bank",
+        "Dubai Islamic Bank",
+        "Mashreq Bank",
+        "Commercial Bank of Dubai",
+        "RAKBANK",
+        "HSBC UAE",
+        "Standard Chartered UAE",
+        "Other UAE Bank"
+    ],
+    "Saudi Arabia": [
+        "Saudi National Bank",
+        "Al Rajhi Bank",
+        "Riyad Bank",
+        "Alinma Bank",
+        "Bank Albilad",
+        "Arab National Bank",
+        "Banque Saudi Fransi",
+        "Other Saudi Bank"
+    ],
+    "Qatar": [
+        "Qatar National Bank",
+        "Qatar Islamic Bank",
+        "Doha Bank",
+        "Commercial Bank of Qatar",
+        "Dukhan Bank",
+        "Ahli Bank Qatar",
+        "Other Qatari Bank"
+    ],
+    "India": [
+        "State Bank of India",
+        "HDFC Bank",
+        "ICICI Bank",
+        "Axis Bank",
+        "Kotak Mahindra Bank",
+        "IndusInd Bank",
+        "Punjab National Bank",
+        "Bank of Baroda",
+        "Canara Bank",
+        "Union Bank of India",
+        "Other Indian Bank"
+    ],
+    "China": [
+        "Industrial and Commercial Bank of China",
+        "China Construction Bank",
+        "Agricultural Bank of China",
+        "Bank of China",
+        "Bank of Communications",
+        "China Merchants Bank",
+        "China CITIC Bank",
+        "Other Chinese Bank"
+    ],
+    "Japan": [
+        "MUFG Bank",
+        "Sumitomo Mitsui Banking Corporation",
+        "Mizuho Bank",
+        "Resona Bank",
+        "Japan Post Bank",
+        "Nomura Bank",
+        "Other Japanese Bank"
+    ],
+    "Singapore": [
+        "DBS Bank",
+        "OCBC Bank",
+        "United Overseas Bank",
+        "Standard Chartered Singapore",
+        "HSBC Singapore",
+        "Citibank Singapore",
+        "Maybank Singapore",
+        "Other Singapore Bank"
+    ],
+    "Malaysia": [
+        "Maybank",
+        "CIMB Bank",
+        "Public Bank",
+        "RHB Bank",
+        "Hong Leong Bank",
+        "AmBank",
+        "Bank Islam Malaysia",
+        "Other Malaysian Bank"
+    ],
+    "Indonesia": [
+        "Bank Mandiri",
+        "Bank Central Asia",
+        "Bank Rakyat Indonesia",
+        "Bank Negara Indonesia",
+        "CIMB Niaga",
+        "Bank Permata",
+        "Bank Danamon",
+        "Other Indonesian Bank"
+    ],
+    "Brazil": [
+        "Banco do Brasil",
+        "Itaú Unibanco",
+        "Bradesco",
+        "Caixa Econômica Federal",
+        "Santander Brasil",
+        "BTG Pactual",
+        "Safra",
+        "Other Brazilian Bank"
+    ],
+    "Mexico": [
+        "BBVA México",
+        "Banorte",
+        "Santander México",
+        "Citibanamex",
+        "HSBC México",
+        "Scotiabank México",
+        "Banco Azteca",
+        "Other Mexican Bank"
+    ],
+    "Argentina": [
+        "Banco de la Nación Argentina",
+        "Banco Santander Argentina",
+        "BBVA Argentina",
+        "Banco Galicia",
+        "Banco Macro",
+        "ICBC Argentina",
+        "Banco Patagonia",
+        "Other Argentine Bank"
+    ],
+    "Chile": [
+        "Banco de Chile",
+        "Banco Santander Chile",
+        "Banco de Crédito e Inversiones",
+        "Scotiabank Chile",
+        "BancoEstado",
+        "Itaú Chile",
+        "Other Chilean Bank"
+    ],
+    "Colombia": [
+        "Bancolombia",
+        "Banco de Bogotá",
+        "Davivienda",
+        "BBVA Colombia",
+        "Banco de Occidente",
+        "Scotiabank Colpatria",
+        "Banco Popular",
+        "Other Colombian Bank"
+    ],
+    "Guyana": [
+        "Republic Bank Guyana",
+        "Guyana Bank for Trade and Industry",
+        "Demerara Bank",
+        "Bank of Baroda Guyana",
+        "Citizens Bank Guyana",
+        "New Building Society",
+        "Other Guyanese Bank"
+    ],
+    "Suriname": [
+        "De Surinaamsche Bank N.V.",
+        "Republic Bank (Suriname) N.V.",
+        "Hakrinbank N.V.",
+        "Finabank N.V.",
+        "Surinaamse Postspaarbank",
+        "Stichting Surinaamse Volkscredietbank",
+        "Surichange Bank N.V.",
+        "Coöperatieve Spaar- en Kredietbank GODO",
+        "Trustbank Amanah",
+        "Southern Commercial Bank N.V.",
+        "Other Surinamese Bank"
+    ],
+    "Trinidad and Tobago": [
+        "Republic Bank",
+        "First Citizens Bank",
+        "RBC Royal Bank",
+        "Scotiabank Trinidad and Tobago",
+        "CIBC Caribbean",
+        "JMMB Bank",
+        "Other Trinidad and Tobago Bank"
+    ],
+    "Jamaica": [
+        "National Commercial Bank Jamaica",
+        "Scotiabank Jamaica",
+        "JMMB Bank Jamaica",
+        "Sagicor Bank Jamaica",
+        "CIBC Caribbean Jamaica",
+        "First Global Bank",
+        "Other Jamaican Bank"
+    ],
+    "Bahamas": [
+        "Commonwealth Bank",
+        "Royal Bank of Canada",
+        "Scotiabank Bahamas",
+        "FirstCaribbean International Bank",
+        "CIBC Caribbean",
+        "Bank of The Bahamas",
+        "Other Bahamian Bank"
+    ],
+    "Barbados": [
+        "Republic Bank Barbados",
+        "CIBC Caribbean",
+        "First Citizens Bank Barbados",
+        "RBC Royal Bank Barbados",
+        "Scotiabank Barbados",
+        "Other Barbadian Bank"
+    ]
+};
+
+    function updateBanks() {
+
+        const country =
+            countrySelect.value;
+
+        bankSelect.innerHTML =
+            '<option value="">Select a bank</option>';
+
+        if (!country) {
+            bankSelect.disabled = true;
+            return;
+        }
+
+        const banks =
+            countryBanks[country] || [];
+
+        if (!banks.length) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = "Other";
+            option.textContent =
+                "Other / Bank not listed";
+
+            bankSelect.appendChild(option);
+
+            bankSelect.disabled = false;
+
+            return;
+        }
+
+        banks.forEach(function (bank) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = bank;
+            option.textContent = bank;
+
+            bankSelect.appendChild(option);
+
+        });
+
+        bankSelect.disabled = false;
+    }
+
+
+    countrySelect.addEventListener(
+        "change",
+        updateBanks
+    );
+
+
+    /*
+     * Start with bank selector disabled until
+     * the customer chooses a destination.
+     */
+    bankSelect.disabled = true;
+
+    updateBanks();
+
+    console.log(
+        "Fairmont country-specific bank selector ready."
+    );
+
+});
+
+</script>
+
+</body>
+</html>
