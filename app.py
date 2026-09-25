@@ -4974,12 +4974,11 @@ def admin_customer_profile(customer_id):
     )
 
     customer_bank_messages = (
-        BankMessage.query
-        .filter_by(customer_id=customer.customer_id)
-        .order_by(BankMessage.created_at.desc())
-        .all()
-    )
-
+    BankMessage.query
+    .filter_by(customer_id=customer.id)
+    .order_by(BankMessage.created_at.desc())
+    .all()
+)
     customer_conversations = (
         LiveChatConversation.query
         .filter_by(customer_id=customer.id)
