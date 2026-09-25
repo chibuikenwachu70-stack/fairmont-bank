@@ -1,139 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <title>Application Submitted | Fairmont Bank</title>
 
-    <title>Account Created | Fairmont Bank</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}">
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            font-family: Arial, Helvetica, sans-serif;
 
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(184,149,74,.12),
+                    transparent 35%
+                ),
+                #07111f;
 
-<style id="fairmont-universal-logo">
-.fairmont-page-brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: 0 auto 20px auto;
-}
+            color: #eef3f8;
+        }
 
-.fairmont-page-logo {
-    display: block;
-    width: 190px;
-    max-width: 75%;
-    height: auto;
-    object-fit: contain;
-}
-</style>
+        .card {
+            width: 100%;
+            max-width: 620px;
 
+            background: rgba(13,28,46,.95);
 
-<style id="fairmont-professional-page-logo">
-.fairmont-page-brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: 0 auto 24px auto;
-}
+            border: 1px solid rgba(255,255,255,.08);
 
-.fairmont-page-logo {
-    display: block;
-    width: 250px;
-    max-width: 82%;
-    height: auto;
-    object-fit: contain;
-}
+            border-radius: 18px;
 
-@media (max-width: 600px) {
-    .fairmont-page-logo {
-        width: 220px;
-        max-width: 84%;
-    }
-}
-</style>
+            padding: 42px 35px;
 
+            text-align: center;
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.35);
+        }
+
+        .logo {
+            margin-bottom: 28px;
+        }
+
+        .logo img {
+            width: 190px;
+            max-width: 80%;
+        }
+
+        .icon {
+            width: 72px;
+            height: 72px;
+
+            margin: 0 auto 22px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: rgba(184,149,74,.12);
+
+            border: 1px solid rgba(184,149,74,.30);
+
+            color: #d8b96a;
+
+            font-size: 32px;
+
+            font-weight: 700;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+
+            font-size: 30px;
+
+            color: #f3f6f9;
+        }
+
+        .subtitle {
+            margin: 0 auto 30px;
+
+            max-width: 500px;
+
+            color: #9fb0c3;
+
+            font-size: 14px;
+
+            line-height: 1.7;
+        }
+
+        .application-status {
+            padding: 18px;
+
+            margin: 25px 0;
+
+            border-radius: 12px;
+
+            background: rgba(184,149,74,.08);
+
+            border: 1px solid rgba(184,149,74,.25);
+        }
+
+        .status-label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #8fa2b7;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+        .status {
+            color: #d8b96a;
+
+            font-size: 18px;
+
+            font-weight: 800;
+        }
+
+        .customer-box {
+            margin-top: 24px;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            background: rgba(255,255,255,.035);
+
+            border: 1px solid rgba(255,255,255,.07);
+        }
+
+        .customer-label {
+            color: #8fa2b7;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .8px;
+
+            margin-bottom: 8px;
+        }
+
+        .customer-id {
+            color: #d8b96a;
+
+            font-size: 25px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+        .message {
+            margin-top: 22px;
+
+            color: #aebdca;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+        .notice {
+            margin-top: 20px;
+
+            padding: 14px 16px;
+
+            border-radius: 10px;
+
+            background: rgba(255,255,255,.025);
+
+            border: 1px solid rgba(255,255,255,.06);
+
+            color: #91a3b7;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+        .actions {
+            margin-top: 30px;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height: 44px;
+
+            padding: 0 20px;
+
+            border-radius: 9px;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: #b8954a;
+
+            color: #07111f;
+        }
+
+        .btn-primary:hover {
+            background: #d0ad5c;
+        }
+
+        .btn-secondary {
+            color: #dce6f2;
+
+            background: rgba(255,255,255,.06);
+
+            border: 1px solid rgba(255,255,255,.09);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,.09);
+        }
+
+        .security {
+            margin-top: 25px;
+
+            color: #71859a;
+
+            font-size: 10px;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 18px;
+            }
+
+            .card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .customer-id {
+                font-size: 21px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <main class="login-page">
+<div class="card">
 
-        <div class="login-shell">
+    <div class="logo">
+        <img
+            src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+            alt="Fairmont Bank">
+    </div>
 
-            <div class="login-brand">
+    <div class="icon">
+        ✓
+    </div>
 
-                <div class="fairmont-page-brand">
-    <img
-        src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
-        alt="Fairmont Bank"
-        class="fairmont-page-logo">
-</div>
+    <h1>
+        Application Submitted
+    </h1>
 
-            </div>
+    <p class="subtitle">
+        Thank you for applying for a Fairmont Bank account.
+        Your application has been successfully submitted and is now
+        waiting for review by a bank administrator.
+    </p>
 
-            <section class="login-intro">
 
-                <p class="eyebrow">
-                    APPLICATION COMPLETE
-                </p>
+    <div class="application-status">
 
-                <h1>
-                    Welcome to<br>
-                    Fairmont.
-                </h1>
+        <span class="status-label">
+            Application Status
+        </span>
 
-                <p>
-                    Your account has been successfully created.
-                </p>
-
-            </section>
-
-            <div class="account-success-card">
-
-                <p class="success-label">
-                    YOUR CUSTOMER ID
-                </p>
-
-                <div class="customer-id">
-                    {{ customer.customer_id }}
-                </div>
-
-                <p class="success-message">
-                    Keep your Customer ID safe. You will use it together with your password to sign in.
-                </p>
-
-            </div>
-
-            <a
-                href="/login"
-                class="login-button success-login-button">
-
-                Sign in to Fairmont
-
-            </a>
-
-            <div class="security-note">
-
-                <span class="security-icon">
-                    ✓
-                </span>
-
-                <span>
-                    Your account information is protected.
-                </span>
-
-            </div>
-
+        <div class="status">
+            Pending Approval
         </div>
 
-    </main>
+    </div>
+
+
+    <div class="customer-box">
+
+        <div class="customer-label">
+            Your Customer ID
+        </div>
+
+        <div class="customer-id">
+            {{ customer.customer_id }}
+        </div>
+
+    </div>
+
+
+    <div class="message">
+
+        Please keep your Customer ID safe.
+
+        Your account will remain unavailable for login until
+        a Fairmont Bank administrator reviews and approves
+        your application.
+
+    </div>
+
+
+    <div class="notice">
+
+        <strong>What happens next?</strong><br><br>
+
+        A bank administrator will review the information
+        submitted in your application. Once your application
+        is approved, your account status will change to
+        <strong>Active</strong> and you will be able to sign in
+        using your Customer ID and password.
+
+    </div>
+
+
+    <div class="actions">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="btn btn-secondary">
+            Return to Home
+        </a>
+
+    </div>
+
+
+    <div class="security">
+        ✓ Your application information is protected by Fairmont Bank security.
+    </div>
+
+</div>
 
 </body>
 </html>
