@@ -3486,7 +3486,7 @@ def bank_statements():
 
     transactions = (
         Transaction.query
-        .filter_by(customer_id=customer.id)
+        .filter_by(customer_id=customer.customer_id)
         .order_by(Transaction.created_at.desc())
         .all()
     )
@@ -4968,14 +4968,14 @@ def admin_customer_profile(customer_id):
 
     customer_transactions = (
         Transaction.query
-        .filter_by(customer_id=customer.id)
+        .filter_by(customer_id=customer.customer_id)
         .order_by(Transaction.created_at.desc())
         .all()
     )
 
     customer_bank_messages = (
         BankMessage.query
-        .filter_by(customer_id=customer.id)
+        .filter_by(customer_id=customer.customer_id)
         .order_by(BankMessage.created_at.desc())
         .all()
     )
