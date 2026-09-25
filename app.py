@@ -37,7 +37,8 @@ app.config["SESSION_PERMANENT"] = True
 
 os.makedirs(app.instance_path, exist_ok=True)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = (
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL",
     "sqlite:///" + os.path.join(app.instance_path, "fairmont.db")
 )
 
