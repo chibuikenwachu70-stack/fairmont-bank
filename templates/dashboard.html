@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -219,7 +219,9 @@
             <p class="balance-label">AVAILABLE BALANCE</p>
             <button type="button" class="balance-toggle" onclick="toggleBalance()">Hide</button>
         </div>
-        <h2 id="balance">£{{ "{:,.2f}".format(customer.account_balance or 0) }}</h2>
+        <h2 id="balance">
+    {{ currency_symbol }}{{ "{:,.2f}".format(display_balance) }}
+</h2>
         <p class="customer-reference">Customer ID · {{ customer.customer_id }}</p>
     </section>
 
@@ -404,7 +406,7 @@ function toggleBalance() {
     const button = document.querySelector(".balance-toggle");
 
     if (balance.dataset.hidden === "true") {
-        balance.textContent = "£" + Number({{ customer.account_balance or 0 }}).toLocaleString("en-GB", {
+        balance.textContent = {{ currency_symbol|tojson }} + Number({{ display_balance }}).toLocaleString({{ currency_locale|tojson }}, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });

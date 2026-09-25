@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send Money to Fairmont Bank</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(145deg,#06172e,#0b2749 55%,#071a33);color:#fff}
+.page{width:100%;max-width:720px;margin:auto;padding:24px 16px 50px}
+.back{display:inline-block;color:#fff;text-decoration:none;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.08);margin-bottom:18px}
+.card{background:rgba(20,55,92,.78);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+h1{margin:0 0 8px;font-size:28px}
+.subtitle{color:rgba(255,255,255,.70);line-height:1.5;margin:0 0 24px}
+.account{padding:16px;border-radius:15px;background:rgba(0,0,0,.14);margin-bottom:24px}
+.account small{color:rgba(255,255,255,.62)}
+.account strong{display:block;margin-top:6px;font-size:18px}
+.balance{margin-top:8px;color:rgba(255,255,255,.75)}
+.field{margin-bottom:19px}
+label{display:block;margin-bottom:8px;font-weight:700;font-size:14px}
+input{width:100%;border:1px solid rgba(255,255,255,.15);border-radius:14px;background:rgba(255,255,255,.11);color:#fff;padding:14px 15px;font-size:15px;outline:none}
+input:focus{border-color:rgba(130,190,255,.75)}
+input::placeholder{color:rgba(255,255,255,.48)}
+.button{width:100%;border:0;border-radius:14px;padding:16px;background:linear-gradient(135deg,#3e8edb,#2568b4);color:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.error{padding:13px 15px;margin-bottom:20px;border-radius:12px;background:rgba(220,70,70,.13);border:1px solid rgba(255,100,100,.25);color:#ffb5b5}
+.notice{margin-top:18px;color:rgba(255,255,255,.58);font-size:12px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="page">
+<a class="back" href="{{ url_for('send_money') }}">← Back to Send Money</a>
+<div class="card">
+<h1>Send Money to Another Fairmont Bank Customer</h1>
+<p class="subtitle">Transfer funds directly to another active Fairmont Bank customer using their Fairmont account number.</p>
+<div class="account">
+<small>Sending from</small>
+<strong>{{ customer.full_name }}</strong>
+<div>Account {{ customer.account_number }}</div>
+<div class="balance">Available Balance: <strong>£{{ "{:,.2f}".format(customer.account_balance or 0) }}</strong></div>
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+<div class="error">{{ message }}</div>
+{% endfor %}
+{% endwith %}
+<form method="POST" action="{{ url_for('send_fairmont_money') }}">
+<div class="field">
+<label for="recipient_account_number">Recipient Fairmont Account Number</label>
+<input type="text" id="recipient_account_number" name="recipient_account_number" placeholder="10-digit Fairmont account number" inputmode="numeric" maxlength="10" autocomplete="off" required>
+</div>
+<div class="field">
+<label for="amount">Amount</label>
+<input type="number" id="amount" name="amount" min="0.01" step="0.01" placeholder="0.00" required>
+</div>
+<div class="field">
+<label for="reference">Reference (optional)</label>
+<input type="text" id="reference" name="reference" maxlength="140" placeholder="Optional payment reference">
+</div>
+<button class="button" type="submit">Send to Fairmont Bank Customer</button>
+</form>
+<div class="notice">The transfer succeeds only when the account number belongs to an active Fairmont Bank customer and the sender has sufficient available funds.</div>
+</div>
+</div>
+</body>
+</html>

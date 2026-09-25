@@ -281,7 +281,7 @@
 
 <div class="page">
 
-    <a class="back" href="/dashboard">
+    <a class="back" href="{{ url_for("leave_bank_statements") }}">
         ← Back to Dashboard
     </a>
 
@@ -454,11 +454,11 @@
 
         <div class="actions">
 
-            <a class="button" href="/transactions">
+            <a class="button" href="{{ url_for("leave_bank_statements") }}">
                 Transaction History
             </a>
 
-            <a class="button secondary" href="/dashboard">
+            <a class="button secondary" href="{{ url_for("leave_bank_statements") }}">
                 Dashboard
             </a>
 
@@ -467,6 +467,61 @@
     </div>
 
 </div>
+
+
+<script>
+(function () {
+
+    /*
+     * Prevent browser caching of the protected statement page.
+     */
+    if (window.history && window.history.replaceState) {
+        window.history.replaceState(
+            null,
+            document.title,
+            window.location.href
+        );
+    }
+
+    /*
+     * When the customer leaves the statement page,
+     * tell the server to clear statement authorization.
+     *
+     * sendBeacon is used because it can still send the
+     * request while the browser is navigating away.
+     */
+    function clearStatementAuthorization() {
+
+        try {
+
+            navigator.sendBeacon(
+                "{{ url_for('leave_bank_statements') }}"
+            );
+
+        } catch (error) {
+
+            fetch(
+                "{{ url_for('leave_bank_statements') }}",
+                {
+                    method: "GET",
+                    credentials: "same-origin",
+                    keepalive: true
+                }
+            ).catch(function () {});
+
+        }
+    }
+
+    /*
+     * Browser navigation / leaving the page.
+     */
+    window.addEventListener(
+        "pagehide",
+        clearStatementAuthorization
+    );
+
+})();
+</script>
 
 </body>
 </html>

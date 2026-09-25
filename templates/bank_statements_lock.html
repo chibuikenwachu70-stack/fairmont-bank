@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Bank Statements Lock & Unlock - Fairmont Bank</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -15,8 +22,16 @@
             margin: 0;
             min-height: 100vh;
             background:
-                radial-gradient(circle at top left, rgba(35, 76, 125, 0.28), transparent 38%),
-                linear-gradient(180deg, #07182d 0%, #061426 100%);
+                radial-gradient(
+                    circle at top left,
+                    rgba(35, 76, 125, 0.28),
+                    transparent 38%
+                ),
+                linear-gradient(
+                    180deg,
+                    #07182d 0%,
+                    #061426 100%
+                );
             color: #ffffff;
             font-family: Arial, Helvetica, sans-serif;
         }
@@ -66,13 +81,10 @@
             background: rgba(13, 34, 59, 0.82);
             border: 1px solid rgba(255,255,255,0.09);
             box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+            margin-bottom: 18px;
         }
 
         .status-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
             padding: 18px;
             margin-bottom: 20px;
             border-radius: 15px;
@@ -100,11 +112,27 @@
             color: #ffb4bd;
         }
 
+        h2 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
         .description {
-            margin: 0 0 22px;
+            margin: 0 0 18px;
             color: rgba(255,255,255,0.62);
             font-size: 13px;
             line-height: 1.55;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.18);
+            color: white;
+            font-size: 14px;
         }
 
         button {
@@ -117,10 +145,15 @@
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
+            margin-top: 4px;
         }
 
         button:hover {
             opacity: 0.92;
+        }
+
+        .remove {
+            background: #8f3945;
         }
 
         .warning {
@@ -134,21 +167,17 @@
             line-height: 1.5;
         }
 
-        @media (max-width: 600px) {
-            .page {
-                padding: 18px 14px 35px;
-            }
-
-            .card {
-                padding: 18px;
-            }
-
-            .status-box {
-                align-items: flex-start;
-                flex-direction: column;
-            }
+        .message {
+            padding: 12px;
+            margin-bottom: 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.85);
+            font-size: 13px;
         }
+
     </style>
+
 </head>
 
 <body>
@@ -157,48 +186,81 @@
 
     <div class="header">
 
-        <a href="{{ url_for('settings') }}" class="back">
+        <a
+            href="{{ url_for('settings') }}"
+            class="back"
+        >
             ‹
         </a>
 
         <div>
+
             <h1>Bank Statements</h1>
+
             <p class="subtitle">
                 Lock or unlock access to your bank statements
             </p>
+
         </div>
 
     </div>
+
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- STATEMENT ACCESS -->
 
     <div class="card">
 
         <div class="status-box">
 
-            <div>
-                <p class="status-label">
-                    Current Status
+            <p class="status-label">
+                Current Status
+            </p>
+
+            {% if customer.bank_statements_locked %}
+
+                <p class="status locked">
+                    Locked
                 </p>
 
-                {% if customer.bank_statements_locked %}
-                    <p class="status locked">
-                        Locked
-                    </p>
-                {% else %}
-                    <p class="status unlocked">
-                        Unlocked
-                    </p>
-                {% endif %}
-            </div>
+            {% else %}
+
+                <p class="status unlocked">
+                    Unlocked
+                </p>
+
+            {% endif %}
 
         </div>
 
         <p class="description">
-            When bank statements are locked, access to your Bank Statements
-            page will be restricted. Your existing transaction records remain
-            safely stored and are not deleted.
+            When statements are locked, customers must unlock
+            access before viewing their statement records.
         </p>
 
         <form method="POST">
+
+            <input
+                type="hidden"
+                name="action"
+                value="toggle_lock"
+            >
 
             {% if customer.bank_statements_locked %}
 
@@ -216,9 +278,101 @@
 
         </form>
 
+    </div>
+
+
+    <!-- STATEMENT PASSWORD -->
+
+    <div class="card">
+
+        <h2>
+            Statement Password
+        </h2>
+
+        {% if customer.bank_statements_password_hash %}
+
+            <p class="description">
+                A statement password is currently set.
+                You can change it or remove it below.
+            </p>
+
+        {% else %}
+
+            <p class="description">
+                Set a personal password that will be required
+                before your bank statements can be viewed.
+            </p>
+
+        {% endif %}
+
+
+        <!-- SET / CHANGE PASSWORD -->
+
+        <form method="POST">
+
+            <input
+                type="hidden"
+                name="action"
+                value="set_password"
+            >
+
+            <input
+                type="password"
+                name="statement_password"
+                placeholder="New statement password"
+                minlength="6"
+                required
+            >
+
+            <input
+                type="password"
+                name="statement_password_confirm"
+                placeholder="Confirm statement password"
+                minlength="6"
+                required
+            >
+
+            <button type="submit">
+                {% if customer.bank_statements_password_hash %}
+                    Change Statement Password
+                {% else %}
+                    Save Statement Password
+                {% endif %}
+            </button>
+
+        </form>
+
+
+        {% if customer.bank_statements_password_hash %}
+
+            <!-- REMOVE PASSWORD -->
+
+            <form
+                method="POST"
+                style="margin-top: 10px;"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="remove_password"
+                >
+
+                <button
+                    type="submit"
+                    class="remove"
+                >
+                    Remove Statement Password
+                </button>
+
+            </form>
+
+        {% endif %}
+
+
         <div class="warning">
-            Locking statements only controls access to the statement page.
-            It does not delete, modify, or remove your transaction history.
+            Removing the password does not delete your
+            bank statements or transaction history.
         </div>
 
     </div>
@@ -226,4 +380,5 @@
 </div>
 
 </body>
+
 </html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Balance Adjusted | Fairmont Bank</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(184,149,74,.10),
+            transparent 32%
+        ),
+        #071525;
+    color: #edf3fb;
+}
+
+.page {
+    max-width: 800px;
+    margin: auto;
+    padding: 45px 20px;
+}
+
+.card {
+    background: rgba(12,31,51,.94);
+    border: 1px solid rgba(184,149,74,.20);
+    border-radius: 22px;
+    padding: 35px;
+    text-align: center;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 25px;
+}
+
+.brand span {
+    color: #d5b467;
+}
+
+.icon {
+    width: 64px;
+    height: 64px;
+    margin: auto auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(70,190,125,.12);
+    border: 1px solid rgba(100,220,155,.30);
+    color: #9de7bc;
+    font-size: 30px;
+    font-weight: 800;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.intro {
+    color: #8fa5bd;
+    line-height: 1.6;
+}
+
+.summary {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.box {
+    padding: 20px;
+    border-radius: 13px;
+    background: rgba(7,21,37,.55);
+    border: 1px solid rgba(255,255,255,.07);
+}
+
+.label {
+    color: #7188a1;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.value {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.arrow {
+    color: #d5b467;
+    font-size: 24px;
+}
+
+.amount {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 13px;
+    background: rgba(184,149,74,.07);
+    border: 1px solid rgba(184,149,74,.18);
+}
+
+.amount strong {
+    color: #d5b467;
+    font-size: 28px;
+}
+
+.actions {
+    margin-top: 30px;
+}
+
+.button {
+    display: inline-block;
+    text-decoration: none;
+    padding: 13px 20px;
+    border-radius: 11px;
+    background: #b8954a;
+    color: #081625;
+    font-weight: 800;
+    margin: 5px;
+}
+
+.secondary {
+    background: rgba(255,255,255,.06);
+    color: #c8d5e3;
+}
+
+@media(max-width:650px) {
+    .summary {
+        grid-template-columns: 1fr;
+    }
+
+    .arrow {
+        transform: rotate(90deg);
+    }
+
+    .button {
+        display: block;
+        margin: 8px 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="card">
+
+<div class="brand">
+FAIRMONT <span>BANK</span>
+</div>
+
+<div class="icon">
+✓
+</div>
+
+<h1>Balance Adjusted Successfully</h1>
+
+<p class="intro">
+The customer's account balance has been increased successfully.
+</p>
+
+<div class="box">
+
+<div class="label">
+Customer
+</div>
+
+<div class="value">
+{{ customer.full_name }}
+</div>
+
+<div style="margin-top:6px;color:#7188a1;font-size:12px;">
+{{ customer.customer_id }}
+</div>
+
+</div>
+
+<div class="summary">
+
+<div class="box">
+
+<div class="label">
+Previous Balance
+</div>
+
+<div class="value">
+{{ customer.preferred_currency_display or "GBP" }}
+{{ "{:,.2f}".format(previous_balance|float) }}
+</div>
+
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div class="box">
+
+<div class="label">
+New Balance
+</div>
+
+<div class="value">
+{{ customer.preferred_currency_display or "GBP" }}
+{{ "{:,.2f}".format(new_balance|float) }}
+</div>
+
+</div>
+
+</div>
+
+<div class="amount">
+
+<div class="label">
+Amount Added
+</div>
+
+<strong>
+{{ customer.preferred_currency_display or "GBP" }}
+{{ "{:,.2f}".format(amount|float) }}
+</strong>
+
+</div>
+
+<div class="actions">
+
+<a
+href="{{ url_for('admin_adjust_customer_balance') }}"
+class="button"
+>
+Adjust Another Account
+</a>
+
+<a
+href="{{ url_for('admin_dashboard') }}"
+class="button secondary"
+>
+Administration Portal
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adjust Customer Balance | Fairmont Bank</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(184,149,74,.10),
+            transparent 32%
+        ),
+        #071525;
+    color: #edf3fb;
+}
+
+.page {
+    max-width: 900px;
+    margin: auto;
+    padding: 35px 20px 60px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.brand span {
+    color: #d5b467;
+}
+
+.back {
+    color: #aebed0;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.card {
+    background: rgba(12,31,51,.94);
+    border: 1px solid rgba(184,149,74,.20);
+    border-radius: 22px;
+    padding: 34px;
+    box-shadow: 0 25px 70px rgba(0,0,0,.30);
+}
+
+h1 {
+    margin: 0 0 9px;
+    font-size: 29px;
+}
+
+.intro {
+    color: #8fa5bd;
+    line-height: 1.6;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.notice {
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(184,149,74,.07);
+    border: 1px solid rgba(184,149,74,.18);
+    color: #b9c8d8;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.error {
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(180,60,60,.10);
+    border: 1px solid rgba(220,90,90,.25);
+    color: #ffb0b0;
+    margin-bottom: 20px;
+}
+
+.field {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #a8b9ca;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+select,
+input,
+textarea {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 10px;
+    background: rgba(5,18,31,.72);
+    color: #edf3fb;
+    padding: 13px 14px;
+    font: inherit;
+}
+
+select option {
+    background: #0b2035;
+    color: white;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.button {
+    border: 0;
+    border-radius: 11px;
+    padding: 13px 21px;
+    background: #b8954a;
+    color: #081625;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.cancel {
+    text-decoration: none;
+    padding: 13px 20px;
+    border-radius: 11px;
+    background: rgba(255,255,255,.06);
+    color: #c8d5e3;
+}
+
+@media(max-width:650px) {
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .card {
+        padding: 24px 17px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .button,
+    .cancel {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="topbar">
+
+<div class="brand">
+FAIRMONT <span>BANK</span>
+</div>
+
+<a
+href="{{ url_for('admin_dashboard') }}"
+class="back"
+>
+Back to Administration Portal
+</a>
+
+</div>
+
+<div class="card">
+
+<h1>Adjust Customer Balance</h1>
+
+<p class="intro">
+Increase an active customer's account balance using an
+administrator-only balance adjustment.
+</p>
+
+<div class="notice">
+This adjustment changes the customer's available balance directly.
+It does not create a normal customer transaction notification.
+An internal administrator audit record is retained.
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="error">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<form
+method="POST"
+action="{{ url_for('admin_adjust_customer_balance') }}"
+>
+
+<div class="field">
+
+<label for="customer_id">
+Select Customer
+</label>
+
+<select
+id="customer_id"
+name="customer_id"
+required
+>
+
+<option value="">
+Select an active customer
+</option>
+
+{% for customer in customers %}
+
+<option value="{{ customer.customer_id }}">
+{{ customer.full_name }}
+— {{ customer.customer_id }}
+{% if customer.account_number %}
+— Account {{ customer.account_number }}
+{% endif %}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="field">
+
+<label for="amount">
+Amount to Add
+</label>
+
+<input
+type="number"
+id="amount"
+name="amount"
+min="0.01"
+step="0.01"
+placeholder="0.00"
+required
+>
+
+</div>
+
+<div class="field">
+
+<label for="reason">
+Internal Adjustment Reason
+</label>
+
+<textarea
+id="reason"
+name="reason"
+maxlength="255"
+placeholder="Optional administrator note"
+></textarea>
+
+</div>
+
+<div class="actions">
+
+<a
+href="{{ url_for('admin_dashboard') }}"
+class="cancel"
+>
+Cancel
+</a>
+
+<button
+type="submit"
+class="button"
+>
+Increase Balance
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</body>
+</html>

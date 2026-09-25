@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Verify Login | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background: #071426;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .otp-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .otp-card {
+            width: 100%;
+            max-width: 460px;
+            background: #0c1f35;
+            border: 1px solid rgba(184,149,74,.20);
+            border-radius: 16px;
+            padding: 34px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.35);
+        }
+
+        .otp-logo {
+            width: 180px;
+            max-width: 100%;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 26px;
+        }
+
+        p {
+            color: #8fa4ba;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .otp-error {
+            background: rgba(190,70,70,.12);
+            border: 1px solid rgba(190,70,70,.25);
+            color: #e5a2a2;
+            padding: 12px;
+            border-radius: 9px;
+            margin: 18px 0;
+            font-size: 13px;
+        }
+
+        .otp-input {
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 18px;
+            padding: 16px;
+            background: #071426;
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 25px;
+            text-align: center;
+            letter-spacing: 8px;
+        }
+
+        .otp-button {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px;
+            border: 0;
+            border-radius: 10px;
+            background: #d8b96a;
+            color: #071426;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .back-login {
+            display: block;
+            margin-top: 18px;
+            text-align: center;
+            color: #d8b96a;
+            text-decoration: none;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="otp-page">
+
+    <div class="otp-card">
+
+        <img
+            src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+            alt="Fairmont Bank"
+            class="otp-logo">
+
+        <h1>Verify your login</h1>
+
+        <p>
+            Login verification is enabled for your Fairmont Bank account.
+            Enter the six-digit verification code to continue.
+        </p>
+
+        {% if error %}
+        <div class="otp-error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if otp_sent %}
+        <p>
+            A verification code has been generated for this login attempt.
+        </p>
+        {% endif %}
+
+        <form
+            method="POST"
+            action="{{ url_for('verify_login_otp') }}">
+
+            <input
+                class="otp-input"
+                type="text"
+                name="otp"
+                inputmode="numeric"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                placeholder="000000"
+                autocomplete="one-time-code"
+                required>
+
+            <button
+                type="submit"
+                class="otp-button">
+                Verify Login
+            </button>
+
+        </form>
+
+        <a
+            href="{{ url_for('login') }}"
+            class="back-login">
+            Return to Sign In
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

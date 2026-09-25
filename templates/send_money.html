@@ -345,6 +345,19 @@
 
     <div class="payment-card">
 
+        <div style="margin-bottom:24px;padding:18px;border-radius:16px;background:rgba(46,122,197,.12);border:1px solid rgba(100,180,255,.22);">
+            <div style="font-size:17px;font-weight:800;margin-bottom:7px;">
+                Send Money to Another Fairmont Bank Customer
+            </div>
+            <div style="color:rgba(255,255,255,.68);font-size:13px;line-height:1.5;margin-bottom:14px;">
+                Send funds directly to another active Fairmont customer using their Fairmont account number.
+            </div>
+            <a href="{{ url_for('send_fairmont_money') }}" style="display:inline-block;text-decoration:none;padding:11px 15px;border-radius:11px;background:#2e7ac5;color:white;font-weight:800;font-size:13px;">
+                Send to Fairmont Customer
+            </a>
+        </div>
+
+
         <h1>Bank Payment</h1>
 
         <p class="subtitle">
