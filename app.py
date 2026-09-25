@@ -4995,11 +4995,107 @@ def admin_customer_profile(customer_id):
         customer_conversations=customer_conversations
     )
 
+# ============================================================
+# ADMIN — ACCOUNT APPLICATION APPROVAL
+# ============================================================
+
+@app.route("/admin/customer/<int:customer_id>/approve", methods=["POST"])
+def admin_approve_customer(customer_id):
+
+    admin_id = session.get("admin_id")
+
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+
+    admin = db.session.get(AdminUser, admin_id)
+
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    customer = db.session.get(Customer, customer_id)
+
+    if customer is None:
+        flash("Customer account was not found.", "error")
+        return redirect(url_for("admin_accounts"))
+
+    if customer.account_status != "Pending Approval":
+        flash("This account is not pending approval.", "error")
+        return redirect(
+            url_for(
+                "admin_customer_profile",
+                customer_id=customer.id
+            )
+        )
+
+    customer.account_status = "Active"
+
+    db.session.commit()
+
+    flash(
+        f"Account application for {customer.full_name} has been approved.",
+        "success"
+    )
+
+    return redirect(
+        url_for(
+            "admin_customer_profile",
+            customer_id=customer.id
+        )
+    )
+
+
+@app.route("/admin/customer/<int:customer_id>/reject", methods=["POST"])
+def admin_reject_customer(customer_id):
+
+    admin_id = session.get("admin_id")
+
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+
+    admin = db.session.get(AdminUser, admin_id)
+
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    customer = db.session.get(Customer, customer_id)
+
+    if customer is None:
+        flash("Customer account was not found.", "error")
+        return redirect(url_for("admin_accounts"))
+
+    if customer.account_status != "Pending Approval":
+        flash("This account is not pending approval.", "error")
+        return redirect(
+            url_for(
+                "admin_customer_profile",
+                customer_id=customer.id
+            )
+        )
+
+    customer.account_status = "Rejected"
+
+    db.session.commit()
+
+    flash(
+        f"Account application for {customer.full_name} has been rejected.",
+        "success"
+    )
+
+    return redirect(
+        url_for(
+            "admin_customer_profile",
+            customer_id=customer.id
+        )
+    )
 
 
 
 # ============================================================
-# ADMIN â€” EDIT CUSTOMER DETAILS
+# ADMIN — EDIT CUSTOMER DETAILS
 # ============================================================
 
 @app.route(
