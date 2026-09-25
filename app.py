@@ -1128,7 +1128,7 @@ def open_account():
                 password
             ),
 
-            account_status="Active",
+            account_status="Pending Approval",
 
             account_balance=0.0
         )
