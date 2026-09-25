@@ -296,6 +296,32 @@
             background: rgba(184, 149, 74, 0.13);
         }
 
+        .customer-action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            align-items: center;
+        }
+
+        .edit-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 34px;
+            padding: 0 13px;
+            border-radius: 8px;
+            border: 1px solid rgba(76, 175, 120, 0.25);
+            background: rgba(76, 175, 120, 0.07);
+            color: #9bd5b4;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .edit-button:hover {
+            background: rgba(76, 175, 120, 0.14);
+        }
+
         .empty {
             padding: 55px 20px;
             text-align: center;
@@ -350,6 +376,50 @@
             }
         }
     </style>
+
+
+<style id="admin-customer-controls">
+.customer-admin-controls {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+
+.customer-admin-controls form {
+    margin:0;
+}
+
+.customer-admin-controls button {
+    border:0;
+    border-radius:8px;
+    padding:9px 13px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.customer-lock-button {
+    background:#fff1f1;
+    color:#a12626;
+}
+
+.customer-unlock-button {
+    background:#effaf3;
+    color:#176b3a;
+}
+
+.customer-delete-button {
+    background:#3a1010;
+    color:#fff;
+}
+
+.customer-tcc-button {
+    background:#eef5ff;
+    color:#2367c8;
+}
+</style>
+
+
 </head>
 
 <body>
@@ -532,14 +602,27 @@
 
                                     <td>
 
-                                        <a
-                                            href="{{ url_for(
-                                                'admin_customer_profile',
-                                                customer_id=customer.id
-                                            ) }}"
-                                            class="view-button">
-                                            View
-                                        </a>
+                                        <div class="customer-action-buttons">
+
+                                            <a
+                                                href="{{ url_for(
+                                                    'admin_customer_profile',
+                                                    customer_id=customer.id
+                                                ) }}"
+                                                class="view-button">
+                                                View Details
+                                            </a>
+
+                                            <a
+                                                href="{{ url_for(
+                                                    'admin_edit_customer',
+                                                    customer_id=customer.id
+                                                ) }}"
+                                                class="edit-button">
+                                                Edit
+                                            </a>
+
+                                        </div>
 
                                     </td>
 

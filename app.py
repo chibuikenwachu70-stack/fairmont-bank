@@ -46,6 +46,61 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+# =========================================================
+# POSTGRES PAYMENT APPROVAL SEQUENCE REPAIR
+# =========================================================
+
+def repair_payment_approvals_sequence():
+    """
+    Synchronize the PostgreSQL payment_approvals.id sequence
+    with the highest existing ID.
+
+    Safe for SQLite: this function does nothing when the
+    application is using SQLite.
+    """
+
+    try:
+        engine_url = str(db.engine.url)
+
+        # Local SQLite database: nothing to repair.
+        if not engine_url.startswith(("postgresql://", "postgresql+")):
+            return
+
+        from sqlalchemy import text
+
+        db.session.execute(
+            text("""
+                SELECT setval(
+                    pg_get_serial_sequence(
+                        'payment_approvals',
+                        'id'
+                    ),
+                    COALESCE(
+                        (
+                            SELECT MAX(id)
+                            FROM payment_approvals
+                        ),
+                        0
+                    ) + 1,
+                    false
+                )
+            """)
+        )
+
+        db.session.commit()
+
+        print(
+            "PAYMENT APPROVALS SEQUENCE: synchronized successfully."
+        )
+
+    except Exception as exc:
+        db.session.rollback()
+
+        print(
+            "PAYMENT APPROVALS SEQUENCE: repair skipped:",
+            exc
+        )
+
 
 # =========================================================
 # CUSTOMER MODEL
@@ -1733,6 +1788,161 @@ def virtual_card_review():
     )
 
 
+
+@app.route("/virtual-card/freeze", methods=["POST"])
+@login_required
+def virtual_card_freeze():
+    customer_id = session.get("customer_id")
+
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(
+        customer_id=customer_id
+    ).first()
+
+    if customer is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    card = VirtualATMCard.query.filter_by(
+        customer_id=customer.customer_id
+    ).first()
+
+    if card is None:
+        flash(
+            "You do not have a virtual ATM card.",
+            "error"
+        )
+        return redirect(url_for("dashboard"))
+
+    if card.status == "Active":
+        card.status = "Frozen"
+
+        flash(
+            "Your virtual ATM card has been frozen.",
+            "success"
+        )
+
+    elif card.status == "Frozen":
+        card.status = "Active"
+
+        flash(
+            "Your virtual ATM card has been unfrozen.",
+            "success"
+        )
+
+    else:
+        flash(
+            "This virtual ATM card cannot currently be frozen or unfrozen.",
+            "error"
+        )
+
+    db.session.commit()
+
+    return redirect(url_for("virtual_card_review"))
+
+
+
+@app.route("/virtual-card/cancel", methods=["POST"])
+@login_required
+def virtual_card_cancel():
+    customer_id = session.get("customer_id")
+
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(
+        customer_id=customer_id
+    ).first()
+
+    if customer is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    card = VirtualATMCard.query.filter_by(
+        customer_id=customer.customer_id
+    ).first()
+
+    if card is None:
+        flash(
+            "You do not have a virtual ATM card.",
+            "error"
+        )
+        return redirect(url_for("dashboard"))
+
+    try:
+        db.session.delete(card)
+        db.session.commit()
+
+        flash(
+            "Your virtual ATM card has been cancelled.",
+            "success"
+        )
+
+    except Exception:
+        db.session.rollback()
+
+        flash(
+            "The virtual ATM card could not be cancelled. Please try again.",
+            "error"
+        )
+
+    return redirect(url_for("dashboard"))
+
+
+
+@app.route("/virtual-card/unfreeze", methods=["POST"])
+@login_required
+def virtual_card_unfreeze():
+    customer_id = session.get("customer_id")
+
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(
+        customer_id=customer_id
+    ).first()
+
+    if customer is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    card = VirtualATMCard.query.filter_by(
+        customer_id=customer.customer_id
+    ).first()
+
+    if card is None:
+        flash(
+            "You do not have a virtual ATM card.",
+            "error"
+        )
+        return redirect(url_for("dashboard"))
+
+    if card.status == "Frozen":
+        card.status = "Active"
+        db.session.commit()
+
+        flash(
+            "Your virtual ATM card has been unfrozen successfully.",
+            "success"
+        )
+
+    elif card.status == "Active":
+        flash(
+            "Your virtual ATM card is already active.",
+            "success"
+        )
+
+    else:
+        flash(
+            "This virtual ATM card cannot currently be unfrozen.",
+            "error"
+        )
+
+    return redirect(url_for("virtual_card_review"))
+
+
 @app.route("/my-profile")
 def my_profile():
 
@@ -1776,6 +1986,87 @@ def logout():
 # =========================================================
 # APPLICATION START
 # =========================================================
+
+
+# =========================================================
+# SQLITE PAYMENT APPROVAL ID REPAIR
+# =========================================================
+
+def repair_payment_approvals_sequence():
+    """
+    Keeps SQLite's payment_approvals AUTOINCREMENT sequence
+    synchronized with the highest existing payment_approvals.id.
+
+    This is needed after importing or migrating database records,
+    which can leave SQLite attempting to reuse an existing ID.
+    """
+
+    try:
+        if not db.engine.url.drivername.startswith("sqlite"):
+            return
+
+        table_exists = db.session.execute(
+            db.text("""
+                SELECT name
+                FROM sqlite_master
+                WHERE type = 'table'
+                  AND name = 'payment_approvals'
+            """)
+        ).scalar()
+
+        if not table_exists:
+            return
+
+        max_id = db.session.execute(
+            db.text("""
+                SELECT COALESCE(MAX(id), 0)
+                FROM payment_approvals
+            """)
+        ).scalar()
+
+        sequence_exists = db.session.execute(
+            db.text("""
+                SELECT name
+                FROM sqlite_master
+                WHERE type = 'table'
+                  AND name = 'sqlite_sequence'
+            """)
+        ).scalar()
+
+        if not sequence_exists:
+            return
+
+        current_sequence = db.session.execute(
+            db.text("""
+                SELECT seq
+                FROM sqlite_sequence
+                WHERE name = 'payment_approvals'
+            """)
+        ).scalar()
+
+        if current_sequence is None:
+            db.session.execute(
+                db.text("""
+                    INSERT INTO sqlite_sequence (name, seq)
+                    VALUES ('payment_approvals', :seq)
+                """),
+                {"seq": int(max_id)}
+            )
+
+        elif int(current_sequence) < int(max_id):
+            db.session.execute(
+                db.text("""
+                    UPDATE sqlite_sequence
+                    SET seq = :seq
+                    WHERE name = 'payment_approvals'
+                """),
+                {"seq": int(max_id)}
+            )
+
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
 
 
 # ============================================================
@@ -3458,6 +3749,8 @@ def tv_subscriptions():
         reference=payment_reference,
     )
 
+@app.route("/bank-statements/lock-settings", methods=["GET", "POST"])
+@login_required
 def bank_statements_lock_settings():
     customer = current_user
 
@@ -4001,7 +4294,10 @@ def payment_tcc_verification(approval_id):
 
 
 
+@app.route("/email-bank", methods=["GET", "POST"])
+@login_required
 def email_bank():
+
 
     messages = (
         BankMessage.query
@@ -4947,6 +5243,138 @@ def admin_toggle_tcc_restriction(customer_id):
     )
 
 
+
+
+# ============================================================
+# ADMIN — CUSTOMER ACCOUNT LOCK / UNLOCK
+# ============================================================
+
+@app.route(
+    "/admin/customer/<int:customer_id>/account-status",
+    methods=["POST"]
+)
+def admin_toggle_customer_lock(customer_id):
+
+    admin_id = session.get("admin_id")
+
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+
+    admin = db.session.get(AdminUser, admin_id)
+
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    customer = db.session.get(Customer, customer_id)
+
+    if customer is None:
+        flash(
+            "The selected customer could not be found.",
+            "error"
+        )
+        return redirect(url_for("admin_customers"))
+
+    action = request.form.get(
+        "account_action",
+        ""
+    ).strip().lower()
+
+    if action == "lock":
+
+        customer.account_status = "Locked"
+
+        db.session.commit()
+
+        flash(
+            f"Customer account for {customer.full_name} has been locked.",
+            "success"
+        )
+
+    elif action == "unlock":
+
+        customer.account_status = "Active"
+
+        db.session.commit()
+
+        flash(
+            f"Customer account for {customer.full_name} has been unlocked.",
+            "success"
+        )
+
+    else:
+
+        flash(
+            "Invalid account status action.",
+            "error"
+        )
+
+    return redirect(
+        url_for(
+            "admin_customer_profile",
+            customer_id=customer.id
+        )
+    )
+
+
+
+
+# ============================================================
+# ADMIN — DELETE CUSTOMER ACCOUNT
+# ============================================================
+
+@app.route(
+    "/admin/customer/<int:customer_id>/delete",
+    methods=["POST"]
+)
+def admin_delete_customer(customer_id):
+
+    admin_id = session.get("admin_id")
+
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+
+    admin = db.session.get(AdminUser, admin_id)
+
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    customer = db.session.get(Customer, customer_id)
+
+    if customer is None:
+        flash(
+            "The selected customer could not be found.",
+            "error"
+        )
+        return redirect(url_for("admin_customers"))
+
+    customer_name = customer.full_name
+
+    try:
+        db.session.delete(customer)
+        db.session.commit()
+
+        flash(
+            f"Customer account for {customer_name} has been deleted.",
+            "success"
+        )
+
+    except Exception:
+        db.session.rollback()
+
+        flash(
+            "The customer account could not be deleted.",
+            "error"
+        )
+
+    return redirect(
+        url_for("admin_customers")
+    )
+
+
 @app.route("/admin/customer/<int:customer_id>")
 def admin_customer_profile(customer_id):
     admin_id = session.get("admin_id")
@@ -5561,12 +5989,7 @@ def admin_payment_approvals():
     )
 
 
-@app.route("/admin/incoming-payment", methods=["GET", "POST"])
-
-@app.route(
-    "/admin/payment-approval/<int:approval_id>",
-    methods=["GET", "POST"]
-)
+@app.route("/admin/payment-approval/<approval_id>", methods=["GET", "POST"])
 def admin_review_payment(approval_id):
 
     admin_id = session.get("admin_id")
@@ -6737,6 +7160,7 @@ if __name__ == "__main__":
         db.create_all()
         ensure_account_preference_columns()
         ensure_virtual_card_security_code_column()
+        repair_payment_approvals_sequence()
 
 
     with app.app_context():
@@ -6749,3 +7173,12 @@ if __name__ == "__main__":
 
 
 
+
+
+# ============================================================
+# ADMIN — CUSTOMER ACCOUNT LOCK / UNLOCK
+# ============================================================
+
+# ============================================================
+# ADMIN — DELETE CUSTOMER ACCOUNT
+# ============================================================

@@ -4,7 +4,8 @@ from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.exc import SQLAlchemyError
 
 SOURCE_DB = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "instance", "fairmont.db")
+    os.path.join(os.path.dirname(__file__), "instance", "fairmont.db")
+
 )
 
 TARGET_URL = os.environ.get("TARGET_DATABASE_URL")

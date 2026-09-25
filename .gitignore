@@ -1,38 +1,200 @@
+# =========================================================
+# FAIRMONT BANK - GITIGNORE
+# =========================================================
+
+# ---------------------------------------------------------
+# Python cache / compiled files
+# ---------------------------------------------------------
 __pycache__/
-*.pyc
-instance/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# ---------------------------------------------------------
+# Python virtual environments
+# ---------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# ---------------------------------------------------------
+# Environment variables / secrets
+# ---------------------------------------------------------
 .env
+.env.*
+!.env.example
+
+secrets/
+*.pem
+*.key
+*.crt
+
+# ---------------------------------------------------------
+# Local databases
+# ---------------------------------------------------------
 *.db
 *.sqlite
 *.sqlite3
+instance/
+
+# ---------------------------------------------------------
+# Uploads / generated local files
+# ---------------------------------------------------------
+uploads/
+media/
+tmp/
+temp/
+
+# ---------------------------------------------------------
+# Python backup files
+# ---------------------------------------------------------
 *.bak
 *.backup
-app.py.*
-deploy/ 
+*.old
+*.orig
+*.tmp
+*.swp
+*.swo
 
-*_BEFORE_*.py
-*_before_*.py
-backup_*.py
+# ---------------------------------------------------------
+# Application backup files
+# ---------------------------------------------------------
+
+# app.py backup/snapshot files
+app.py.*
+app_*.py
+app_backup_*
+app_before_*
+app_BEFORE_*
+
+# Other backup naming patterns
+*_backup.py
+*_backup/
+*backup*.py
+*backup*.html
+*backup*.bak
+
+# BEFORE snapshots
+*BEFORE*.py
+*BEFORE*.html
+*BEFORE*.bak
+*before_*.py
+*before_*.html
+*before_*.bak
+
+# Timestamped snapshot files
+*.before_*.py
+*.before_*.html
+*.before_*.bak
+
+# ---------------------------------------------------------
+# Specific backup folders
+# ---------------------------------------------------------
+change_password_backup/
+login_otp_backup/
+personal_information_backup/
+settings_feature_backup/
+
+# ---------------------------------------------------------
+# Development / repair scripts
+# ---------------------------------------------------------
 add_*.py
-create_*.py
 fix_*.py
-repair_*.py
-rebuild_*.py
-clean_*.py
+create_*.py
 connect_*.py
-remove_*.py
+repair_*.py
 restore_*.py
+rebuild_*.py
+remove_*.py
 update_*.py
 upgrade_*.py
-diagnose_*.py
-audit_*.py
-check_*.py
-enforce_*.py
+clean_*.py
 expand_*.py
+enforce_*.py
 implement_*.py
 inspect_*.py
+diagnose_*.py
+audit_*.py
+backup_*.py
 seed_*.py
 standardize_*.py
 migrate_*.py
-dashboard.html
-*.p
+
+# ---------------------------------------------------------
+# Temporary deployment / generated folders
+# ---------------------------------------------------------
+deploy/
+build/
+dist/
+
+# ---------------------------------------------------------
+# Root-level temporary HTML files
+# ---------------------------------------------------------
+/dashboard.html
+
+# ---------------------------------------------------------
+# Temporary template backup files
+# ---------------------------------------------------------
+templates/*backup*
+templates/*BACKUP*
+templates/*before*
+templates/*BEFORE*
+templates/*.bak
+templates/*.backup
+
+# ---------------------------------------------------------
+# Editor files
+# ---------------------------------------------------------
+.vscode/
+.idea/
+*.code-workspace
+
+# ---------------------------------------------------------
+# Operating system files
+# ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---------------------------------------------------------
+# Logs
+# ---------------------------------------------------------
+*.log
+logs/
+
+# ---------------------------------------------------------
+# Testing / coverage
+# ---------------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# ---------------------------------------------------------
+# Jupyter
+# ---------------------------------------------------------
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------
+# Node / frontend temporary files
+# ---------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---------------------------------------------------------
+# Deployment platform local files
+# ---------------------------------------------------------
+.vercel/
+.netlify/
+
+# ---------------------------------------------------------
+# OS / IDE temporary files
+# ---------------------------------------------------------
+*.sublime-workspace
+*.sublime-project

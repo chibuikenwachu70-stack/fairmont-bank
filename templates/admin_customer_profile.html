@@ -464,6 +464,37 @@
 </style>
 ```
 
+
+<style id="customer-profile-details-repair">
+
+.profile-detail-box {
+    padding:15px 16px;
+    background:#071321;
+    border:1px solid rgba(255,255,255,0.065);
+    border-radius:10px;
+    min-height:72px;
+}
+
+.profile-detail-box span {
+    display:block;
+    margin-bottom:7px;
+    color:#71869e;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    font-weight:700;
+}
+
+.profile-detail-box strong {
+    display:block;
+    color:#e6edf5;
+    font-size:12px;
+    line-height:1.45;
+    word-break:break-word;
+}
+
+</style>
+
 </head>
 
 <body>
@@ -893,6 +924,560 @@
 ```
 
 </div>
+
+
+
+<!-- ======================================================
+     ADMIN CUSTOMER ACCOUNT CONTROLS
+     ====================================================== -->
+
+
+<section
+    id="customer-details-repair-panel"
+    style="
+        margin:0 0 24px 0;
+        padding:24px;
+        background:#0b192b;
+        border:1px solid rgba(255,255,255,0.08);
+        border-radius:14px;
+    ">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:20px;
+        flex-wrap:wrap;
+        margin-bottom:22px;
+    ">
+
+        <div>
+
+            <h2 style="
+                margin:0;
+                color:#f2f5f8;
+                font-size:20px;
+            ">
+                Customer Details
+            </h2>
+
+            <p style="
+                margin:7px 0 0;
+                color:#71869e;
+                font-size:12px;
+            ">
+                Complete information for this customer account.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for(
+                'admin_edit_customer',
+                customer_id=customer.id
+            ) }}"
+            style="
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                padding:11px 17px;
+                border-radius:8px;
+                background:#b8954a;
+                color:#071321;
+                font-size:11px;
+                font-weight:800;
+                text-decoration:none;
+            ">
+            Edit Customer
+        </a>
+
+    </div>
+
+
+    <div style="
+        display:grid;
+        grid-template-columns:
+            repeat(auto-fit,minmax(230px,1fr));
+        gap:12px;
+    ">
+
+
+        <div class="profile-detail-box">
+            <span>Full Name</span>
+            <strong>
+                {{ customer.full_name }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Customer ID</span>
+            <strong>
+                {{ customer.customer_id }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Account Number</span>
+            <strong>
+                {{ customer.account_number or "Not assigned" }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Email Address</span>
+            <strong>
+                {{ customer.email }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Phone Number</span>
+            <strong>
+                {{ customer.phone }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Account Type</span>
+            <strong>
+                {{ customer.account_type|title }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Country</span>
+            <strong>
+                {{ customer.country|title }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Account Status</span>
+            <strong>
+                {{ customer.account_status }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Account Balance</span>
+            <strong>
+                {{ customer.preferred_currency_display or "GBP" }}
+                {{ "{:,.2f}".format(customer.account_balance or 0) }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>TCC Payment Restriction</span>
+            <strong>
+                {% if customer.tcc_payment_restriction_enabled %}
+                    ON
+                {% else %}
+                    OFF
+                {% endif %}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Bank Statements</span>
+            <strong>
+                {% if customer.bank_statements_locked %}
+                    Locked
+                {% else %}
+                    Unlocked
+                {% endif %}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Preferred Language</span>
+            <strong>
+                {{ customer.preferred_language or "English" }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Currency Display</span>
+            <strong>
+                {{ customer.preferred_currency_display or "GBP" }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Date Format</span>
+            <strong>
+                {{ customer.preferred_date_format or "DD/MM/YYYY" }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Account Display</span>
+            <strong>
+                {{ customer.account_display_preference or "Standard" }}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Login OTP</span>
+            <strong>
+                {% if customer.login_otp_enabled %}
+                    Enabled
+                {% else %}
+                    Disabled
+                {% endif %}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Transaction Notifications</span>
+            <strong>
+                {% if customer.transaction_notifications %}
+                    Enabled
+                {% else %}
+                    Disabled
+                {% endif %}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Security Notifications</span>
+            <strong>
+                {% if customer.security_notifications %}
+                    Enabled
+                {% else %}
+                    Disabled
+                {% endif %}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Account Notifications</span>
+            <strong>
+                {% if customer.account_notifications %}
+                    Enabled
+                {% else %}
+                    Disabled
+                {% endif %}
+            </strong>
+        </div>
+
+
+        <div class="profile-detail-box">
+            <span>Promotional Notifications</span>
+            <strong>
+                {% if customer.promotional_notifications %}
+                    Enabled
+                {% else %}
+                    Disabled
+                {% endif %}
+            </strong>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="admin-customer-controls"
+         style="
+         margin-top:25px;
+         padding:20px;
+         border:1px solid #e1e7ef;
+         border-radius:14px;
+         background:#fff;
+         ">
+
+    <h3 style="margin-top:0;">
+        Customer Account Controls
+    </h3>
+
+    <p style="color:#68778a;font-size:14px;">
+        Manage the customer's account status, TCC payment
+        restriction, or permanently delete the customer account.
+    </p>
+
+    <div style="
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-top:15px;
+    ">
+
+        {% if customer.tcc_payment_restriction_enabled %}
+
+        <form method="POST"
+              action="{{ url_for('admin_toggle_tcc_restriction', customer_id=customer.id) }}">
+
+            <input type="hidden"
+                   name="tcc_action"
+                   value="disable">
+
+            <button type="submit"
+                    style="
+                    padding:10px 16px;
+                    border:0;
+                    border-radius:8px;
+                    background:#176b3a;
+                    color:#fff;
+                    font-weight:700;
+                    cursor:pointer;
+                    ">
+                TCC Restriction: ON — Turn OFF
+            </button>
+
+        </form>
+
+        {% else %}
+
+        <form method="POST"
+              action="{{ url_for('admin_toggle_tcc_restriction', customer_id=customer.id) }}">
+
+            <input type="hidden"
+                   name="tcc_action"
+                   value="enable">
+
+            <button type="submit"
+                    style="
+                    padding:10px 16px;
+                    border:0;
+                    border-radius:8px;
+                    background:#b36b00;
+                    color:#fff;
+                    font-weight:700;
+                    cursor:pointer;
+                    ">
+                TCC Restriction: OFF — Turn ON
+            </button>
+
+        </form>
+
+        {% endif %}
+
+
+        {% if customer.account_status == "Locked" %}
+
+        <form method="POST"
+              action="{{ url_for('admin_toggle_customer_lock', customer_id=customer.id) }}">
+
+            <input type="hidden"
+                   name="account_action"
+                   value="unlock">
+
+            <button type="submit"
+                    style="
+                    padding:10px 16px;
+                    border:0;
+                    border-radius:8px;
+                    background:#176b3a;
+                    color:#fff;
+                    font-weight:700;
+                    cursor:pointer;
+                    ">
+                Unlock Customer Account
+            </button>
+
+        </form>
+
+        {% else %}
+
+        <form method="POST"
+              action="{{ url_for('admin_toggle_customer_lock', customer_id=customer.id) }}">
+
+            <input type="hidden"
+                   name="account_action"
+                   value="lock">
+
+            <button type="submit"
+                    style="
+                    padding:10px 16px;
+                    border:0;
+                    border-radius:8px;
+                    background:#a12626;
+                    color:#fff;
+                    font-weight:700;
+                    cursor:pointer;
+                    ">
+                Lock Customer Account
+            </button>
+
+        </form>
+
+        {% endif %}
+
+
+        <form method="POST"
+              action="{{ url_for('admin_delete_customer', customer_id=customer.id) }}"
+              onsubmit="return confirm('Are you sure you want to permanently delete this customer account? This action cannot be undone.');">
+
+            <input type="hidden"
+                   name="confirm_delete"
+                   value="delete">
+
+            <button type="submit"
+                    style="
+                    padding:10px 16px;
+                    border:0;
+                    border-radius:8px;
+                    background:#3a1010;
+                    color:#fff;
+                    font-weight:700;
+                    cursor:pointer;
+                    ">
+                Delete Customer Account
+            </button>
+
+        </form>
+
+    </div>
+
+
+        <!-- TCC PAYMENT RESTRICTION CONTROL -->
+
+        <div class="tcc-admin-control"
+             style="
+             margin-top:15px;
+             padding:15px;
+             border:1px solid rgba(255,255,255,0.07);
+             border-radius:10px;
+             background:rgba(255,255,255,0.025);
+             ">
+
+            <div style="
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:15px;
+                flex-wrap:wrap;
+            ">
+
+                <div>
+
+                    <div style="
+                        color:#edf2f7;
+                        font-size:13px;
+                        font-weight:700;
+                    ">
+                        TCC Payment Restriction
+                    </div>
+
+                    <div style="
+                        margin-top:5px;
+                        color:#71869e;
+                        font-size:11px;
+                    ">
+                        Control whether TCC payment restriction
+                        is enabled for this customer.
+                    </div>
+
+                </div>
+
+
+                {% if customer.tcc_payment_restriction_enabled %}
+
+                    <span style="
+                        display:inline-block;
+                        padding:6px 10px;
+                        border-radius:20px;
+                        background:rgba(190,82,82,0.12);
+                        border:1px solid rgba(190,82,82,0.25);
+                        color:#e0a0a0;
+                        font-size:10px;
+                        font-weight:700;
+                    ">
+                        TCC RESTRICTION: ON
+                    </span>
+
+                {% else %}
+
+                    <span style="
+                        display:inline-block;
+                        padding:6px 10px;
+                        border-radius:20px;
+                        background:rgba(74,180,125,0.10);
+                        border:1px solid rgba(74,180,125,0.22);
+                        color:#9bd5b4;
+                        font-size:10px;
+                        font-weight:700;
+                    ">
+                        TCC RESTRICTION: OFF
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <form method="POST"
+                  action="{{ url_for(
+                      'admin_toggle_tcc_restriction',
+                      customer_id=customer.id
+                  ) }}"
+                  style="margin-top:13px;">
+
+                {% if customer.tcc_payment_restriction_enabled %}
+
+                    <input type="hidden"
+                           name="tcc_action"
+                           value="disable">
+
+                    <button type="submit"
+                            style="
+                            padding:9px 14px;
+                            border:0;
+                            border-radius:8px;
+                            background:#176b3a;
+                            color:#fff;
+                            font-size:11px;
+                            font-weight:700;
+                            cursor:pointer;
+                            ">
+                        Turn TCC Restriction OFF
+                    </button>
+
+                {% else %}
+
+                    <input type="hidden"
+                           name="tcc_action"
+                           value="enable">
+
+                    <button type="submit"
+                            style="
+                            padding:9px 14px;
+                            border:0;
+                            border-radius:8px;
+                            background:#a12626;
+                            color:#fff;
+                            font-size:11px;
+                            font-weight:700;
+                            cursor:pointer;
+                            ">
+                        Turn TCC Restriction ON
+                    </button>
+
+                {% endif %}
+
+            </form>
+
+        </div>
+
+</section>
+
 
 </body>
 </html>
