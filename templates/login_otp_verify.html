@@ -132,7 +132,14 @@
         </p>
         {% endif %}
 
-        <form
+        
+{% if message %}
+<div class="otp-message">
+    {{ message }}
+</div>
+{% endif %}
+
+<form
             method="POST"
             action="{{ url_for('verify_login_otp') }}">
 
@@ -153,7 +160,29 @@
                 Verify Login
             </button>
 
-        </form>
+        </form
+
+<div class="otp-resend-section">
+
+    <p class="otp-resend-text">
+        Didn't receive a verification code?
+    </p>
+
+    <form
+        method="POST"
+        action="{{ url_for('resend_login_otp') }}"
+    >
+        <button
+            type="submit"
+            class="otp-resend-button"
+        >
+            Resend Verification Code
+        </button>
+    </form>
+
+</div>
+
+>
 
         <a
             href="{{ url_for('login') }}"

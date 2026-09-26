@@ -231,7 +231,7 @@
             <h2>Virtual ATM Card</h2>
         </div>
 
-        {% if virtual_card %}
+        {% if virtual_card and virtual_card.status != "Cancelled" %}
             <div class="virtual-card">
                 <div class="virtual-card-top">
                     <span class="virtual-card-brand">FAIRMONT BANK</span>

@@ -1087,16 +1087,7 @@
         </div>
 
 
-        <div class="profile-detail-box">
-            <span>Bank Statements</span>
-            <strong>
-                {% if customer.bank_statements_locked %}
-                    Locked
-                {% else %}
-                    Unlocked
-                {% endif %}
-            </strong>
-        </div>
+        
 
 
         <div class="profile-detail-box">
@@ -1131,8 +1122,12 @@
         </div>
 
 
+        
+
+
         <div class="profile-detail-box">
-            <span>Login OTP</span>
+            <span>Customer Login OTP</span>
+
             <strong>
                 {% if customer.login_otp_enabled %}
                     Enabled
@@ -1140,6 +1135,34 @@
                     Disabled
                 {% endif %}
             </strong>
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_toggle_customer_login_otp', customer_id=customer.id) }}"
+                style="margin-top: 10px;"
+            >
+
+                {% if customer.login_otp_enabled %}
+
+                    <button
+                        type="submit"
+                        class="action"
+                    >
+                        Disable Login OTP
+                    </button>
+
+                {% else %}
+
+                    <button
+                        type="submit"
+                        class="action"
+                    >
+                        Enable Login OTP
+                    </button>
+
+                {% endif %}
+
+            </form>
         </div>
 
 
@@ -1272,82 +1295,93 @@
 
         {% if customer.account_status == "Locked" %}
 
-        <form method="POST"
-              action="{{ url_for('admin_toggle_customer_lock', customer_id=customer.id) }}">
-
-            <input type="hidden"
-                   name="account_action"
-                   value="unlock">
-
-            <button type="submit"
-                    style="
-                    padding:10px 16px;
-                    border:0;
-                    border-radius:8px;
-                    background:#176b3a;
-                    color:#fff;
-                    font-weight:700;
-                    cursor:pointer;
-                    ">
-                Unlock Customer Account
-            </button>
-
-        </form>
+        
 
         {% else %}
 
-        <form method="POST"
-              action="{{ url_for('admin_toggle_customer_lock', customer_id=customer.id) }}">
-
-            <input type="hidden"
-                   name="account_action"
-                   value="lock">
-
-            <button type="submit"
-                    style="
-                    padding:10px 16px;
-                    border:0;
-                    border-radius:8px;
-                    background:#a12626;
-                    color:#fff;
-                    font-weight:700;
-                    cursor:pointer;
-                    ">
-                Lock Customer Account
-            </button>
-
-        </form>
+        
 
         {% endif %}
 
 
-        <form method="POST"
-              action="{{ url_for('admin_delete_customer', customer_id=customer.id) }}"
-              onsubmit="return confirm('Are you sure you want to permanently delete this customer account? This action cannot be undone.');">
-
-            <input type="hidden"
-                   name="confirm_delete"
-                   value="delete">
-
-            <button type="submit"
-                    style="
-                    padding:10px 16px;
-                    border:0;
-                    border-radius:8px;
-                    background:#3a1010;
-                    color:#fff;
-                    font-weight:700;
-                    cursor:pointer;
-                    ">
-                Delete Customer Account
-            </button>
-
-        </form>
+        
 
     </div>
 
 
-        <!-- TCC PAYMENT RESTRICTION CONTROL -->
+        
+        <div style="
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-top:15px;
+        ">
+
+            {% if customer.account_status == "Locked" %}
+
+            <form method="POST"
+                  action="{{ url_for('admin_toggle_customer_freeze', customer_id=customer.id) }}">
+
+                <button type="submit"
+                        style="
+                        padding:10px 16px;
+                        border:0;
+                        border-radius:8px;
+                        background:#176b3a;
+                        color:#fff;
+                        font-weight:700;
+                        cursor:pointer;
+                        ">
+                    Unfreeze Customer Account
+                </button>
+
+            </form>
+
+            {% else %}
+
+            <form method="POST"
+                  action="{{ url_for('admin_toggle_customer_freeze', customer_id=customer.id) }}"
+                  onsubmit="return confirm('Freeze this customer account?');">
+
+                <button type="submit"
+                        style="
+                        padding:10px 16px;
+                        border:0;
+                        border-radius:8px;
+                        background:#b36b00;
+                        color:#fff;
+                        font-weight:700;
+                        cursor:pointer;
+                        ">
+                    Freeze Customer Account
+                </button>
+
+            </form>
+
+            {% endif %}
+
+            <form method="POST"
+                  action="{{ url_for('admin_delete_customer', customer_id=customer.id) }}"
+                  onsubmit="return confirm('PERMANENT ACTION: Delete this customer account? This cannot be undone.');">
+
+                <button type="submit"
+                        style="
+                        padding:10px 16px;
+                        border:0;
+                        border-radius:8px;
+                        background:#b42318;
+                        color:#fff;
+                        font-weight:700;
+                        cursor:pointer;
+                        ">
+                    Permanently Delete Customer
+                </button>
+
+            </form>
+
+        </div>
+
+<!-- TCC PAYMENT RESTRICTION CONTROL -->
 
         <div class="tcc-admin-control"
              style="

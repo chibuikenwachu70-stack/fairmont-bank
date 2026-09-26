@@ -4,292 +4,270 @@
 <head>
 
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>My Profile | Fairmont Bank</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            margin: 0;
+            background: #f4f6f8;
+            font-family: Arial, sans-serif;
+            color: #172b4d;
+        }
+
+        .profile-page {
+            max-width: 850px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.08);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #172b4d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .profile-header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .profile-header p {
+            margin: 6px 0 0;
+            color: #667085;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 17px 0;
+            border-bottom: 1px solid #eaecf0;
+        }
+
+        .profile-label {
+            color: #667085;
+            font-weight: 600;
+        }
+
+        .profile-value {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .status {
+            color: #18794e;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #172b4d;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+    </style>
+
+
+<style id="fairmont-profile-text-fix">
+/* Fairmont Bank - customer profile text visibility */
+
+.profile-card,
+.profile-container,
+.profile-details,
+.profile-section,
+.account-details,
+.customer-details {
+    color: #111827 !important;
+}
+
+.profile-card *,
+.profile-container *,
+.profile-details *,
+.profile-section *,
+.account-details *,
+.customer-details * {
+    color: #111827 !important;
+}
+
+.profile-card label,
+.profile-container label,
+.profile-details label,
+.profile-section label {
+    color: #374151 !important;
+    font-weight: 600 !important;
+}
+
+.profile-card input,
+.profile-container input,
+.profile-details input,
+.profile-section input {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+}
+
+.profile-card table,
+.profile-card td,
+.profile-card th,
+.profile-container table,
+.profile-container td,
+.profile-container th {
+    color: #111827 !important;
+}
+
+</style>
 
 </head>
 
 <body>
 
-    <main class="profile-page">
+<div class="profile-page">
 
-        <div class="profile-shell">
+    <div class="profile-card">
 
+        <div class="profile-header">
 
-            <header class="profile-page-header">
+            <div class="profile-avatar">
+                {{ customer.full_name[0].upper() }}
+            </div>
 
-                <a href="/dashboard" class="profile-back-button">
+            <div>
 
-                    ←
+                <h1>My Profile</h1>
 
-                </a>
+                <p>
+                    {{ customer.full_name }}
+                </p>
 
-                <div class="profile-page-title">
-
-                    <p>
-                        FAIRMONT BANK
-                    </p>
-
-                    <h1>
-                        My Profile
-                    </h1>
-
-                </div>
-
-            </header>
-
-
-            <section class="profile-identity-card">
-
-                <div class="large-profile-avatar">
-
-                    {{ customer.full_name[0].upper() }}
-
-                </div>
-
-
-                <div class="profile-identity-details">
-
-                    <h2>
-                        {{ customer.full_name }}
-                    </h2>
-
-                    <p>
-                        Customer ID · {{ customer.customer_id }}
-                    </p>
-
-                    <span class="profile-status">
-
-                        <span class="status-dot"></span>
-
-                        {{ customer.account_status }}
-
-                    </span>
-
-                </div>
-
-            </section>
-
-
-            <section class="profile-section">
-
-                <div class="profile-section-heading">
-
-                    <p>
-                        PERSONAL INFORMATION
-                    </p>
-
-                    <h2>
-                        Personal details
-                    </h2>
-
-                </div>
-
-
-                <div class="profile-details-card">
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Full name
-                        </div>
-
-                        <div class="profile-detail-value">
-                            {{ customer.full_name }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Email address
-                        </div>
-
-                        <div class="profile-detail-value">
-                            {{ customer.email }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Phone number
-                        </div>
-
-                        <div class="profile-detail-value">
-                            {{ customer.phone }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Country of residence
-                        </div>
-
-                        <div class="profile-detail-value">
-                            {{ customer.country }}
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-            </section>
-
-
-            <section class="profile-section">
-
-                <div class="profile-section-heading">
-
-                    <p>
-                        ACCOUNT INFORMATION
-                    </p>
-
-                    <h2>
-                        Account details
-                    </h2>
-
-                </div>
-
-
-                <div class="profile-details-card">
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Customer ID
-                        </div>
-
-                        <div class="profile-detail-value">
-                            {{ customer.customer_id }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Account type
-                        </div>
-
-                        <div class="profile-detail-value account-type-value">
-                            {{ customer.account_type }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Account status
-                        </div>
-
-                        <div class="profile-detail-value profile-active-status">
-                            {{ customer.account_status }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="profile-detail-row">
-
-                        <div class="profile-detail-label">
-                            Available balance
-                        </div>
-
-                        <div class="profile-detail-value profile-balance-value">
-
-                            £{{ "{:,.2f}".format(customer.account_balance) }}
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-            </section>
-
-
-            <section class="profile-section">
-
-                <div class="profile-section-heading">
-
-                    <p>
-                        SECURITY
-                    </p>
-
-                    <h2>
-                        Account security
-                    </h2>
-
-                </div>
-
-
-                <div class="profile-security-card">
-
-                    <div class="security-check">
-                        ✓
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Your account is protected
-                        </strong>
-
-                        <p>
-                            Your password is securely stored and your account information is protected.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <a
-                href="/dashboard"
-                class="profile-dashboard-button">
-
-                Return to dashboard
-
-            </a>
-
-
-            <a
-                href="/logout"
-                class="profile-logout">
-
-                Sign out
-
-            </a>
-
+            </div>
 
         </div>
 
-    </main>
+        <div class="profile-row">
+
+            <div class="profile-label">
+                Full Name
+            </div>
+
+            <div class="profile-value">
+                {{ customer.full_name }}
+            </div>
+
+        </div>
+
+        <div class="profile-row">
+
+            <div class="profile-label">
+                Email
+            </div>
+
+            <div class="profile-value">
+                {{ customer.email }}
+            </div>
+
+        </div>
+
+        <div class="profile-row">
+
+            <div class="profile-label">
+                Phone
+            </div>
+
+            <div class="profile-value">
+                {{ customer.phone }}
+            </div>
+
+        </div>
+
+        <div class="profile-row">
+
+            <div class="profile-label">
+                Account Number
+            </div>
+
+            <div class="profile-value">
+                {{ customer.account_number }}
+            </div>
+
+        </div>
+
+        <div class="profile-row">
+
+            <div class="profile-label">
+                Account Type
+            </div>
+
+            <div class="profile-value">
+                {{ customer.account_type }}
+            </div>
+
+        </div>
+
+        <div class="profile-row">
+
+            <div class="profile-label">
+                Country
+            </div>
+
+            <div class="profile-value">
+                {{ customer.country }}
+            </div>
+
+        </div>
+
+        <div class="profile-row">
+
+            <div class="profile-label">
+                Account Status
+            </div>
+
+            <div class="profile-value status">
+                {{ customer.account_status }}
+            </div>
+
+        </div>
+
+        <a href="{{ url_for('dashboard') }}"
+           class="back-button">
+
+            ← Back to Dashboard
+
+        </a>
+
+    </div>
+
+</div>
 
 </body>
 

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash
+from flask import Flask, request, redirect, url_for, render_template, session, flash, make_response
 from flask_login import login_required, current_user
 from flask_login import UserMixin
 from flask_login import login_user
@@ -9,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 import string
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 import re
 
 
@@ -329,6 +330,11 @@ class Customer(UserMixin, db.Model):
         default=False
     )
 
+    bank_statements_password_hash = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
 
 
 
@@ -361,87 +367,6 @@ class Customer(UserMixin, db.Model):
         db.Boolean,
         nullable=False,
         default=False
-    )
-
-class CustomerLoginOTP(db.Model):
-
-    __tablename__ = "customer_login_otp"
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    customer_id = db.Column(
-        db.Integer,
-        db.ForeignKey("customer.id"),
-        nullable=False,
-        index=True
-    )
-
-    otp_code = db.Column(
-        db.String(6),
-        nullable=False
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=datetime.utcnow
-    )
-
-    expires_at = db.Column(
-        db.DateTime,
-        nullable=False
-    )
-
-    used = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-
-
-class LoginOTPRecoveryRequest(db.Model):
-
-    __tablename__ = "login_otp_recovery_request"
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    customer_id = db.Column(
-        db.Integer,
-        db.ForeignKey("customer.id"),
-        nullable=False
-    )
-
-    recovery_code = db.Column(
-        db.String(20),
-        nullable=False
-    )
-
-    status = db.Column(
-        db.String(20),
-        nullable=False,
-        default="Pending"
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=datetime.utcnow
-    )
-
-    expires_at = db.Column(
-        db.DateTime,
-        nullable=False
-    )
-
-    used_at = db.Column(
-        db.DateTime,
-        nullable=True
     )
 
 class Notification(db.Model):
@@ -1087,60 +1012,6 @@ def generate_transaction_reference():
 # HOME
 # =========================================================
 
-
-
-# --------------------------------------------------
-# Dashboard template values
-# --------------------------------------------------
-
-@app.context_processor
-def inject_dashboard_values():
-    """
-    Always provide dashboard.html with the values it needs.
-
-    This does not modify the customer's database record.
-    It only supplies template variables while rendering.
-    """
-
-    balance = 0.0
-
-    try:
-        if current_user.is_authenticated:
-
-            # Primary account-balance field.
-            if hasattr(current_user, "account_balance"):
-                balance = getattr(
-                    current_user,
-                    "account_balance",
-                    0
-                ) or 0
-
-            # Compatibility with applications that use
-            # "balance" instead.
-            elif hasattr(current_user, "balance"):
-                balance = getattr(
-                    current_user,
-                    "balance",
-                    0
-                ) or 0
-
-    except Exception:
-        balance = 0.0
-
-    try:
-        balance = float(balance)
-    except (TypeError, ValueError):
-        balance = 0.0
-
-    return {
-        "display_balance": balance,
-        "currency_symbol": app.config.get(
-            "CURRENCY_SYMBOL",
-            "£"
-        )
-    }
-
-
 @app.route("/")
 def home():
 
@@ -1173,14 +1044,12 @@ def login():
         ).first()
 
         if customer is None:
-
             return render_template(
                 "login.html",
                 error="Invalid Customer ID or password."
             )
 
         if customer.account_status != "Active":
-
             return render_template(
                 "login.html",
                 error="Your account is currently unavailable. Please contact Fairmont Bank."
@@ -1190,67 +1059,76 @@ def login():
             customer.password_hash,
             password
         ):
-
             return render_template(
                 "login.html",
                 error="Invalid Customer ID or password."
             )
 
-        # ADMIN CONTROLLED OTP LOGIN
-        #
-        # Only customers explicitly enabled by an administrator
-        # require this additional verification step.
+        # -------------------------------------------------
+        # LOGIN OTP CHECK
+        # -------------------------------------------------
 
-        if customer.login_otp_enabled:
+        if getattr(customer, "login_otp_enabled", False):
 
-            # Invalidate previous unused OTP codes.
-            old_otps = (
-                CustomerLoginOTP.query
-                .filter_by(
-                    customer_id=customer.id,
-                    used=False
-                )
-                .all()
+            import secrets
+
+            otp_code = str(
+                secrets.randbelow(900000) + 100000
             )
 
-            for old_otp in old_otps:
-                old_otp.used = True
+            now = datetime.utcnow()
 
-            # Generate a fresh six-digit OTP.
-            otp_code = f"{secrets.randbelow(1000000):06d}"
+            CustomerLoginOTP.query.filter_by(
+                customer_id=customer.id,
+                used=False
+            ).update(
+                {"used": True},
+                synchronize_session=False
+            )
 
-            otp_record = CustomerLoginOTP(
+            otp = CustomerLoginOTP(
                 customer_id=customer.id,
                 otp_code=otp_code,
-                used=False,
-                expires_at=(
-                    datetime.now(timezone.utc)
-                    + timedelta(minutes=10)
-                ),
-                created_at=datetime.now(timezone.utc)
+                created_at=now,
+                expires_at=now + timedelta(minutes=10),
+                used=False
             )
 
-            db.session.add(otp_record)
+            db.session.add(otp)
+
+            # -------------------------------------------------
+            # CREATE ADMIN LOGIN OTP RECOVERY REQUEST
+            # -------------------------------------------------
+            # The customer's OTP is also recorded as a pending
+            # recovery request so an authenticated administrator
+            # can view and process the login request.
+            recovery_request = LoginOTPRecoveryRequest(
+                customer_id=customer.id,
+                recovery_code=otp_code,
+                status="Pending",
+                created_at=now,
+                expires_at=now + timedelta(minutes=10)
+            )
+
+            db.session.add(recovery_request)
             db.session.commit()
 
-            session["pending_login_customer_id"] = customer.customer_id
+            session["pending_login_customer_id"] = customer.id
+            session["pending_login_customer_code"] = customer.customer_id
+
+            # Keep the OTP in the server-side login session
+            # temporarily so the verification page can use it.
+            session["login_otp_pending"] = True
 
             return render_template(
                 "login_otp_verify.html",
                 customer=customer,
-                error=None
+                otp_sent=True
             )
 
-        login_user(customer)
-
-        session["customer_id"] = customer.customer_id
-
-        next_url = request.form.get("next") or request.args.get("next")
-
-        if next_url and next_url.startswith("/") and not next_url.startswith("//"):
-            return redirect(next_url)
-
-        return redirect("/dashboard")
+        # -------------------------------------------------
+        # NORMAL LOGIN
+        # -------------------------------------------------
 
         login_user(customer)
 
@@ -1258,7 +1136,11 @@ def login():
 
         next_url = request.form.get("next") or request.args.get("next")
 
-        if next_url and next_url.startswith("/") and not next_url.startswith("//"):
+        if (
+            next_url
+            and next_url.startswith("/")
+            and not next_url.startswith("//")
+        ):
             return redirect(next_url)
 
         return redirect("/dashboard")
@@ -1268,88 +1150,27 @@ def login():
     )
 
 
-
-
-
-@app.route("/login/resend-otp", methods=["POST"])
-def resend_login_otp():
-
-    customer_id = session.get("pending_login_customer_id")
-
-    if not customer_id:
-        return redirect(url_for("login"))
-
-    customer = Customer.query.filter_by(
-        customer_id=customer_id
-    ).first()
-
-    if customer is None:
-        session.pop("pending_login_customer_id", None)
-        return redirect(url_for("login"))
-
-    # OTP must still be controlled by the administrator.
-    if not customer.login_otp_enabled:
-        session.pop("pending_login_customer_id", None)
-        return redirect(url_for("login"))
-
-    # Invalidate all previous unused OTP codes.
-    old_otps = (
-        CustomerLoginOTP.query
-        .filter_by(
-            customer_id=customer.id,
-            used=False
-        )
-        .all()
-    )
-
-    for old_otp in old_otps:
-        old_otp.used = True
-
-    # Generate a fresh six-digit OTP.
-    otp_code = f"{secrets.randbelow(1000000):06d}"
-
-    now_utc = datetime.now(timezone.utc)
-
-    otp_record = CustomerLoginOTP(
-        customer_id=customer.id,
-        otp_code=otp_code,
-        used=False,
-        created_at=now_utc,
-        expires_at=now_utc + timedelta(minutes=10)
-    )
-
-    db.session.add(otp_record)
-    db.session.commit()
-
-    return render_template(
-        "login_otp_verify.html",
-        customer=customer,
-        error=None,
-        message="A new verification code has been requested. Please contact Fairmont Bank support for your code."
-    )
-
-
 @app.route("/login/verify-otp", methods=["POST"])
 def verify_login_otp():
 
-    customer_id = session.get("pending_login_customer_id")
+    customer_id = session.get(
+        "pending_login_customer_id"
+    )
 
     if not customer_id:
         return redirect(url_for("login"))
 
-    customer = Customer.query.filter_by(
-        customer_id=customer_id
-    ).first()
+    customer = db.session.get(
+        Customer,
+        customer_id
+    )
 
     if customer is None:
         session.pop("pending_login_customer_id", None)
-        return redirect(url_for("login"))
+        session.pop("pending_login_customer_code", None)
+        session.pop("login_otp_pending", None)
 
-    if not customer.login_otp_enabled:
-        login_user(customer)
-        session["customer_id"] = customer.customer_id
-        session.pop("pending_login_customer_id", None)
-        return redirect("/dashboard")
+        return redirect(url_for("login"))
 
     entered_otp = request.form.get(
         "otp",
@@ -1372,50 +1193,38 @@ def verify_login_otp():
         return render_template(
             "login_otp_verify.html",
             customer=customer,
-            error="No active verification code is available. Please contact the bank administrator."
+            error="No active verification code was found."
         )
 
-    if otp_record.expires_at:
-        expiry = otp_record.expires_at
-
-        if expiry.tzinfo is None:
-            expiry = expiry.replace(tzinfo=timezone.utc)
-
-        if datetime.now(timezone.utc) > expiry:
-
-            otp_record.used = True
-            db.session.commit()
-
-            return render_template(
-                "login_otp_verify.html",
-                customer=customer,
-                error="This verification code has expired. Please contact the bank administrator for a new login attempt."
-            )
-
-    if entered_otp != otp_record.otp_code:
+    if datetime.utcnow() > otp_record.expires_at:
+        otp_record.used = True
+        db.session.commit()
 
         return render_template(
             "login_otp_verify.html",
             customer=customer,
-            error="Invalid verification code. Please contact the bank administrator."
+            error="Your verification code has expired. Please sign in again."
+        )
+
+    if entered_otp != otp_record.otp_code:
+        return render_template(
+            "login_otp_verify.html",
+            customer=customer,
+            error="Invalid verification code."
         )
 
     otp_record.used = True
+    db.session.commit()
 
     login_user(customer)
 
     session["customer_id"] = customer.customer_id
-    session.pop("pending_login_customer_id", None)
 
-    db.session.commit()
+    session.pop("pending_login_customer_id", None)
+    session.pop("pending_login_customer_code", None)
+    session.pop("login_otp_pending", None)
 
     return redirect("/dashboard")
-
-
-# =========================================================
-# OPEN ACCOUNT
-# =========================================================
-
 @app.route("/open-account", methods=["GET", "POST"])
 def open_account():
 
@@ -1930,10 +1739,8 @@ def dashboard():
 
         return render_template(
             "login.html",
-            error="Please sign in to access your dashboard.",
-        display_balance=display_balance,
-        currency_symbol=app.config.get("CURRENCY_SYMBOL", "£"),
-    )
+            error="Please sign in to access your dashboard."
+        )
 
     customer = Customer.query.filter_by(
         customer_id=customer_id
@@ -2023,20 +1830,53 @@ def dashboard():
         customer_id=customer.customer_id
     ).first()
 
+    # -------------------------------------------------
+    # CUSTOMER PREFERRED CURRENCY DISPLAY
+    # -------------------------------------------------
 
-    # DASHBOARD BALANCE REPAIR
-    # Always provide the real customer account balance
-    # to dashboard.html.
-    display_balance = customer.account_balance or 0
+    preferred_currency = (
+        getattr(customer, "preferred_currency_display", "GBP")
+        or "GBP"
+    ).upper()
+
+    currency_symbols = {
+        "GBP": "£",
+        "USD": "$",
+        "EUR": "€"
+    }
+
+    currency_locales = {
+        "GBP": "en-GB",
+        "USD": "en-US",
+        "EUR": "de-DE"
+    }
+
+    currency_symbol = currency_symbols.get(
+        preferred_currency,
+        "£"
+    )
+
+    currency_locale = currency_locales.get(
+        preferred_currency,
+        "en-GB"
+    )
+
+    # The stored account balance remains unchanged.
+    # The selected currency is used only for presentation.
+    display_balance = float(
+        customer.account_balance or 0
+    )
+
     return render_template(
         "dashboard.html",
         customer=customer,
         notification_unread_count=notification_unread_count,
         recent_transactions=recent_transactions,
         virtual_card=virtual_card,
-        display_balance=display_balance,
-        currency_symbol=app.config.get("CURRENCY_SYMBOL", "£"),
-        currency_locale=app.config.get("CURRENCY_LOCALE", "en-GB"),
+        preferred_currency=preferred_currency,
+        currency_symbol=currency_symbol,
+        currency_locale=currency_locale,
+        display_balance=display_balance
     )
 
 # =========================================================
@@ -2134,135 +1974,189 @@ def virtual_card_review():
 
 
 
+@app.route("/virtual-card/freeze", methods=["POST"])
+@login_required
+def virtual_card_freeze():
+    customer_id = session.get("customer_id")
 
-# =========================================================
-# CUSTOMER — MY PROFILE
-# =========================================================
-
-@app.route("/my-profile")
-def my_profile():
-
-    if "customer_id" not in session:
+    if not customer_id:
         return redirect(url_for("login"))
 
     customer = Customer.query.filter_by(
-        customer_id=session["customer_id"]
+        customer_id=customer_id
     ).first()
 
     if customer is None:
         session.clear()
         return redirect(url_for("login"))
 
-    return render_template(
-        "my_profile.html",
-        customer=customer
-    )
-
-
-# =========================================================
-# VIRTUAL CARD MANAGEMENT
-# =========================================================
-
-@app.route("/virtual-card/freeze", methods=["POST"])
-@login_required
-def virtual_card_freeze():
-
-    customer_id = session.get("customer_id")
-
-    if not customer_id:
-        return redirect(url_for("login"))
-
     card = VirtualATMCard.query.filter_by(
-        customer_id=customer_id
+        customer_id=customer.customer_id
     ).first()
 
-    if not card:
-        flash("No virtual card was found.", "error")
+    if card is None:
+        flash(
+            "You do not have a virtual ATM card.",
+            "error"
+        )
         return redirect(url_for("dashboard"))
-
-    if card.status == "Cancelled":
-        flash("A cancelled card cannot be frozen.", "error")
-        return redirect(url_for("virtual_card_review"))
-
-    if card.status == "Frozen":
-        flash("Your virtual card is already frozen.", "info")
-        return redirect(url_for("virtual_card_review"))
-
-    card.status = "Frozen"
-
-    db.session.commit()
-
-    flash("Your virtual card has been frozen.", "success")
-
-    return redirect(url_for("virtual_card_review"))
-
-
-@app.route("/virtual-card/unfreeze", methods=["POST"])
-@login_required
-def virtual_card_unfreeze():
-
-    customer_id = session.get("customer_id")
-
-    if not customer_id:
-        return redirect(url_for("login"))
-
-    card = VirtualATMCard.query.filter_by(
-        customer_id=customer_id
-    ).first()
-
-    if not card:
-        flash("No virtual card was found.", "error")
-        return redirect(url_for("dashboard"))
-
-    if card.status == "Cancelled":
-        flash("A cancelled card cannot be unfrozen.", "error")
-        return redirect(url_for("virtual_card_review"))
 
     if card.status == "Active":
-        flash("Your virtual card is already active.", "info")
-        return redirect(url_for("virtual_card_review"))
+        card.status = "Frozen"
 
-    card.status = "Active"
+        flash(
+            "Your virtual ATM card has been frozen.",
+            "success"
+        )
+
+    elif card.status == "Frozen":
+        card.status = "Active"
+
+        flash(
+            "Your virtual ATM card has been unfrozen.",
+            "success"
+        )
+
+    else:
+        flash(
+            "This virtual ATM card cannot currently be frozen or unfrozen.",
+            "error"
+        )
 
     db.session.commit()
 
-    flash(
-        "Your virtual card has been unfrozen and is active again.",
-        "success"
-    )
-
     return redirect(url_for("virtual_card_review"))
+
 
 
 @app.route("/virtual-card/cancel", methods=["POST"])
 @login_required
 def virtual_card_cancel():
-
     customer_id = session.get("customer_id")
 
     if not customer_id:
         return redirect(url_for("login"))
 
-    card = VirtualATMCard.query.filter_by(
+    customer = Customer.query.filter_by(
         customer_id=customer_id
     ).first()
 
-    if not card:
-        flash("No virtual card was found.", "error")
-        return redirect(url_for("apply_virtual_card"))
+    if customer is None:
+        session.clear()
+        return redirect(url_for("login"))
 
-    # Permanently remove the cancelled virtual card.
-    db.session.delete(card)
-    db.session.commit()
+    card = VirtualATMCard.query.filter_by(
+        customer_id=customer.customer_id
+    ).first()
 
-    flash(
-        "Your virtual card has been permanently cancelled. "
-        "You can apply for a new virtual card.",
-        "success"
+    if card is None:
+        flash(
+            "You do not have a virtual ATM card.",
+            "error"
+        )
+        return redirect(url_for("dashboard"))
+
+    try:
+        db.session.delete(card)
+        db.session.commit()
+
+        flash(
+            "Your virtual ATM card has been cancelled.",
+            "success"
+        )
+
+    except Exception:
+        db.session.rollback()
+
+        flash(
+            "The virtual ATM card could not be cancelled. Please try again.",
+            "error"
+        )
+
+    return redirect(url_for("dashboard"))
+
+
+
+@app.route("/virtual-card/unfreeze", methods=["POST"])
+@login_required
+def virtual_card_unfreeze():
+    customer_id = session.get("customer_id")
+
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(
+        customer_id=customer_id
+    ).first()
+
+    if customer is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    card = VirtualATMCard.query.filter_by(
+        customer_id=customer.customer_id
+    ).first()
+
+    if card is None:
+        flash(
+            "You do not have a virtual ATM card.",
+            "error"
+        )
+        return redirect(url_for("dashboard"))
+
+    if card.status == "Frozen":
+        card.status = "Active"
+        db.session.commit()
+
+        flash(
+            "Your virtual ATM card has been unfrozen successfully.",
+            "success"
+        )
+
+    elif card.status == "Active":
+        flash(
+            "Your virtual ATM card is already active.",
+            "success"
+        )
+
+    else:
+        flash(
+            "This virtual ATM card cannot currently be unfrozen.",
+            "error"
+        )
+
+    return redirect(url_for("virtual_card_review"))
+
+
+@app.route("/my-profile")
+def my_profile():
+
+    customer_id = session.get("customer_id")
+
+    if not customer_id:
+
+        return render_template(
+            "login.html",
+            error="Please sign in to access your profile."
+        )
+
+    customer = Customer.query.filter_by(
+        customer_id=customer_id
+    ).first()
+
+    if customer is None:
+
+        session.clear()
+
+        return render_template(
+            "login.html",
+            error="Your session could not be verified. Please sign in again."
+        )
+
+    return render_template(
+        "my_profile.html",
+        customer=customer
     )
-
-    return redirect(url_for("apply_virtual_card"))
-
 
 @app.route("/logout")
 def logout():
@@ -2999,227 +2893,8 @@ def withdraw_venmo():
     return _external_withdrawal_page("Venmo", "Venmo username", "Venmo Withdrawal", "V", "withdraw_venmo")
 
 
-
-# =========================================================
-# SEND MONEY TO ANOTHER FAIRMONT BANK CUSTOMER
-# =========================================================
-
-@app.route("/send-fairmont-money", methods=["GET", "POST"])
-def send_fairmont_money():
-
-    if "customer_id" not in session:
-        return redirect(url_for("login"))
-
-    customer = Customer.query.filter_by(
-        customer_id=session["customer_id"]
-    ).first()
-
-    if customer is None:
-        session.clear()
-        return redirect(url_for("login"))
-
-    if request.method == "GET":
-        return render_template(
-            "send_fairmont_money.html",
-            customer=customer
-        )
-
-    recipient_account_number = request.form.get(
-        "recipient_account_number",
-        ""
-    ).strip()
-
-    amount_text = request.form.get(
-        "amount",
-        ""
-    ).strip()
-
-    reference = request.form.get(
-        "reference",
-        ""
-    ).strip()
-
-    if not re.fullmatch(
-        r"\d{10}",
-        recipient_account_number
-    ):
-        flash(
-            "Fairmont account number must contain exactly 10 digits.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    try:
-        amount = float(amount_text)
-    except (TypeError, ValueError):
-        flash(
-            "Please enter a valid amount.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    if amount <= 0:
-        flash(
-            "Transfer amount must be greater than zero.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    sender_balance = float(
-        customer.account_balance or 0
-    )
-
-    if amount > sender_balance:
-        flash(
-            "Insufficient available balance.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    recipient = Customer.query.filter_by(
-        account_number=recipient_account_number
-    ).first()
-
-    if recipient is None:
-        flash(
-            "No Fairmont customer was found with that account number.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    if recipient.id == customer.id:
-        flash(
-            "You cannot send money to your own account.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    if str(
-        recipient.account_status
-    ).lower() != "active":
-        flash(
-            "The recipient account is not active.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    previous_sender_balance = float(
-        customer.account_balance or 0
-    )
-
-    previous_recipient_balance = float(
-        recipient.account_balance or 0
-    )
-
-    new_sender_balance = (
-        previous_sender_balance - amount
-    )
-
-    new_recipient_balance = (
-        previous_recipient_balance + amount
-    )
-
-    sender_transaction_reference = (
-        generate_transaction_reference()
-    )
-
-    recipient_transaction_reference = (
-        generate_transaction_reference()
-    )
-
-    # The database requires transaction_reference to be unique.
-    # Make absolutely sure the two references are different.
-    while recipient_transaction_reference == sender_transaction_reference:
-        recipient_transaction_reference = (
-            generate_transaction_reference()
-        )
-
-    sender_transaction = Transaction(
-        transaction_reference=sender_transaction_reference,
-        customer_id=customer.customer_id,
-        transaction_type="Fairmont Internal Transfer",
-        direction="Debit",
-        amount=amount,
-        balance_after=new_sender_balance,
-        description=(
-            reference
-            or f"Transfer to {recipient.full_name}"
-        ),
-        counterparty=recipient.full_name,
-        status="Completed",
-        sender_name=customer.full_name,
-        sender_account_number=customer.account_number,
-        sender_bank="Fairmont Bank",
-        sender_country=customer.country
-    )
-
-    recipient_transaction = Transaction(
-        transaction_reference=recipient_transaction_reference,
-        customer_id=recipient.customer_id,
-        transaction_type="Fairmont Internal Transfer",
-        direction="Credit",
-        amount=amount,
-        balance_after=new_recipient_balance,
-        description=(
-            f"Transfer from {customer.full_name}"
-        ),
-        counterparty=customer.full_name,
-        status="Completed",
-        sender_name=customer.full_name,
-        sender_account_number=customer.account_number,
-        sender_bank="Fairmont Bank",
-        sender_country=customer.country
-    )
-
-    customer.account_balance = new_sender_balance
-    recipient.account_balance = new_recipient_balance
-
-    db.session.add(sender_transaction)
-    db.session.add(recipient_transaction)
-
-    try:
-        db.session.commit()
-
-    except Exception as e:
-        db.session.rollback()
-
-        print("=" * 70)
-        print(" FAIRMONT TRANSFER DATABASE ERROR")
-        print("=" * 70)
-        print()
-        print("Exception type:", type(e).__name__)
-        print("Exception message:", str(e))
-        print()
-        print("FULL DATABASE ERROR:")
-        print(repr(e))
-        print("=" * 70)
-
-        flash(
-            "Transfer failed. Check the server console for the database error.",
-            "error"
-        )
-
-        return redirect(url_for("send_fairmont_money"))
-
-    return render_template(
-        "send_fairmont_money_success.html",
-        customer=customer,
-        recipient=recipient,
-        amount=amount,
-        previous_sender_balance=previous_sender_balance,
-        new_sender_balance=new_sender_balance,
-        previous_recipient_balance=previous_recipient_balance,
-        new_recipient_balance=new_recipient_balance,
-        reference=reference,
-        transaction_reference=sender_transaction_reference
-    )
-
-
 @app.route("/send-money", methods=["GET", "POST"])
 def send_money():
-
-    repair_payment_approvals_sequence()
-
 
     if "customer_id" not in session:
         return redirect(url_for("login"))
@@ -3342,7 +3017,13 @@ def send_money():
     payment_reference = generate_transaction_reference()
 
     # ---------------------------------------------------------
-    # INTERNAL FAIRMONT CUSTOMER PAYMENT
+    # INTERNAL FAIRMONT CUSTOMER TRANSFER
+    # ---------------------------------------------------------
+    #
+    # If the destination account number belongs to another
+    # active Fairmont Bank customer, complete the transfer
+    # immediately. External-bank payments continue below
+    # through the existing approval process.
     # ---------------------------------------------------------
 
     if recipient_customer:
@@ -3357,63 +3038,88 @@ def send_money():
             )
             return redirect(url_for("send_money"))
 
-        approval = PaymentApproval(
-            payment_reference=payment_reference,
+        sender_balance = float(
+            customer.account_balance or 0
+        )
+
+        recipient_balance = float(
+            recipient_customer.account_balance or 0
+        )
+
+        sender_new_balance = sender_balance - amount
+        recipient_new_balance = recipient_balance + amount
+
+        # Update both customer balances.
+        customer.account_balance = sender_new_balance
+        recipient_customer.account_balance = recipient_new_balance
+
+        description = (
+            reference
+            if reference
+            else "Fairmont Bank internal transfer"
+        )
+
+        # Sender-side transaction.
+        sender_transaction = Transaction(
+            transaction_reference=payment_reference,
             customer_id=customer.customer_id,
-            payment_type="Bank Transfer",
+            transaction_type="Bank Transfer",
             direction="Debit",
             amount=amount,
-            description=reference or "Bank payment",
+            balance_after=sender_new_balance,
+            description=description,
             counterparty=recipient_customer.full_name,
-            status="Pending Approval",
-            recipient_customer_id=recipient_customer.customer_id,
-            recipient_name=recipient_customer.full_name,
-            recipient_account_number=recipient_customer.account_number,
+            status="Completed",
             sender_name=customer.full_name,
             sender_account_number=customer.account_number,
             sender_bank="Fairmont Bank",
             sender_country=customer.country,
+            recipient_account_number=recipient_customer.account_number
         )
 
-        apply_tcc_requirement(
-            customer,
-            approval
+        # Recipient-side transaction.
+        recipient_transaction_reference = (
+            generate_transaction_reference()
         )
-        db.session.add(approval)
+
+        recipient_transaction = Transaction(
+            transaction_reference=recipient_transaction_reference,
+            customer_id=recipient_customer.customer_id,
+            transaction_type="Bank Transfer",
+            direction="Credit",
+            amount=amount,
+            balance_after=recipient_new_balance,
+            description=description,
+            counterparty=customer.full_name,
+            status="Completed",
+            sender_name=customer.full_name,
+            sender_account_number=customer.account_number,
+            sender_bank="Fairmont Bank",
+            sender_country=customer.country,
+            recipient_account_number=recipient_customer.account_number
+        )
+
+        db.session.add(sender_transaction)
+        db.session.add(recipient_transaction)
 
         try:
             db.session.commit()
 
-        except IntegrityError:
+        except Exception:
             db.session.rollback()
-
-            # Repair a possible SQLite primary-key sequence mismatch.
-            repair_payment_approvals_sequence()
-
-            # Try the insert again.
-            db.session.add(approval)
-            db.session.commit()
-
-        if approval.status == "TCC Verification Required":
-
-            return redirect(
-                url_for(
-                    "payment_tcc_verification",
-                    approval_id=approval.id
-                )
+            flash(
+                "The transfer could not be completed. No account balance was changed.",
+                "error"
             )
+            return redirect(url_for("send_money"))
 
-        return render_template(
-            "payment_pending_confirmation.html",
-            customer=customer,
-            approval=approval,
-            amount=amount,
-            recipient_name=recipient_customer.full_name,
-            bank_name=bank_name,
-            account_number=account_number,
-            sort_code=sort_code,
-            reference=reference,
+        flash(
+            f"Transfer of {amount:,.2f} completed successfully "
+            f"to {recipient_customer.full_name}.",
+            "success"
         )
+
+        return redirect(url_for("dashboard"))
 
     # ---------------------------------------------------------
     # EXTERNAL UK BANK PAYMENT
@@ -3465,6 +3171,264 @@ def send_money():
         reference=reference,
     )
 
+
+
+@app.route("/send-fairmont-money", methods=["GET", "POST"])
+def send_fairmont_money():
+    """
+    Auditable internal Fairmont Bank customer transfer.
+
+    A successful transfer:
+      1. Verifies the sender.
+      2. Finds the destination by Fairmont account number.
+      3. Verifies the recipient is active.
+      4. Checks the sender balance.
+      5. Debits the sender.
+      6. Credits the recipient.
+      7. Creates a debit transaction for the sender.
+      8. Creates a credit transaction for the recipient.
+      9. Commits everything together.
+
+    If the database transaction fails, neither balance is changed.
+    """
+
+    if "customer_id" not in session:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(
+        customer_id=session["customer_id"]
+    ).first()
+
+    if not customer:
+        session.clear()
+        return redirect(url_for("login"))
+
+    if request.method == "GET":
+        return render_template(
+            "send_fairmont_money.html",
+            customer=customer
+        )
+
+    recipient_account_number = request.form.get(
+        "recipient_account_number",
+        ""
+    ).strip()
+
+    amount_text = request.form.get(
+        "amount",
+        ""
+    ).strip()
+
+    reference = request.form.get(
+        "reference",
+        ""
+    ).strip()
+
+    # --------------------------------------------------------
+    # VALIDATE ACCOUNT NUMBER
+    # --------------------------------------------------------
+
+    if not re.fullmatch(
+        r"\d{10}",
+        recipient_account_number
+    ):
+        flash(
+            "Please enter the recipient's 10-digit Fairmont account number.",
+            "error"
+        )
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    # --------------------------------------------------------
+    # VALIDATE AMOUNT
+    # --------------------------------------------------------
+
+    try:
+        amount = float(amount_text)
+    except (TypeError, ValueError):
+        flash(
+            "Please enter a valid transfer amount.",
+            "error"
+        )
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    if amount <= 0:
+        flash(
+            "Transfer amount must be greater than zero.",
+            "error"
+        )
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    # --------------------------------------------------------
+    # FIND RECIPIENT
+    # --------------------------------------------------------
+
+    recipient = Customer.query.filter_by(
+        account_number=recipient_account_number
+    ).first()
+
+    if not recipient:
+        flash(
+            "No Fairmont Bank customer account was found with that account number.",
+            "error"
+        )
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    if recipient.customer_id == customer.customer_id:
+        flash(
+            "You cannot send money to your own Fairmont account.",
+            "error"
+        )
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    if str(recipient.account_status).lower() != "active":
+        flash(
+            "The recipient Fairmont account is not active.",
+            "error"
+        )
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    # --------------------------------------------------------
+    # BALANCES
+    # --------------------------------------------------------
+
+    sender_balance = float(
+        customer.account_balance or 0
+    )
+
+    recipient_balance = float(
+        recipient.account_balance or 0
+    )
+
+    if amount > sender_balance:
+        flash(
+            "Insufficient available balance.",
+            "error"
+        )
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    sender_new_balance = sender_balance - amount
+    recipient_new_balance = recipient_balance + amount
+
+    # One reference for the actual transfer.
+    transfer_reference = generate_transaction_reference()
+
+    description = (
+        reference
+        if reference
+        else "Fairmont Bank internal transfer"
+    )
+
+    # --------------------------------------------------------
+    # UPDATE BOTH ACCOUNTS
+    # --------------------------------------------------------
+
+    customer.account_balance = sender_new_balance
+    recipient.account_balance = recipient_new_balance
+
+    # --------------------------------------------------------
+    # SENDER DEBIT
+    # --------------------------------------------------------
+
+    sender_transaction = Transaction(
+        transaction_reference=transfer_reference + "-D",
+        customer_id=customer.customer_id,
+        transaction_type="Fairmont Bank Transfer",
+        direction="Debit",
+        amount=amount,
+        balance_after=sender_new_balance,
+        description=description,
+        counterparty=recipient.full_name,
+        status="Completed",
+        sender_name=customer.full_name,
+        sender_account_number=customer.account_number,
+        sender_bank="Fairmont Bank",
+        sender_country=customer.country
+    )
+
+    # --------------------------------------------------------
+    # RECIPIENT CREDIT
+    # --------------------------------------------------------
+
+    recipient_transaction = Transaction(
+        transaction_reference=transfer_reference + "-C",
+        customer_id=recipient.customer_id,
+        transaction_type="Fairmont Bank Transfer",
+        direction="Credit",
+        amount=amount,
+        balance_after=recipient_new_balance,
+        description=description,
+        counterparty=customer.full_name,
+        status="Completed",
+        sender_name=customer.full_name,
+        sender_account_number=customer.account_number,
+        sender_bank="Fairmont Bank",
+        sender_country=customer.country
+    )
+
+    db.session.add(sender_transaction)
+    db.session.add(recipient_transaction)
+
+    # --------------------------------------------------------
+    # ATOMIC COMMIT
+    # --------------------------------------------------------
+
+    try:
+        db.session.commit()
+
+    except Exception as exc:
+        db.session.rollback()
+
+        print(
+            "FAIRMONT TRANSFER DATABASE ERROR:",
+            repr(exc)
+        )
+
+        flash(
+            "The Fairmont-to-Fairmont transfer could not be completed. "
+            "No account balance was changed.",
+            "error"
+        )
+
+        return redirect(
+            url_for("send_fairmont_money")
+        )
+
+    # --------------------------------------------------------
+    # SUCCESS
+    # --------------------------------------------------------
+
+    flash(
+        f"Transfer of £{amount:,.2f} completed successfully "
+        f"to {recipient.full_name}.",
+        "success"
+    )
+
+    return render_template(
+        "send_fairmont_money_success.html",
+        customer=customer,
+        recipient=recipient,
+        amount=amount,
+        previous_sender_balance=sender_balance,
+        new_sender_balance=sender_new_balance,
+        previous_recipient_balance=recipient_balance,
+        new_recipient_balance=recipient_new_balance,
+        reference=reference,
+        transfer_reference=transfer_reference
+    )
 
 @app.route("/international-transfer", methods=["GET", "POST"])
 @login_required
@@ -4270,24 +4234,345 @@ def tv_subscriptions():
         reference=payment_reference,
     )
 
+@app.route(
+    "/bank-statements/lock-settings",
+    methods=["GET", "POST"]
+)
+@login_required
+def bank_statements_lock_settings():
+
+    customer = current_user
+
+    if request.method == "POST":
+
+        action = request.form.get(
+            "action",
+            ""
+        ).strip()
+
+        # -----------------------------------------------
+        # SET / CHANGE PASSWORD
+        # -----------------------------------------------
+
+        if action == "set_password":
+
+            password = request.form.get(
+                "statement_password",
+                ""
+            )
+
+            confirm = request.form.get(
+                "statement_password_confirm",
+                ""
+            )
+
+            if len(password) < 6:
+
+                flash(
+                    "Statement password must be at least 6 characters.",
+                    "error"
+                )
+
+            elif password != confirm:
+
+                flash(
+                    "Statement passwords do not match.",
+                    "error"
+                )
+
+            else:
+
+                customer.bank_statements_password_hash = (
+                    generate_password_hash(password)
+                )
+
+                db.session.commit()
+
+                # Setting a new password also removes the old
+                # verified session for security.
+
+                session.pop(
+                    "statement_access_verified",
+                    None
+                )
+
+                session.pop(
+                    "statement_access_customer_id",
+                    None
+                )
+
+                flash(
+                    "Statement password saved successfully.",
+                    "success"
+                )
+
+        # -----------------------------------------------
+        # REMOVE PASSWORD
+        # -----------------------------------------------
+
+        elif action == "remove_password":
+
+            customer.bank_statements_password_hash = None
+
+            session.pop(
+                "statement_access_verified",
+                None
+            )
+
+            session.pop(
+                "statement_access_customer_id",
+                None
+            )
+
+            db.session.commit()
+
+            flash(
+                "Statement password removed successfully.",
+                "success"
+            )
+
+        # -----------------------------------------------
+        # LOCK / UNLOCK
+        # -----------------------------------------------
+
+        elif action == "toggle_lock":
+
+            customer.bank_statements_locked = (
+                not customer.bank_statements_locked
+            )
+
+            session.pop(
+                "statement_access_verified",
+                None
+            )
+
+            session.pop(
+                "statement_access_customer_id",
+                None
+            )
+
+            db.session.commit()
+
+            if customer.bank_statements_locked:
+
+                flash(
+                    "Bank Statements are now locked.",
+                    "success"
+                )
+
+            else:
+
+                flash(
+                    "Bank Statements are now unlocked.",
+                    "success"
+                )
+
+        return redirect(
+            url_for("bank_statements_lock_settings")
+        )
+
+    return render_template(
+        "bank_statements_lock.html",
+        customer=customer
+    )
+
+
+
+@app.route(
+    "/bank-statements/verify-password",
+    methods=["GET", "POST"]
+)
+@login_required
+def verify_bank_statement_password():
+
+    customer = current_user
+
+    if not customer.bank_statements_password_hash:
+
+        flash(
+            "Please create a statement password first.",
+            "error"
+        )
+
+        return redirect(
+            url_for("bank_statements_lock_settings")
+        )
+
+    if request.method == "POST":
+
+        statement_password = request.form.get(
+            "statement_password",
+            ""
+        ).strip()
+
+        if not statement_password:
+
+            flash(
+                "Please enter your statement password.",
+                "error"
+            )
+
+            return render_template(
+                "bank_statement_password_required.html",
+                customer=customer,
+                password_not_set=False
+            )
+
+        if not check_password_hash(
+            customer.bank_statements_password_hash,
+            statement_password
+        ):
+
+            flash(
+                "Incorrect statement password.",
+                "error"
+            )
+
+            return render_template(
+                "bank_statement_password_required.html",
+                customer=customer,
+                password_not_set=False
+            )
+
+        session["statement_access_verified"] = True
+
+        session["statement_access_customer_id"] = (
+            customer.customer_id
+        )
+
+        return redirect(
+            url_for("bank_statements")
+        )
+
+    return render_template(
+        "bank_statement_password_required.html",
+        customer=customer,
+        password_not_set=False
+    )
+
+
 @app.route("/bank-statements")
 @login_required
 def bank_statements():
+
     customer = current_user
+
+    # -------------------------------------------------------
+    # NEVER ALLOW A LOCKED STATEMENT PAGE TO BE VIEWED
+    # -------------------------------------------------------
+
+    if customer.bank_statements_locked:
+
+        session.pop(
+            "statement_access_verified",
+            None
+        )
+
+        session.pop(
+            "statement_access_customer_id",
+            None
+        )
+
+        return render_template(
+            "bank_statements_locked.html",
+            customer=customer
+        )
+
+    # -------------------------------------------------------
+    # PASSWORD MUST EXIST
+    # -------------------------------------------------------
+
+    if not customer.bank_statements_password_hash:
+
+        session.pop(
+            "statement_access_verified",
+            None
+        )
+
+        session.pop(
+            "statement_access_customer_id",
+            None
+        )
+
+        return render_template(
+            "bank_statement_password_required.html",
+            customer=customer,
+            password_not_set=True
+        )
+
+    # -------------------------------------------------------
+    # VERIFY CURRENT STATEMENT AUTHORIZATION
+    # -------------------------------------------------------
+
+    verified = session.get(
+        "statement_access_verified",
+        False
+    )
+
+    verified_customer = session.get(
+        "statement_access_customer_id"
+    )
+
+    if (
+        not verified
+        or verified_customer != customer.customer_id
+    ):
+
+        session.pop(
+            "statement_access_verified",
+            None
+        )
+
+        session.pop(
+            "statement_access_customer_id",
+            None
+        )
+
+        return render_template(
+            "bank_statement_password_required.html",
+            customer=customer,
+            password_not_set=False
+        )
+
+    # -------------------------------------------------------
+    # LOAD STATEMENTS
+    # -------------------------------------------------------
 
     transactions = (
         Transaction.query
-        .filter_by(customer_id=customer.customer_id)
-        .order_by(Transaction.created_at.desc())
+        .filter_by(
+            customer_id=customer.customer_id
+        )
+        .order_by(
+            Transaction.created_at.desc()
+        )
         .all()
     )
 
-    return render_template(
-        "bank_statements.html",
-        customer=customer,
-        transactions=transactions,
-        statement_date=datetime.now()
+    response = make_response(
+        render_template(
+            "bank_statements.html",
+            customer=customer,
+            transactions=transactions,
+            statement_date=datetime.now()
+        )
     )
+
+    # -------------------------------------------------------
+    # SECURITY HEADERS
+    # Prevent browser/proxy from caching statements.
+    # -------------------------------------------------------
+
+    response.headers["Cache-Control"] = (
+        "no-store, no-cache, must-revalidate, "
+        "max-age=0, private"
+    )
+
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+
+    return response
+
 
 
 @app.route("/lifestyle", methods=["GET", "POST"])
@@ -4792,7 +5077,10 @@ def payment_tcc_verification(approval_id):
 
 
 
+@app.route("/email-bank", methods=["GET", "POST"])
+@login_required
 def email_bank():
+
 
     messages = (
         BankMessage.query
@@ -5104,6 +5392,109 @@ def change_password():
     )
 
 
+
+
+# =========================================================
+# ADMIN LOGIN OTP RECOVERY REQUESTS
+# =========================================================
+
+
+# =========================================================
+# CUSTOMER LOGIN OTP
+# =========================================================
+
+class CustomerLoginOTP(db.Model):
+
+    __tablename__ = "customer_login_otp"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    customer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("customer.id"),
+        nullable=False,
+        index=True
+    )
+
+    otp_code = db.Column(
+        db.String(6),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    expires_at = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
+    used = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
+
+class LoginOTPRecoveryRequest(db.Model):
+
+    __tablename__ = "login_otp_recovery_request"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    customer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("customer.id"),
+        nullable=False
+    )
+
+    recovery_code = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="Pending"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    expires_at = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
+    used_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+
+def generate_login_recovery_code():
+
+    import secrets
+
+    return str(
+        secrets.randbelow(900000) + 100000
+    )
+
+
+
 # =========================================================
 # LOGIN OTP DATABASE MIGRATION
 # =========================================================
@@ -5133,6 +5524,50 @@ def ensure_login_otp_column():
                 BOOLEAN NOT NULL DEFAULT 0
                 """
             )
+
+
+@app.route("/settings/login-otp", methods=["GET", "POST"])
+@login_required
+def login_otp_settings():
+
+    customer = current_user
+
+    if request.method == "POST":
+
+        otp_value = request.form.get(
+            "login_otp_enabled",
+            ""
+        )
+
+        customer.login_otp_enabled = (
+            otp_value == "on"
+        )
+
+        db.session.commit()
+
+        if customer.login_otp_enabled:
+
+            flash(
+                "Login OTP has been turned on.",
+                "success"
+            )
+
+        else:
+
+            flash(
+                "Login OTP has been turned off.",
+                "success"
+            )
+
+        return redirect(
+            url_for("login_otp_settings")
+        )
+
+    return render_template(
+        "login_otp.html",
+        customer=customer
+    )
+
 
 
 # ============================================================
@@ -5315,150 +5750,124 @@ def admin_logout():
     return redirect(url_for("admin_login"))
 
 
+
+
 # =========================================================
-# ADMIN CONTROLLED CUSTOMER LOGIN OTP
+# ADMIN — LOGIN OTP RECOVERY REQUESTS
 # =========================================================
 
-@app.route("/admin/customer/<int:customer_id>/toggle-login-otp", methods=["POST"])
-def admin_toggle_customer_login_otp(customer_id):
-
-    admin_id = session.get("admin_id")
-
-    if not admin_id:
-        return redirect(url_for("admin_login"))
-
-    admin = db.session.get(AdminUser, admin_id)
-
-    if not admin or not admin.is_active:
-        session.pop("admin_id", None)
-        return redirect(url_for("admin_login"))
-
-    customer = db.session.get(Customer, customer_id)
-
-    if customer is None:
-        flash("Customer could not be found.", "error")
-        return redirect(url_for("admin_customers"))
-
-    customer.login_otp_enabled = not bool(
-        customer.login_otp_enabled
-    )
-
-    db.session.commit()
-
-    if customer.login_otp_enabled:
-        flash(
-            f"Login OTP has been enabled for {customer.full_name}.",
-            "success"
-        )
-    else:
-        flash(
-            f"Login OTP has been disabled for {customer.full_name}.",
-            "success"
-        )
-
-    return redirect(
-        url_for(
-            "admin_customer_profile",
-            customer_id=customer.id
-        )
-    )
-
-
-@app.route("/admin/login-otp-requests")
+@app.route(
+    "/admin/login-otp-requests",
+    methods=["GET"]
+)
 def admin_login_otp_requests():
 
     admin_id = session.get("admin_id")
 
     if not admin_id:
-        return redirect(url_for("admin_login"))
+        return redirect(
+            url_for("admin_login")
+        )
 
-    admin = db.session.get(AdminUser, admin_id)
+    admin = db.session.get(
+        AdminUser,
+        admin_id
+    )
 
-    if not admin or not admin.is_active:
+    if admin is None or not admin.is_active:
+
         session.pop("admin_id", None)
         session.pop("admin_username", None)
-        return redirect(url_for("admin_login"))
 
-    # Get all unused OTP records, newest first.
-    otp_records = (
-        CustomerLoginOTP.query
-        .filter_by(used=False)
-        .order_by(CustomerLoginOTP.created_at.desc())
+        return redirect(
+            url_for("admin_login")
+        )
+
+    requests = (
+        LoginOTPRecoveryRequest.query
+        .order_by(
+            LoginOTPRecoveryRequest.created_at.desc()
+        )
         .all()
     )
 
-    active_requests = []
+    customers = {}
 
-    now = datetime.utcnow()
-
-    for otp in otp_records:
-
-        if not otp.expires_at:
-            continue
-
-        expires_at = otp.expires_at
-
-        # SQLite may return naive datetimes.
-        if expires_at.tzinfo is not None:
-            expires_at = expires_at.astimezone(
-                timezone.utc
-            ).replace(tzinfo=None)
-
-        # Expired OTPs are automatically marked used.
-        if now >= expires_at:
-            otp.used = True
-            continue
+    for recovery_request in requests:
 
         customer = db.session.get(
             Customer,
-            otp.customer_id
+            recovery_request.customer_id
         )
 
-        if customer is None:
-            continue
-
-        # Only show OTPs for customers who are currently
-        # controlled by the administrator.
-        if not customer.login_otp_enabled:
-            continue
-
-        active_requests.append({
-            "otp": otp,
-            "customer": customer
-        })
-
-    db.session.commit()
+        customers[recovery_request.id] = customer
 
     return render_template(
         "admin_login_otp_requests.html",
         admin=admin,
-        otp_requests=active_requests
+        requests=requests,
+        customers=customers
     )
 
 
-@app.route("/admin/login-otp/<int:otp_id>/mark-used", methods=["POST"])
-def admin_mark_login_otp_used(otp_id):
+# =========================================================
+# ADMIN — MARK LOGIN RECOVERY CODE USED
+# =========================================================
+
+@app.route(
+    "/admin/login-otp-requests/<int:request_id>/used",
+    methods=["POST"]
+)
+def admin_mark_login_otp_used(request_id):
 
     admin_id = session.get("admin_id")
 
     if not admin_id:
-        return redirect(url_for("admin_login"))
+        return redirect(
+            url_for("admin_login")
+        )
 
-    admin = db.session.get(AdminUser, admin_id)
+    admin = db.session.get(
+        AdminUser,
+        admin_id
+    )
 
-    if not admin or not admin.is_active:
-        session.pop("admin_id", None)
-        return redirect(url_for("admin_login"))
+    if admin is None or not admin.is_active:
+        return redirect(
+            url_for("admin_login")
+        )
 
-    otp = db.session.get(CustomerLoginOTP, otp_id)
+    recovery_request = db.session.get(
+        LoginOTPRecoveryRequest,
+        request_id
+    )
 
-    if otp:
-        otp.used = True
-        db.session.commit()
+    if recovery_request is None:
+        flash(
+            "Login recovery request was not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_login_otp_requests")
+        )
+
+    recovery_request.status = "Used"
+
+    recovery_request.used_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash(
+        "Login recovery code marked as used.",
+        "success"
+    )
 
     return redirect(
         url_for("admin_login_otp_requests")
     )
+
+
 
 
 @app.route("/admin")
@@ -5843,14 +6252,14 @@ def admin_toggle_tcc_restriction(customer_id):
 
 
 # ============================================================
-# ADMIN - FREEZE / UNFREEZE CUSTOMER ACCOUNT
+# ADMIN — CUSTOMER ACCOUNT LOCK / UNLOCK
 # ============================================================
 
 @app.route(
-    "/admin/customer/<int:customer_id>/toggle-freeze",
+    "/admin/customer/<int:customer_id>/account-status",
     methods=["POST"]
 )
-def admin_toggle_customer_freeze(customer_id):
+def admin_toggle_customer_lock(customer_id):
 
     admin_id = session.get("admin_id")
 
@@ -5873,28 +6282,39 @@ def admin_toggle_customer_freeze(customer_id):
         )
         return redirect(url_for("admin_customers"))
 
-    if customer.account_status == "Locked":
+    action = request.form.get(
+        "account_action",
+        ""
+    ).strip().lower()
+
+    if action == "lock":
+
+        customer.account_status = "Locked"
+
+        db.session.commit()
+
+        flash(
+            f"Customer account for {customer.full_name} has been locked.",
+            "success"
+        )
+
+    elif action == "unlock":
 
         customer.account_status = "Active"
 
+        db.session.commit()
+
         flash(
-            f"{customer.full_name}'s account has been unfrozen.",
+            f"Customer account for {customer.full_name} has been unlocked.",
             "success"
         )
 
     else:
 
-        customer.account_status = "Locked"
-
-        # Disable OTP while the account is frozen.
-        customer.login_otp_enabled = False
-
         flash(
-            f"{customer.full_name}'s account has been frozen.",
-            "success"
+            "Invalid account status action.",
+            "error"
         )
-
-    db.session.commit()
 
     return redirect(
         url_for(
@@ -5907,7 +6327,7 @@ def admin_toggle_customer_freeze(customer_id):
 
 
 # ============================================================
-# ADMIN - PERMANENTLY DELETE CUSTOMER
+# ADMIN — DELETE CUSTOMER ACCOUNT
 # ============================================================
 
 @app.route(
@@ -5938,139 +6358,27 @@ def admin_delete_customer(customer_id):
         return redirect(url_for("admin_customers"))
 
     customer_name = customer.full_name
-    customer_code = customer.customer_id
 
     try:
-
-        # -----------------------------------------------------
-        # Remove related records before deleting the customer.
-        #
-        # This uses the SQLAlchemy model metadata so the cleanup
-        # works with the existing database structure.
-        # -----------------------------------------------------
-
-        for model in list(db.Model.registry._class_registry.values()):
-
-            if not isinstance(model, type):
-                continue
-
-            if not hasattr(model, "__table__"):
-                continue
-
-            if model is Customer:
-                continue
-
-            table = model.__table__
-
-            # Look for direct customer_id references.
-            customer_id_column = table.columns.get("customer_id")
-
-            if customer_id_column is not None:
-
-                try:
-
-                    query = db.session.query(model).filter(
-                        customer_id_column == customer.id
-                    )
-
-                    rows = query.all()
-
-                    for row in rows:
-                        db.session.delete(row)
-
-                except Exception:
-                    pass
-
-            # Some application tables use the public
-            # Customer ID string instead of the numeric DB ID.
-            customer_code_column = table.columns.get("customer_id")
-
-            if customer_code_column is not None:
-
-                try:
-
-                    rows = (
-                        db.session.query(model)
-                        .filter(
-                            customer_code_column == customer_code
-                        )
-                        .all()
-                    )
-
-                    for row in rows:
-                        if row not in db.session.deleted:
-                            db.session.delete(row)
-
-                except Exception:
-                    pass
-
-            # Handle tables using recipient_customer_id.
-            recipient_column = table.columns.get(
-                "recipient_customer_id"
-            )
-
-            if recipient_column is not None:
-
-                try:
-
-                    rows = (
-                        db.session.query(model)
-                        .filter(
-                            recipient_column == customer_code
-                        )
-                        .all()
-                    )
-
-                    for row in rows:
-                        if row not in db.session.deleted:
-                            db.session.delete(row)
-
-                except Exception:
-                    pass
-
-        # -----------------------------------------------------
-        # Delete the customer itself.
-        # -----------------------------------------------------
-
         db.session.delete(customer)
-
         db.session.commit()
 
-        # Remove customer login session if applicable.
-        session.pop("customer_id", None)
-        session.pop("pending_login_customer_id", None)
-
         flash(
-            f"Customer {customer_name} ({customer_code}) "
-            "has been permanently deleted.",
+            f"Customer account for {customer_name} has been deleted.",
             "success"
         )
 
-        return redirect(
-            url_for("admin_customers")
-        )
-
-    except Exception as exc:
-
+    except Exception:
         db.session.rollback()
 
-        print(
-            "CUSTOMER DELETE ERROR:",
-            repr(exc)
-        )
-
         flash(
-            "The customer could not be deleted because "
-            "related account data could not be safely removed.",
+            "The customer account could not be deleted.",
             "error"
         )
 
-        return redirect(
-            url_for(
-                "admin_customer_profile",
-                customer_id=customer.id
-            )
-        )
+    return redirect(
+        url_for("admin_customers")
+    )
 
 
 @app.route("/admin/customer/<int:customer_id>")
@@ -6687,12 +6995,7 @@ def admin_payment_approvals():
     )
 
 
-@app.route("/admin/incoming-payment", methods=["GET", "POST"])
-
-@app.route(
-    "/admin/payment-approval/<int:approval_id>",
-    methods=["GET", "POST"]
-)
+@app.route("/admin/payment-approval/<approval_id>", methods=["GET", "POST"])
 def admin_review_payment(approval_id):
 
     admin_id = session.get("admin_id")
@@ -7840,6 +8143,187 @@ def admin_fund_customer():
     )
 
 
+
+
+# =========================================================
+# FAIRMont ADMIN BALANCE ADJUSTMENT
+# =========================================================
+
+@app.route("/admin/adjust-customer-balance", methods=["GET", "POST"])
+def admin_adjust_customer_balance():
+
+    admin_id = session.get("admin_id")
+
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+
+    admin = db.session.get(AdminUser, admin_id)
+
+    if not admin or not admin.is_active:
+        session.pop("admin_id", None)
+        return redirect(url_for("admin_login"))
+
+    customers = (
+        Customer.query
+        .filter_by(account_status="Active")
+        .order_by(Customer.full_name.asc())
+        .all()
+    )
+
+    if request.method == "POST":
+
+        customer_id = request.form.get(
+            "customer_id",
+            ""
+        ).strip()
+
+        amount_text = request.form.get(
+            "amount",
+            ""
+        ).strip()
+
+        reason = request.form.get(
+            "reason",
+            ""
+        ).strip()
+
+        if not customer_id:
+            flash(
+                "Please select a customer.",
+                "error"
+            )
+
+            return render_template(
+                "admin_adjust_customer_balance.html",
+                admin=admin,
+                customers=customers
+            )
+
+        customer = Customer.query.filter_by(
+            customer_id=customer_id
+        ).first()
+
+        if not customer:
+            flash(
+                "The selected customer could not be found.",
+                "error"
+            )
+
+            return render_template(
+                "admin_adjust_customer_balance.html",
+                admin=admin,
+                customers=customers
+            )
+
+        if customer.account_status != "Active":
+            flash(
+                "Only active customer accounts can be adjusted.",
+                "error"
+            )
+
+            return render_template(
+                "admin_adjust_customer_balance.html",
+                admin=admin,
+                customers=customers
+            )
+
+        try:
+            amount = float(amount_text)
+        except (TypeError, ValueError):
+            amount = 0
+
+        if amount <= 0:
+            flash(
+                "The adjustment amount must be greater than zero.",
+                "error"
+            )
+
+            return render_template(
+                "admin_adjust_customer_balance.html",
+                admin=admin,
+                customers=customers
+            )
+
+        previous_balance = float(
+            customer.account_balance or 0
+        )
+
+        new_balance = previous_balance + amount
+
+        customer.account_balance = new_balance
+
+        db.session.commit()
+
+        # -------------------------------------------------
+        # INTERNAL ADMIN AUDIT
+        # -------------------------------------------------
+
+        with open(
+            "admin_audit/balance_adjustments.log",
+            "a",
+            encoding="utf-8"
+        ) as audit:
+
+            audit.write(
+                "\n"
+                + "=" * 70
+                + "\n"
+            )
+
+            audit.write(
+                f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            )
+
+            audit.write(
+                f"Admin ID: {admin.id}\n"
+            )
+
+            audit.write(
+                f"Customer ID: {customer.customer_id}\n"
+            )
+
+            audit.write(
+                f"Customer Name: {customer.full_name}\n"
+            )
+
+            audit.write(
+                f"Previous Balance: {previous_balance:.2f}\n"
+            )
+
+            audit.write(
+                f"Amount Added: {amount:.2f}\n"
+            )
+
+            audit.write(
+                f"New Balance: {new_balance:.2f}\n"
+            )
+
+            audit.write(
+                f"Reason: {reason or 'Administrative balance adjustment'}\n"
+            )
+
+            audit.write(
+                "=" * 70
+                + "\n"
+            )
+
+        return render_template(
+            "admin_adjust_customer_balance_success.html",
+            admin=admin,
+            customer=customer,
+            amount=amount,
+            previous_balance=previous_balance,
+            new_balance=new_balance,
+            reason=reason
+        )
+
+    return render_template(
+        "admin_adjust_customer_balance.html",
+        admin=admin,
+        customers=customers
+    )
+
+
 # FAIRMont_ADMIN_INCOMING_ENDPOINT_FIX
 #
 # Explicitly register the existing admin incoming-payment function
@@ -7858,6 +8342,26 @@ if "admin_incoming_payment" not in app.view_functions:
     )
 
 
+
+
+@app.route("/bank-statements/leave")
+@login_required
+def leave_bank_statements():
+
+    session.pop(
+        "statement_access_verified",
+        None
+    )
+
+    session.pop(
+        "statement_access_customer_id",
+        None
+    )
+
+    return redirect(
+        url_for("dashboard")
+    )
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
@@ -7872,6 +8376,21 @@ if __name__ == "__main__":
     app.run(
         debug=True
     )
+
+
+
+
+
+
+# ============================================================
+# ADMIN — CUSTOMER ACCOUNT LOCK / UNLOCK
+# ============================================================
+
+# ============================================================
+# ADMIN — DELETE CUSTOMER ACCOUNT
+# ============================================================
+
+
 
 
 

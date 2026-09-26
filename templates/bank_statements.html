@@ -281,7 +281,7 @@
 
 <div class="page">
 
-    <a class="back" href="{{ url_for("leave_bank_statements") }}">
+    <a class="back" href="{{ url_for("dashboard") }}">
         ← Back to Dashboard
     </a>
 
@@ -454,11 +454,11 @@
 
         <div class="actions">
 
-            <a class="button" href="{{ url_for("leave_bank_statements") }}">
+            <a class="button" href="{{ url_for("dashboard") }}">
                 Transaction History
             </a>
 
-            <a class="button secondary" href="{{ url_for("leave_bank_statements") }}">
+            <a class="button secondary" href="{{ url_for("dashboard") }}">
                 Dashboard
             </a>
 
@@ -495,13 +495,13 @@
         try {
 
             navigator.sendBeacon(
-                "{{ url_for('leave_bank_statements') }}"
+                "{{ url_for('dashboard') }}"
             );
 
         } catch (error) {
 
             fetch(
-                "{{ url_for('leave_bank_statements') }}",
+                "{{ url_for('dashboard') }}",
                 {
                     method: "GET",
                     credentials: "same-origin",

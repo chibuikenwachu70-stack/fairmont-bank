@@ -442,13 +442,19 @@
         Accounts
     </a>
 
-    <a href="{{ url_for('admin_login_otp_requests') }}" class="nav-link">
-        <span class="nav-icon">⌁</span>
-        Login OTP Requests
-    </a>
+    
 
 
-    <div class="sidebar-bottom">
+    
+        <a href="{{ url_for('admin_login_otp_requests') }}"
+           class="nav-link">
+
+            <span class="nav-icon">OTP</span>
+            Login OTP Requests
+
+        </a>
+
+<div class="sidebar-bottom">
 
         <div class="admin-user">
 
@@ -722,7 +728,7 @@
 
 
                 <a
-                    href="{{ url_for('admin_adjust_customer_balance') }}"
+                    href="{{ url_for('admin_fund_customer') }}"
                     class="action"
                 >
 
@@ -737,18 +743,7 @@
 
                 </a>
 
-                <a href="{{ url_for('admin_login_otp_requests') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Login OTP Requests
-                    </div>
-
-                    <div class="action-text">
-                        View customer login OTP recovery requests and manage their status.
-                    </div>
-
-                </a>
+                
 
 
             </div>
