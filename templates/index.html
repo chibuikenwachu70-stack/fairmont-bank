@@ -39,6 +39,15 @@
                 <a href="#contact">Contact</a>
             </nav>
 
+            <div class="language-selector">
+                <button class="language-toggle" type="button" aria-expanded="false" aria-haspopup="listbox">
+                    <span class="language-current">EN</span><span class="language-arrow">⌄</span>
+                </button>
+                <div class="language-menu" role="listbox">
+                    <button type="button" data-lang="EN">English</button><button type="button" data-lang="FR">Français</button><button type="button" data-lang="ES">Español</button><button type="button" data-lang="NL">Nederlands</button><button type="button" data-lang="DE">Deutsch</button><button type="button" data-lang="PT">Português</button><button type="button" data-lang="IT">Italiano</button><button type="button" data-lang="AR">العربية</button><button type="button" data-lang="HI">हिन्दी (India)</button><button type="button" data-lang="BN">বাংলা</button><button type="button" data-lang="UR">اردو</button><button type="button" data-lang="ZH">中文</button><button type="button" data-lang="JA">日本語</button><button type="button" data-lang="KO">한국어</button><button type="button" data-lang="RU">Русский</button><button type="button" data-lang="TR">Türkçe</button><button type="button" data-lang="SW">Kiswahili</button><button type="button" data-lang="PA">ਪੰਜਾਬੀ</button><button type="button" data-lang="GU">ગુજરાતી</button><button type="button" data-lang="ML">മലയാളം</button>
+                </div>
+            </div>
+
             <div class="header-actions">
                 <a href="/login" class="header-signin">Sign In</a>
                 <a href="/open-account" class="header-signup">Open an Account</a>
@@ -313,6 +322,16 @@
                     menuButton.setAttribute("aria-expanded", "false");
                 });
             });
+        }
+
+        const languageSelector = document.querySelector(".language-selector");
+        const languageToggle = document.querySelector(".language-toggle");
+        const languageMenu = document.querySelector(".language-menu");
+        const languageCurrent = document.querySelector(".language-current");
+        if (languageSelector && languageToggle && languageMenu && languageCurrent) {
+            languageToggle.addEventListener("click", event => { event.stopPropagation(); const open = languageMenu.classList.toggle("open"); languageToggle.setAttribute("aria-expanded", open ? "true" : "false"); });
+            languageMenu.querySelectorAll("button").forEach(button => button.addEventListener("click", () => { languageCurrent.textContent = button.dataset.lang; languageMenu.classList.remove("open"); languageToggle.setAttribute("aria-expanded", "false"); }));
+            document.addEventListener("click", event => { if (!languageSelector.contains(event.target)) { languageMenu.classList.remove("open"); languageToggle.setAttribute("aria-expanded", "false"); } });
         }
     </script>
 </body>
