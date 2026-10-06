@@ -1090,6 +1090,48 @@ def generate_transaction_reference():
 
 
 # --------------------------------------------------
+# Global customer language assets
+# --------------------------------------------------
+
+@app.after_request
+def inject_customer_language_assets(response):
+    # Load the shared language selector/translator on every customer HTML page.
+    try:
+        content_type = response.headers.get("Content-Type", "")
+        path = request.path or ""
+        is_admin = path == "/admin" or path.startswith("/admin/")
+
+        if (
+            "text/html" in content_type
+            and not is_admin
+            and response.status_code < 400
+        ):
+            html = response.get_data(as_text=True)
+
+            if "/static/js/language.js" not in html:
+                head_assets = (
+                    '\n<link rel="stylesheet" href="/static/css/language.css">'
+                    '\n<div id="google_translate_element" aria-hidden="true"></div>\n'
+                )
+                if "</head>" in html:
+                    html = html.replace("</head>", head_assets + "</head>", 1)
+
+                if "</body>" in html:
+                    html = html.replace(
+                        "</body>",
+                        '<script src="/static/js/language.js"></script>\n</body>',
+                        1
+                    )
+
+                response.set_data(html)
+                response.headers.pop("Content-Length", None)
+    except Exception:
+        pass
+
+    return response
+
+
+# --------------------------------------------------
 # Dashboard template values
 # --------------------------------------------------
 
@@ -1147,6 +1189,64 @@ def home():
     return render_template(
         "index.html"
     )
+
+
+# =========================================================
+# SITE LANGUAGE
+# =========================================================
+
+SUPPORTED_SITE_LANGUAGES = {
+    "EN": "English",
+    "FR": "Français",
+    "ES": "Español",
+    "NL": "Nederlands",
+    "DE": "Deutsch",
+    "PT": "Português",
+    "IT": "Italiano",
+    "AR": "العربية",
+    "HI": "हिन्दी (India)",
+    "BN": "বাংলা",
+    "UR": "اردو",
+    "ZH": "中文",
+    "JA": "日本語",
+    "KO": "한국어",
+    "RU": "Русский",
+    "TR": "Türkçe",
+    "SW": "Kiswahili",
+    "PA": "ਪੰਜਾਬੀ",
+    "GU": "ગુજરાતી",
+    "ML": "മലയാളം"
+}
+
+SITE_LANGUAGE_GOOGLE_CODES = {
+    "EN": "en", "FR": "fr", "ES": "es", "NL": "nl", "DE": "de",
+    "PT": "pt", "IT": "it", "AR": "ar", "HI": "hi", "BN": "bn",
+    "UR": "ur", "ZH": "zh-CN", "JA": "ja", "KO": "ko", "RU": "ru",
+    "TR": "tr", "SW": "sw", "PA": "pa", "GU": "gu", "ML": "ml"
+}
+
+
+@app.route("/set-language", methods=["POST"])
+def set_language():
+    # Persist the selected site language in the session/account.
+    code = request.form.get("language", "").strip().upper()
+
+    if code not in SUPPORTED_SITE_LANGUAGES:
+        return {"ok": False, "error": "Unsupported language"}, 400
+
+    language_name = SUPPORTED_SITE_LANGUAGES[code]
+    session["site_language"] = code
+    session["site_language_name"] = language_name
+
+    if current_user.is_authenticated:
+        try:
+            current_user.preferred_language = language_name
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            return {"ok": False, "error": "Could not save language preference"}, 500
+
+    return {"ok": True, "code": code, "language": language_name}
 
 
 # =========================================================
@@ -1240,6 +1340,11 @@ def login():
                 customer=customer,
                 error=None
             )
+
+        selected_language = session.get("site_language")
+        if selected_language in SUPPORTED_SITE_LANGUAGES:
+            customer.preferred_language = SUPPORTED_SITE_LANGUAGES[selected_language]
+            db.session.commit()
 
         login_user(customer)
 
@@ -1401,6 +1506,10 @@ def verify_login_otp():
         )
 
     otp_record.used = True
+
+    selected_language = session.get("site_language")
+    if selected_language in SUPPORTED_SITE_LANGUAGES:
+        customer.preferred_language = SUPPORTED_SITE_LANGUAGES[selected_language]
 
     login_user(customer)
 
@@ -4950,9 +5059,7 @@ def account_preferences():
             "Standard"
         ).strip()
 
-        allowed_languages = {
-            "English"
-        }
+        allowed_languages = set(SUPPORTED_SITE_LANGUAGES.values())
 
         allowed_currencies = {
             "GBP",

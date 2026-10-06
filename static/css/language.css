@@ -1,0 +1,118 @@
+/* Shared Fairmont customer language selector */
+
+.language-selector-global {
+    position: fixed !important;
+    top: 18px !important;
+    right: 22px !important;
+    z-index: 2147483000 !important;
+}
+
+.language-selector-global .language-toggle,
+.site-header .language-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    min-width: 50px !important;
+    height: 38px !important;
+    padding: 0 11px !important;
+    border: 1px solid rgba(255,255,255,.65) !important;
+    border-radius: 7px !important;
+    background: rgba(17,31,51,.88) !important;
+    color: #fff !important;
+    font: inherit !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 5px 18px rgba(0,0,0,.16) !important;
+}
+
+.language-selector-global .language-toggle:hover,
+.language-selector-global .language-toggle[aria-expanded="true"],
+.site-header .language-toggle:hover,
+.site-header .language-toggle[aria-expanded="true"] {
+    background: #243a59 !important;
+    border-color: #e0b44f !important;
+}
+
+.language-selector .language-arrow {
+    color: #fff !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+}
+
+.language-selector .language-menu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    right: 0 !important;
+    width: 200px !important;
+    max-height: 390px !important;
+    overflow-y: auto !important;
+    padding: 7px !important;
+    margin: 0 !important;
+    border: 1px solid #dfe5ec !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    box-shadow: 0 16px 38px rgba(0,0,0,.25) !important;
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    z-index: 2147483001 !important;
+    box-sizing: border-box !important;
+}
+
+.language-selector .language-menu.open {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.language-selector .language-menu button {
+    display: block !important;
+    width: 100% !important;
+    padding: 9px 11px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    color: #172235 !important;
+    text-align: left !important;
+    font: inherit !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+}
+
+.language-selector .language-menu button:hover {
+    background: #f1f4f7 !important;
+    color: #172235 !important;
+}
+
+/* Hide Google's own UI; the Fairmont selector controls it. */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+body {
+    top: 0 !important;
+}
+
+.goog-te-gadget,
+#google_translate_element {
+    display: none !important;
+}
+
+@media (max-width: 700px) {
+    .language-selector-global {
+        top: 12px !important;
+        right: 12px !important;
+    }
+
+    .language-selector .language-menu {
+        right: 0 !important;
+        width: 185px !important;
+        max-height: 330px !important;
+    }
+}

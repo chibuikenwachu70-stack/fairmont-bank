@@ -242,14 +242,37 @@
                     class="preference-select"
                 >
 
+{% for language_name in [
+    "English",
+    "Français",
+    "Español",
+    "Nederlands",
+    "Deutsch",
+    "Português",
+    "Italiano",
+    "العربية",
+    "हिन्दी (India)",
+    "বাংলা",
+    "اردو",
+    "中文",
+    "日本語",
+    "한국어",
+    "Русский",
+    "Türkçe",
+    "Kiswahili",
+    "ਪੰਜਾਬੀ",
+    "ગુજરાતી",
+    "മലയാളം"
+] %}
                     <option
-                        value="English"
-                        {% if customer.preferred_language == "English" %}
+                        value="{{ language_name }}"
+                        {% if customer.preferred_language == language_name %}
                             selected
                         {% endif %}
                     >
-                        English
+                        {{ language_name }}
                     </option>
+{% endfor %}
 
                 </select>
 
