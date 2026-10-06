@@ -3,110 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fairmont Bank demonstration banking interface.">
+    <title>Fairmont Bank — Demo</title>
 
-    <title>Fairmont Bank</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
-
-<style id="fairmont-universal-logo">
-.fairmont-page-brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: 0 auto 20px auto;
-}
-
-.fairmont-page-logo {
-    display: block;
-    width: 190px;
-    max-width: 75%;
-    height: auto;
-    object-fit: contain;
-}
-</style>
-
-
-<style id="fairmont-professional-page-logo">
-.fairmont-page-brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: 0 auto 24px auto;
-}
-
-.fairmont-page-logo {
-    display: block;
-    width: 250px;
-    max-width: 82%;
-    height: auto;
-    object-fit: contain;
-}
-
-@media (max-width: 600px) {
-    .fairmont-page-logo {
-        width: 220px;
-        max-width: 84%;
-    }
-}
-</style>
-
 </head>
-
 <body>
 
-    <main class="welcome-page">
+    <header class="site-header">
+<body>
+    <!-- Clearly identifies this public-facing prototype as a demo. -->
+    
 
-        <div class="welcome-overlay"></div>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="/" class="site-brand" aria-label="Fairmont Bank home">
+                <img
+                    src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                    alt="Fairmont Bank"
+                    class="site-logo">
+            </a>
 
-        <section class="welcome-content">
+            <button class="mobile-menu-button" type="button"
+                    aria-label="Open navigation"
+                    aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
 
-            <div class="brand">
-                <div class="fairmont-page-brand">
-    <img
-        src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
-        alt="Fairmont Bank"
-        class="fairmont-page-logo">
-</div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="#home" class="active">Home</a>
+                <a href="#about">About Us</a>
+                <a href="#services">Services</a>
+                <a href="#faq">FAQ</a>
+                <a href="#contact">Contact</a>
+            </nav>
+
+            <div class="header-actions">
+                <a href="/login" class="header-signin">Sign In</a>
+                <a href="/open-account" class="header-signup">Open an Account</a>
             </div>
+        </div>
+    </header>
 
-            <div class="welcome-message">
-                <p class="eyebrow">WELCOME TO FAIRMONT</p>
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <span class="section-kicker hero-kicker">WELCOME TO FAIRMONT</span>
+                <h1>Banking made<br>simple.</h1>
+                <p>
+                    A polished demonstration of a modern banking experience,
+                    designed around convenient digital access and clear account management.
+                </p>
+                <div class="hero-actions">
+                    <a href="/login" class="hero-button primary">Sign In</a>
+                    <a href="/open-account" class="hero-button secondary">Open an Account</a>
+                </div>
+                <div class="hero-note">
+                    <span>Secure interface</span>
+                    <span>•</span>
+                    <span>Digital banking demo</span>
+                </div>
+            </div>
+        </section>
 
-                <h1>
-                    Banking made<br>
-                    simple.
-                </h1>
+        <section class="services-section" id="services">
+            <div class="section-container">
+                <div class="section-heading-block">
+                    <span class="section-kicker">SERVICES</span>
+                    <h2>What we offer</h2>
+                    <p>Explore the main services represented in this banking prototype.</p>
+                </div>
 
-                <p class="welcome-text">
-                    Secure, convenient banking designed around you.
+                <div class="services-grid">
+                    <article class="service-card">
+                        <div class="service-icon">▣</div>
+                        <div>
+                            <h3>Checking Accounts</h3>
+                            <p>Convenient everyday account management with digital access and transaction tools.</p>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon">◇</div>
+                        <div>
+                            <h3>Savings Accounts</h3>
+                            <p>A clean interface for viewing savings information and planning toward financial goals.</p>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon">▤</div>
+                        <div>
+                            <h3>Loans</h3>
+                            <p>Present lending options clearly with a straightforward customer experience.</p>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon">▱</div>
+                        <div>
+                            <h3>Cards & Payments</h3>
+                            <p>Organize card and payment features in one accessible digital banking interface.</p>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon">◎</div>
+                        <div>
+                            <h3>Online Banking</h3>
+                            <p>Access account information, transfers and transaction history through the customer area.</p>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon">◷</div>
+                        <div>
+                            <h3>Business Services</h3>
+                            <p>A flexible presentation area for business-focused account and payment services.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="visual-strip" aria-label="Banking imagery">
+            <div class="visual-card visual-card-large"></div>
+            <div class="visual-card visual-card-small visual-card-two"></div>
+            <div class="visual-card visual-card-small visual-card-three"></div>
+        </section>
+
+        <section class="about-section" id="about">
+            <div class="section-container">
+                <div class="section-heading-block">
+                    <span class="section-kicker">ABOUT</span>
+                    <h2>Who we are</h2>
+                </div>
+
+                <div class="about-panel">
+                    <div class="about-copy">
+                        <p class="lead">
+                            Fairmont Bank is presented here as a modern banking interface
+                            focused on clarity, accessibility and a straightforward digital experience.
+                        </p>
+                        <p>
+                            This prototype brings account access, transaction information,
+                            transfers and customer services into one cohesive experience.
+                        </p>
+                        <ul class="check-list">
+                            <li>Simple navigation and account access</li>
+                            <li>Clear presentation of banking services</li>
+                            <li>Responsive experience across devices</li>
+                            <li>Customer-focused digital interface</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-stat-panel">
+                        <div class="stat-item">
+                            <strong>24/7</strong>
+                            <span>Digital access concept</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>01</strong>
+                            <span>Connected customer experience</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>∞</strong>
+                            <span>Designed for future expansion</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mission-section">
+            <div class="section-container mission-grid">
+                <div class="mission-image"></div>
+
+                <div class="mission-content">
+                    <span class="section-kicker">OUR APPROACH</span>
+                    <h2>Built around your banking experience.</h2>
+
+                    <div class="mission-item">
+                        <div class="mission-icon">01</div>
+                        <div>
+                            <h3>Our Mission</h3>
+                            <p>Create a clear and convenient digital banking experience for customers.</p>
+                        </div>
+                    </div>
+
+                    <div class="mission-item">
+                        <div class="mission-icon">02</div>
+                        <div>
+                            <h3>Our Vision</h3>
+                            <p>Make everyday account management feel simpler, more accessible and more organized.</p>
+                        </div>
+                    </div>
+
+                    <div class="mission-item">
+                        <div class="mission-icon">03</div>
+                        <div>
+                            <h3>Our Values</h3>
+                            <p>Clarity, responsible design, privacy-conscious interfaces and dependable customer support.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-section" id="faq">
+            <div class="section-container">
+                <div class="section-heading-block centered">
+                    <span class="section-kicker">FAQ</span>
+                    <h2>Frequently asked questions</h2>
+                </div>
+
+                <div class="faq-grid">
+                    <details>
+                        <summary>How do I access my account?</summary>
+                        <p>Use the Sign In button above to access the existing customer login interface.</p>
+                    </details>
+                    <details>
+                        <summary>Can I create an account?</summary>
+                        <p>Use Open an Account to reach the existing account-opening workflow in this prototype.</p>
+                    </details>
+                    <details>
+                        <summary>Where can I view transactions?</summary>
+                        <p>After signing in, use the customer dashboard's transaction area.</p>
+                    </details>
+                    <details>
+                        <summary>Is this a live banking service?</summary>
+                        <p>No. This interface is explicitly presented as a demonstration/prototype.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section" id="contact">
+            <div class="section-container contact-panel">
+                <div>
+                    <span class="section-kicker">CONTACT</span>
+                    <h2>Need assistance?</h2>
+                    <p>
+                        Use the customer support details configured for your project,
+                        or sign in to access the available customer interface.
+                    </p>
+                </div>
+                <a href="/login" class="contact-button">Access Customer Area</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-about">
+                <img
+                    src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                    alt="Fairmont Bank"
+                    class="footer-logo">
+                <p>
+                    Fairmont Bank is presented here as a banking interface prototype
+                    for demonstration and development purposes.
                 </p>
             </div>
 
-            <div class="welcome-actions">
-
-                <a href="/login" class="primary-button">
-                    Sign in
-                </a>
-
-                <a href="/open-account" class="secondary-button">
-                    Open an account
-                </a>
-
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a>
+                <a href="#about">About Us</a>
+                <a href="#services">Services</a>
+                <a href="#faq">FAQ</a>
+                <a href="#contact">Contact</a>
             </div>
 
-            <div class="welcome-footer">
-                <span>Secure banking</span>
-                <span class="footer-dot">•</span>
-                <span>Fairmont Bank</span>
+            <div class="footer-column">
+                <h3>Account</h3>
+                <a href="/login">Sign In</a>
+                <a href="/open-account">Open an Account</a>
             </div>
 
-        </section>
+            <div class="footer-column">
+                <h3>Information</h3>
+                <span>Demo / Prototype</span>
+                <span>Privacy-conscious design</span>
+                <span>Digital banking interface</span>
+            </div>
+        </div>
 
-    </main>
+        <div class="footer-bottom">
+            <span>© 2026 Fairmont Bank — Reserved</span>
+            <span>Banking interface demonstration</span>
+        </div>
+    </footer>
 
+    <script>
+        const menuButton = document.querySelector(".mobile-menu-button");
+        const nav = document.querySelector(".main-nav");
+
+        if (menuButton && nav) {
+            menuButton.addEventListener("click", () => {
+                const open = nav.classList.toggle("open");
+                menuButton.setAttribute("aria-expanded", open ? "true" : "false");
+            });
+
+            nav.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", () => {
+                    nav.classList.remove("open");
+                    menuButton.setAttribute("aria-expanded", "false");
+                });
+            });
+        }
+    </script>
 </body>
 </html>
