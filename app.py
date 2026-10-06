@@ -3586,10 +3586,28 @@ def international_transfer():
         original_transaction_reference=transaction_reference
     )
 
+    # Apply the customer's existing TCC payment restriction.
+    # TCC OFF -> Pending Approval.
+    # TCC ON  -> TCC Verification Required.
+    apply_tcc_requirement(
+        customer,
+        approval
+    )
+
     try:
         db.session.add(transfer)
         db.session.add(approval)
         db.session.commit()
+
+        # Do not show the normal confirmation page until
+        # TCC verification has been completed.
+        if approval.status == "TCC Verification Required":
+            return redirect(
+                url_for(
+                    "payment_tcc_verification",
+                    approval_id=approval.id
+                )
+            )
     except IntegrityError:
         db.session.rollback()
         flash(
