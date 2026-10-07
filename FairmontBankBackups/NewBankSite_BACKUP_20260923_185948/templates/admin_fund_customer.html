@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fund Customer Account | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(184,149,74,.10),
+                    transparent 32%
+                ),
+                #071525;
+            color: #edf3fb;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 35px 20px 60px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .brand span {
+            color: #d5b467;
+        }
+
+        .back {
+            color: #aebed0;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .back:hover {
+            color: #d5b467;
+        }
+
+        .card {
+            background: rgba(12,31,51,.94);
+            border: 1px solid rgba(184,149,74,.20);
+            border-radius: 22px;
+            padding: 34px;
+            box-shadow: 0 25px 70px rgba(0,0,0,.30);
+        }
+
+        .heading {
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            margin: 0 0 9px;
+            font-size: 29px;
+        }
+
+        .intro {
+            margin: 0;
+            color: #8fa5bd;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .notice {
+            margin-bottom: 24px;
+            padding: 15px 17px;
+            border-radius: 12px;
+            background: rgba(184,149,74,.07);
+            border: 1px solid rgba(184,149,74,.18);
+            color: #b9c8d8;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .error {
+            margin-bottom: 24px;
+            padding: 14px 16px;
+            border-radius: 11px;
+            background: rgba(180,60,60,.10);
+            border: 1px solid rgba(220,90,90,.25);
+            color: #ffb0b0;
+            font-size: 13px;
+        }
+
+        .section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+
+        .section h2 {
+            margin: 0 0 17px;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 17px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #a8b9ca;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 10px;
+            background: rgba(5,18,31,.72);
+            color: #edf3fb;
+            padding: 13px 14px;
+            outline: none;
+            font: inherit;
+            font-size: 14px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: rgba(184,149,74,.65);
+            box-shadow: 0 0 0 3px rgba(184,149,74,.08);
+        }
+
+        select option {
+            background: #0b2035;
+            color: #ffffff;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .hint {
+            color: #7188a1;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .submit-area {
+            margin-top: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            border: 0;
+            border-radius: 11px;
+            padding: 13px 21px;
+            background: #b8954a;
+            color: #081625;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #d5b467;
+        }
+
+        .cancel {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 11px;
+            padding: 12px 20px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.10);
+            color: #c8d5e3;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .cancel:hover {
+            background: rgba(255,255,255,.10);
+        }
+
+        @media (max-width: 650px) {
+
+            .page {
+                padding: 20px 12px 40px;
+            }
+
+            .card {
+                padding: 24px 17px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .submit-area {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .button,
+            .cancel {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="topbar">
+
+        <div class="brand">
+            FAIRMONT <span>BANK</span>
+        </div>
+
+        <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="back"
+        >
+            Back to Administration Portal
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <div class="heading">
+
+            <h1>Fund Customer Account</h1>
+
+            <p class="intro">
+                Add funds to an existing Fairmont Bank customer account.
+                The amount will be added to the customer's current balance
+                and recorded as a completed credit transaction.
+            </p>
+
+        </div>
+
+        <div class="notice">
+            Existing account funds will not be overwritten. The funding
+            amount is added to the customer's current balance and a
+            permanent Account Funding transaction is created.
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="error">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form
+            method="POST"
+            action="{{ url_for('admin_fund_customer') }}"
+        >
+
+            <div class="section">
+
+                <h2>Customer Account</h2>
+
+                <div class="grid">
+
+                    <div class="field full">
+
+                        <label for="customer_id">
+                            Select Customer
+                        </label>
+
+                        <select
+                            id="customer_id"
+                            name="customer_id"
+                            required
+                        >
+
+                            <option value="">
+                                Select an existing customer
+                            </option>
+
+                            {% for customer in customers %}
+
+                            <option
+                                value="{{ customer.customer_id }}"
+                            >
+                                {{ customer.full_name }}
+                                — {{ customer.customer_id }}
+                                {% if customer.account_number %}
+                                    — Account {{ customer.account_number }}
+                                {% endif %}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="hint">
+                            Only existing Fairmont customer accounts are
+                            available for funding.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="section">
+
+                <h2>Funding Details</h2>
+
+                <div class="grid">
+
+                    <div class="field">
+
+                        <label for="amount">
+                            Funding Amount
+                        </label>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                        >
+
+                        <div class="hint">
+                            Enter the amount to add to the current balance.
+                        </div>
+
+                    </div>
+
+                    <div class="field">
+
+                        <label for="funding_reference">
+                            Funding Reference
+                        </label>
+
+                        <input
+                            type="text"
+                            id="funding_reference"
+                            name="funding_reference"
+                            maxlength="100"
+                            placeholder="Optional reference"
+                        >
+
+                    </div>
+
+                    <div class="field full">
+
+                        <label for="funding_description">
+                            Funding Description
+                        </label>
+
+                        <textarea
+                            id="funding_description"
+                            name="funding_description"
+                            maxlength="255"
+                            placeholder="Optional description for the transaction"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="submit-area">
+
+                <a
+                    href="{{ url_for('admin_dashboard') }}"
+                    class="cancel"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="button"
+                >
+                    Fund Customer Account
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

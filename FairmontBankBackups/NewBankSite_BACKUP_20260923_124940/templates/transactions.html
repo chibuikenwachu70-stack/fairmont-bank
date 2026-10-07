@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Transaction History | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+
+<style>
+    .transaction-filters {
+        margin: 0 0 20px;
+    }
+
+    .transaction-filter-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .transaction-search-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .transaction-search-row input {
+        flex: 1;
+        min-width: 0;
+        padding: 13px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.07);
+        color: inherit;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .transaction-search-row button {
+        padding: 13px 16px;
+        border: 0;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .transaction-filter-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .transaction-filter-row select {
+        width: 100%;
+        padding: 12px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.07);
+        color: inherit;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .transaction-filter-actions {
+        text-align: right;
+    }
+
+    .transaction-filter-actions a {
+        text-decoration: none;
+        font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+        .transaction-search-row {
+            flex-direction: column;
+        }
+
+        .transaction-filter-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+    <main class="transaction-page">
+
+        <div class="transaction-shell">
+
+            <header class="transaction-header">
+
+                <a
+                    href="/dashboard"
+                    class="transaction-back-button">
+
+                    ←
+
+                </a>
+
+                <div>
+
+                    <p class="transaction-eyebrow">
+                        FAIRMONT BANK
+                    </p>
+
+                    <h1>
+                        Transaction History
+                    </h1>
+
+                </div>
+
+            </header>
+
+
+            <section class="transaction-account-card">
+
+                <div>
+
+                    <p>
+                        AVAILABLE BALANCE
+                    </p>
+
+                    <h2>
+                        £{{ "{:,.2f}".format(customer.account_balance) }}
+                    </h2>
+
+                </div>
+
+                <div class="transaction-customer-reference">
+
+                    {{ customer.customer_id }}
+
+                </div>
+
+            </section>
+
+
+            <section class="transaction-filters">
+
+                <form
+                    method="GET"
+                    action="{{ url_for('transactions') }}"
+                    class="transaction-filter-form">
+
+                    <div class="transaction-search-row">
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="Search transactions, references or recipients">
+
+                        <button type="submit">
+                            Search
+                        </button>
+
+                    </div>
+
+
+                    <div class="transaction-filter-row">
+
+                        <select name="type">
+
+                            <option value="">
+                                All transaction types
+                            </option>
+
+                            {% for transaction_type in transaction_types %}
+
+                                <option
+                                    value="{{ transaction_type }}"
+                                    {% if selected_type == transaction_type %}selected{% endif %}>
+                                    {{ transaction_type }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        <select name="direction">
+
+                            <option value="">
+                                All activity
+                            </option>
+
+                            <option
+                                value="Credit"
+                                {% if selected_direction == "Credit" %}selected{% endif %}>
+                                Credits
+                            </option>
+
+                            <option
+                                value="Debit"
+                                {% if selected_direction == "Debit" %}selected{% endif %}>
+                                Debits
+                            </option>
+
+                        </select>
+
+
+                        <select name="date_range">
+
+                            <option value="">
+                                All dates
+                            </option>
+
+                            <option
+                                value="today"
+                                {% if selected_date_range == "today" %}selected{% endif %}>
+                                Today
+                            </option>
+
+                            <option
+                                value="7"
+                                {% if selected_date_range == "7" %}selected{% endif %}>
+                                Last 7 days
+                            </option>
+
+                            <option
+                                value="30"
+                                {% if selected_date_range == "30" %}selected{% endif %}>
+                                Last 30 days
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="transaction-filter-actions">
+
+                        <a href="{{ url_for('transactions') }}">
+                            Clear filters
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <section class="transaction-list-section">
+
+                <div class="transaction-section-heading">
+
+                    <h2>
+                        Transactions
+                    </h2>
+
+                    <span>
+                        {{ transactions|length }}
+                    </span>
+
+                </div>
+
+
+                {% if transactions %}
+
+                    <div class="transaction-list">
+
+                        {% for transaction in transactions %}
+
+                            <a
+                                href="{{ url_for('transaction_details', transaction_reference=transaction.transaction_reference) }}"
+                                class="transaction-item">
+
+                                <div
+                                    class="transaction-icon
+                                    {% if transaction.direction == 'Credit' %}
+                                        transaction-credit
+                                    {% else %}
+                                        transaction-debit
+                                    {% endif %}">
+
+                                    {% if transaction.direction == "Credit" %}
+                                        ↓
+                                    {% else %}
+                                        ↑
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="transaction-main">
+
+                                    <strong>
+                                        {{ transaction.description }}
+                                    </strong>
+
+                                    <span>
+
+                                        {{ transaction.created_at.strftime("%d %b %Y, %H:%M") }}
+
+                                    </span>
+
+                                    {% if transaction.counterparty %}
+
+                                        <small>
+                                            {{ transaction.counterparty }}
+                                        </small>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div
+                                    class="transaction-amount
+                                    {% if transaction.direction == 'Credit' %}
+                                        amount-credit
+                                    {% else %}
+                                        amount-debit
+                                    {% endif %}">
+
+                                    {% if transaction.direction == "Credit" %}
+                                        +
+                                    {% else %}
+                                        -
+                                    {% endif %}
+
+                                    £{{ "{:,.2f}".format(transaction.amount) }}
+
+                                </div>
+
+                            </a>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="transaction-empty">
+
+                        <div class="transaction-empty-icon">
+                            —
+                        </div>
+
+                        <h3>
+                            No transactions yet
+                        </h3>
+
+                        <p>
+                            Your completed banking activity will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <a
+                href="/dashboard"
+                class="transaction-dashboard-button">
+
+                Return to dashboard
+
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

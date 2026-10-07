@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Settings - Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(35, 76, 125, 0.28), transparent 38%),
+                linear-gradient(180deg, #07182d 0%, #061426 100%);
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .settings-page {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 22px 18px 45px;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .back-button {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #ffffff;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
+            font-size: 22px;
+        }
+
+        .settings-title {
+            margin: 0;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .settings-subtitle {
+            margin: 4px 0 0;
+            color: rgba(255,255,255,0.60);
+            font-size: 13px;
+        }
+
+        .settings-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            min-height: 82px;
+            padding: 18px;
+            margin: 0 0 12px 0;
+            border-radius: 17px;
+            background: rgba(13, 34, 59, 0.82);
+            border: 1px solid rgba(255,255,255,0.09);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .settings-icon {
+            flex: 0 0 46px;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(53, 111, 177, 0.18);
+            border: 1px solid rgba(100, 160, 220, 0.15);
+            font-size: 21px;
+        }
+
+        .settings-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .settings-name {
+            margin: 0 0 5px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .settings-description {
+            margin: 0;
+            color: rgba(255,255,255,0.58);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .settings-arrow {
+            color: rgba(255,255,255,0.45);
+            font-size: 22px;
+        }
+
+        .settings-note {
+            margin-top: 22px;
+            padding: 15px 16px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.045);
+            border: 1px solid rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.52);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .settings-page {
+                padding: 18px 14px 35px;
+            }
+
+            .settings-title {
+                font-size: 22px;
+            }
+
+            .settings-card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="settings-page">
+
+    <div class="settings-header">
+
+        <a href="{{ url_for('dashboard') }}" class="back-button">
+            ‹
+        </a>
+
+        <div>
+            <h1 class="settings-title">Settings</h1>
+            <p class="settings-subtitle">
+                Manage your Fairmont Bank account preferences
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- PERSONAL INFORMATION -->
+
+    <a
+        href="{{ url_for('personal_information') }}"
+        class="settings-card"
+        style="text-decoration:none; color:inherit;">
+
+        <div class="settings-icon">
+            👤
+        </div>
+
+        <div class="settings-content">
+
+            <p class="settings-name">
+                Personal Information
+            </p>
+
+            <p class="settings-description">
+                Manage your personal and customer account information.
+            </p>
+
+        </div>
+
+        <div class="settings-arrow">
+            ›
+        </div>
+
+    </a>
+
+
+    <!-- CHANGE PASSWORD -->
+
+    <a
+        href="{{ url_for('change_password') }}"
+        class="settings-card"
+        style="text-decoration:none; color:inherit;">
+
+        <div class="settings-icon">
+            🔑
+        </div>
+
+        <div class="settings-content">
+
+            <p class="settings-name">
+                Change Password
+            </p>
+
+            <p class="settings-description">
+                Change the password used to sign in to your account.
+            </p>
+
+        </div>
+
+        <div class="settings-arrow">
+            ›
+        </div>
+
+    </a>
+
+
+    <!-- LOGIN OTP -->
+
+    <a
+        href="{{ url_for('login_otp_settings') }}"
+        class="settings-card"
+        style="text-decoration:none; color:inherit;">
+
+        <div class="settings-icon">
+            🔐
+        </div>
+
+        <div class="settings-content">
+
+            <p class="settings-name">
+                Login OTP
+            </p>
+
+            <p class="settings-description">
+                Turn login one-time password verification on or off.
+            </p>
+
+        </div>
+
+        <div class="settings-arrow">
+            ›
+        </div>
+
+    </a>
+
+    <!-- BANK STATEMENTS -->
+
+    <a
+        href="{{ url_for('bank_statements_lock_settings') }}"
+        class="settings-card"
+        style="text-decoration:none; color:inherit;">
+
+        <div class="settings-icon">
+            📄
+        </div>
+
+        <div class="settings-content">
+
+            <p class="settings-name">
+                Bank Statements Lock &amp; Unlock
+            </p>
+
+            <p class="settings-description">
+                Control whether access to your bank statements is locked or unlocked.
+            </p>
+
+        </div>
+
+        <div class="settings-arrow">
+            ›
+        </div>
+
+    </a>
+
+    <!-- NOTIFICATIONS -->
+
+    <a
+        href="{{ url_for('notification_preferences') }}"
+        class="settings-card"
+        style="text-decoration:none; color:inherit;">
+
+        <div class="settings-icon">
+            🔔
+        </div>
+
+        <div class="settings-content">
+
+            <p class="settings-name">
+                Notification Preferences
+            </p>
+
+            <p class="settings-description">
+                Choose which account notifications you receive.
+            </p>
+
+        </div>
+
+        <div class="settings-arrow">
+            ›
+        </div>
+
+    </a>
+
+
+    <!-- SECURITY -->
+
+    <div class="settings-card">
+
+        <div class="settings-icon">
+            🛡
+        </div>
+
+        <div class="settings-content">
+
+            <p class="settings-name">
+                Security &amp; Session Settings
+            </p>
+
+            <p class="settings-description">
+                Review account security and manage active login sessions.
+            </p>
+
+        </div>
+
+        <div class="settings-arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <!-- ACCOUNT PREFERENCES -->
+
+    <div class="settings-card">
+
+        <div class="settings-icon">
+            ⚙
+        </div>
+
+        <div class="settings-content">
+
+            <p class="settings-name">
+                Account Preferences
+            </p>
+
+            <p class="settings-description">
+                Manage your account display and general banking preferences.
+            </p>
+
+        </div>
+
+        <div class="settings-arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <div class="settings-note">
+        Settings controls will be enabled individually as each account feature is added.
+    </div>
+
+</div>
+
+</body>
+</html>

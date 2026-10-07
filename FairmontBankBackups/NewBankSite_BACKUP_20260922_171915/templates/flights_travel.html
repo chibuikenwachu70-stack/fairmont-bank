@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Flights & Travel | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(40, 83, 145, 0.28), transparent 35%),
+                linear-gradient(145deg, #061426, #0a1d34 55%, #07111f);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 22px 16px 40px;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #dceaff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .back:hover {
+            color: #ffffff;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .eyebrow {
+            color: #8fb7ed;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            color: #aebed2;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .balance {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(14px);
+        }
+
+        .balance-label {
+            color: #9db0c8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-value {
+            margin-top: 7px;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .card {
+            background: rgba(11, 31, 55, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+            backdrop-filter: blur(16px);
+        }
+
+        .error {
+            background: rgba(180, 45, 55, 0.18);
+            border: 1px solid rgba(255, 100, 110, 0.35);
+            color: #ffd5d8;
+            border-radius: 13px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            font-size: 13px;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            color: #dce8f6;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            border-radius: 13px;
+            padding: 13px 14px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(123, 177, 244, 0.75);
+        }
+
+        select option {
+            background: #0b2038;
+            color: #ffffff;
+        }
+
+        .button {
+            width: 100%;
+            border: 0;
+            border-radius: 14px;
+            padding: 14px;
+            background: #2f70c9;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        .button:hover {
+            background: #3b80df;
+        }
+
+        .secure {
+            text-align: center;
+            color: #71869f;
+            font-size: 11px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 520px) {
+            .page {
+                padding: 18px 13px 30px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <a href="{{ url_for('dashboard') }}" class="back">
+        ← Back to Dashboard
+    </a>
+
+    <div class="header">
+
+        <div class="eyebrow">Fairmont Bank</div>
+
+        <h1>Flights & Travel</h1>
+
+        <div class="subtitle">
+            Pay for travel services and bookings directly from your Fairmont Bank account.
+        </div>
+
+    </div>
+
+    <div class="balance">
+
+        <div class="balance-label">
+            Available Balance
+        </div>
+
+        <div class="balance-value">
+            £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        {% if errors %}
+
+            <div class="error">
+
+                {% for error in errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+        <form method="POST">
+
+            <div class="field">
+
+                <label for="category">
+                    Travel Service
+                </label>
+
+                <select name="category" id="category" required>
+
+                    <option value="">
+                        Select a travel service
+                    </option>
+
+                    {% for item in categories %}
+
+                        <option value="{{ item }}"
+                            {% if category == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="field">
+
+                <label for="provider">
+                    Airline / Hotel / Travel Provider
+                </label>
+
+                <input
+                    type="text"
+                    id="provider"
+                    name="provider"
+                    value="{{ provider or '' }}"
+                    placeholder="Enter provider name"
+                    required>
+
+            </div>
+
+            <div class="field">
+
+                <label for="traveler_name">
+                    Traveler Name
+                </label>
+
+                <input
+                    type="text"
+                    id="traveler_name"
+                    name="traveler_name"
+                    value="{{ traveler_name or '' }}"
+                    placeholder="Enter traveler name"
+                    required>
+
+            </div>
+
+            <div class="field">
+
+                <label for="booking_reference">
+                    Booking / Travel Reference
+                </label>
+
+                <input
+                    type="text"
+                    id="booking_reference"
+                    name="booking_reference"
+                    value="{{ booking_reference or '' }}"
+                    placeholder="Enter booking or travel reference"
+                    required>
+
+            </div>
+
+            <div class="field">
+
+                <label for="amount">
+                    Payment Amount (£)
+                </label>
+
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    value="{{ amount or '' }}"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00"
+                    required>
+
+            </div>
+
+            <div class="field">
+
+                <label for="payment_reference">
+                    Payment Reference (Optional)
+                </label>
+
+                <input
+                    type="text"
+                    id="payment_reference"
+                    name="payment_reference"
+                    value="{{ payment_reference or '' }}"
+                    placeholder="Optional payment reference">
+
+            </div>
+
+            <button type="submit" class="button">
+                Make Travel Payment
+            </button>
+
+        </form>
+
+        <div class="secure">
+            Travel payments are recorded securely in your Fairmont Bank transaction history.
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

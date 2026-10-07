@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Transaction History | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <main class="transaction-page">
+
+        <div class="transaction-shell">
+
+            <header class="transaction-header">
+
+                <a
+                    href="/dashboard"
+                    class="transaction-back-button">
+
+                    ←
+
+                </a>
+
+                <div>
+
+                    <p class="transaction-eyebrow">
+                        FAIRMONT BANK
+                    </p>
+
+                    <h1>
+                        Transaction History
+                    </h1>
+
+                </div>
+
+            </header>
+
+
+            <section class="transaction-account-card">
+
+                <div>
+
+                    <p>
+                        AVAILABLE BALANCE
+                    </p>
+
+                    <h2>
+                        £{{ "{:,.2f}".format(customer.account_balance) }}
+                    </h2>
+
+                </div>
+
+                <div class="transaction-customer-reference">
+
+                    {{ customer.customer_id }}
+
+                </div>
+
+            </section>
+
+
+            <section class="transaction-list-section">
+
+                <div class="transaction-section-heading">
+
+                    <h2>
+                        Transactions
+                    </h2>
+
+                    <span>
+                        {{ transactions|length }}
+                    </span>
+
+                </div>
+
+
+                {% if transactions %}
+
+                    <div class="transaction-list">
+
+                        {% for transaction in transactions %}
+
+                            <a
+                                href="{{ url_for('transaction_details', transaction_reference=transaction.transaction_reference) }}"
+                                class="transaction-item">
+
+                                <div
+                                    class="transaction-icon
+                                    {% if transaction.direction == 'Credit' %}
+                                        transaction-credit
+                                    {% else %}
+                                        transaction-debit
+                                    {% endif %}">
+
+                                    {% if transaction.direction == "Credit" %}
+                                        ↓
+                                    {% else %}
+                                        ↑
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="transaction-main">
+
+                                    <strong>
+                                        {{ transaction.description }}
+                                    </strong>
+
+                                    <span>
+
+                                        {{ transaction.created_at.strftime("%d %b %Y, %H:%M") }}
+
+                                    </span>
+
+                                    {% if transaction.counterparty %}
+
+                                        <small>
+                                            {{ transaction.counterparty }}
+                                        </small>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div
+                                    class="transaction-amount
+                                    {% if transaction.direction == 'Credit' %}
+                                        amount-credit
+                                    {% else %}
+                                        amount-debit
+                                    {% endif %}">
+
+                                    {% if transaction.direction == "Credit" %}
+                                        +
+                                    {% else %}
+                                        -
+                                    {% endif %}
+
+                                    £{{ "{:,.2f}".format(transaction.amount) }}
+
+                                </div>
+
+                            </a>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="transaction-empty">
+
+                        <div class="transaction-empty-icon">
+                            —
+                        </div>
+
+                        <h3>
+                            No transactions yet
+                        </h3>
+
+                        <p>
+                            Your completed banking activity will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <a
+                href="/dashboard"
+                class="transaction-dashboard-button">
+
+                Return to dashboard
+
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

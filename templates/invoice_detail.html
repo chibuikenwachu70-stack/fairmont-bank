@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>{{ invoice.invoice_number }} | Fairmont Bank</title>
+
+<style>
+:root{
+    --navy:#071426;
+    --ink:#14233a;
+    --muted:#63738a;
+    --line:#dbe3ec;
+    --soft:#f6f8fb;
+    --gold:#b58a3a;
+    --blue:#173b63;
+    --green:#216247;
+    --red:#8c463d;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:linear-gradient(180deg,#071426 0,#0a1a2e 100%);
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--ink);
+}
+
+.wrap{
+    max-width:900px;
+    margin:30px auto;
+    padding:0 18px;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+.back{
+    color:#fff;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.back:hover{
+    text-decoration:underline;
+}
+
+.brand{
+    color:#d8b76a;
+    font-weight:800;
+    letter-spacing:2px;
+    font-size:15px;
+}
+
+/* Invoice paper */
+
+.paper{
+    background:#fff;
+    border:1px solid #d6dee8;
+    border-radius:12px;
+    box-shadow:0 18px 55px rgba(0,0,0,.24);
+    overflow:hidden;
+}
+
+/* Header */
+
+.paper-head{
+    padding:34px 38px 28px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:35px;
+}
+
+.brand-lockup{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.brand-mark{
+    width:42px;
+    height:42px;
+    border:2px solid var(--gold);
+    border-radius:10px;
+    display:grid;
+    place-items:center;
+    color:var(--gold);
+    font-weight:900;
+    font-size:20px;
+    flex-shrink:0;
+}
+
+.bank-name{
+    font-weight:900;
+    letter-spacing:1.6px;
+    font-size:17px;
+}
+
+.bank-sub{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:4px;
+    letter-spacing:.6px;
+}
+
+.company-details{
+    margin-top:9px;
+    font-size:11px;
+    line-height:1.6;
+    color:#63738a;
+}
+
+.invoice-label{
+    margin:20px 0 3px;
+    font-size:30px;
+    letter-spacing:-.5px;
+}
+
+.invoice-no{
+    color:#52708f;
+    font-size:13px;
+}
+
+.meta{
+    text-align:right;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.9;
+    min-width:180px;
+}
+
+.meta strong{
+    color:var(--ink);
+    font-weight:700;
+}
+
+.status{
+    display:inline-block;
+    padding:6px 11px;
+    border-radius:999px;
+    background:#edf3fa;
+    color:#244c73;
+    font-weight:700;
+    margin-bottom:5px;
+}
+
+.status.paid{
+    background:#e7f5ed;
+    color:#216044;
+}
+
+.status.cancelled{
+    background:#f6e9e7;
+    color:#8c463d;
+}
+
+/* Main content */
+
+.content{
+    padding:28px 38px 34px;
+}
+
+.bill-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    margin-bottom:25px;
+}
+
+.block-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#718198;
+    margin-bottom:8px;
+    font-weight:700;
+}
+
+.customer-name{
+    font-size:16px;
+    font-weight:800;
+}
+
+.muted{
+    color:var(--muted);
+}
+
+.customer-id{
+    font-size:13px;
+    margin-top:5px;
+    line-height:1.5;
+}
+
+.summary{
+    background:var(--soft);
+    border:1px solid #e3e9f0;
+    border-radius:10px;
+    padding:14px 16px;
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    font-size:13px;
+    padding:5px 0;
+}
+
+.summary-row strong{
+    color:var(--ink);
+    text-align:right;
+}
+
+/* Invoice details */
+
+.details{
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:20px;
+    padding:14px 16px;
+    border-bottom:1px solid #edf0f4;
+    background:#fff;
+}
+
+.row:nth-child(even){
+    background:#fafbfd;
+}
+
+.row:last-child{
+    border-bottom:0;
+}
+
+.row span:first-child{
+    color:#63738a;
+}
+
+.row strong{
+    text-align:right;
+    max-width:420px;
+}
+
+.total{
+    background:#eef3f8!important;
+    border-top:2px solid #d4dee9!important;
+    font-size:19px;
+}
+
+.total strong{
+    font-size:22px;
+}
+
+.tax-note{
+    font-size:11px;
+    color:#66748a;
+    margin-top:9px;
+}
+
+/* Notes */
+
+.note{
+    background:#f8fafc;
+    border:1px solid #e4e9ef;
+    padding:14px 16px;
+    border-radius:9px;
+    margin-top:18px;
+    line-height:1.55;
+    font-size:13px;
+}
+
+.note strong{
+    color:var(--ink);
+}
+
+/* Footer */
+
+.footer{
+    margin-top:28px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:30px;
+    font-size:11px;
+    line-height:1.65;
+    color:#738197;
+}
+
+.footer strong{
+    color:#14233a;
+    font-size:12px;
+    letter-spacing:.5px;
+}
+
+/* Buttons */
+
+.actions{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid #edf0f4;
+}
+
+.btn{
+    border:0;
+    border-radius:8px;
+    padding:11px 16px;
+    background:#173251;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#21466e;
+}
+
+/* Mobile */
+
+@media(max-width:700px){
+
+    .wrap{
+        margin:16px auto;
+        padding:0 12px;
+    }
+
+    .top{
+        margin-bottom:12px;
+    }
+
+    .paper-head{
+        padding:25px 22px;
+        flex-direction:column;
+    }
+
+    .meta{
+        text-align:left;
+        min-width:0;
+    }
+
+    .content{
+        padding:22px;
+    }
+
+    .bill-grid{
+        grid-template-columns:1fr;
+    }
+
+    .row{
+        grid-template-columns:1fr;
+        gap:5px;
+    }
+
+    .row strong{
+        text-align:left;
+        max-width:none;
+    }
+
+    .summary-row{
+        align-items:flex-start;
+    }
+
+    .summary-row strong{
+        max-width:60%;
+    }
+
+    .footer{
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .footer div:last-child{
+        text-align:left!important;
+    }
+
+    .actions{
+        justify-content:stretch;
+    }
+
+    .btn{
+        width:100%;
+    }
+}
+
+/* Print */
+
+@media print{
+
+    @page{
+        size:A4;
+        margin:12mm;
+    }
+
+    body{
+        background:#fff;
+    }
+
+    .top,
+    .actions{
+        display:none;
+    }
+
+    .wrap{
+        max-width:none;
+        margin:0;
+        padding:0;
+    }
+
+    .paper{
+        box-shadow:none;
+        border:0;
+        border-radius:0;
+    }
+
+    .paper-head{
+        padding-top:0;
+    }
+
+    .content{
+        padding-bottom:0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+    <!-- Top navigation -->
+    <div class="top">
+
+        <a class="back" href="{{ url_for('customer_invoices') }}">
+            ← Bills &amp; Invoices
+        </a>
+
+        <div class="brand">
+            FAIRMONT BANK
+        </div>
+
+    </div>
+
+
+    <!-- Invoice paper -->
+    <div class="paper">
+
+
+        <!-- =========================
+             COMPANY / INVOICE HEADER
+             ========================= -->
+
+        <div class="paper-head">
+
+            <div>
+
+                <div class="brand-lockup">
+
+                    <div class="brand-mark">
+                        F
+                    </div>
+
+                    <div>
+
+                        <div class="bank-name">
+                            FAIRMONT BANK
+                        </div>
+
+                        <div class="bank-sub">
+                            Banking &amp; Financial Services
+                        </div>
+
+                        <div class="company-details">
+                            Unit 9, Central Way, Park Royal, London<br>
+                            Phone: +1 (731) 733-0071<br>
+                            Support: support@fairmontbank.com
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="invoice-label">
+                    Invoice
+                </div>
+
+                <div class="invoice-no">
+                    {{ invoice.invoice_number }}
+                </div>
+
+            </div>
+
+
+            <!-- Invoice status and dates -->
+
+            <div class="meta">
+
+                <span class="status {% if invoice.status=='Paid' %}paid{% elif invoice.status=='Cancelled' %}cancelled{% endif %}">
+                    {{ invoice.status }}
+                </span>
+
+                <br>
+
+                <strong>Issued</strong>
+                {{ invoice.issue_date.strftime('%d %b %Y') }}
+
+                <br>
+
+                <strong>Due</strong>
+                {{ invoice.due_date.strftime('%d %b %Y') }}
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             INVOICE CONTENT
+             ========================= -->
+
+        <div class="content">
+
+
+            <!-- Issued By / Bill To -->
+
+            <div class="bill-grid">
+
+
+                <!-- Company -->
+
+                <div>
+
+                    <div class="block-label">
+                        Issued by
+                    </div>
+
+                    <div class="customer-name">
+                        FAIRMONT BANK
+                    </div>
+
+                    <div class="customer-id muted">
+                        Unit 9, Central Way, Park Royal, London
+                    </div>
+
+                    <div class="customer-id muted">
+                        Phone: +1 (731) 733-0071
+                    </div>
+
+                    <div class="customer-id muted">
+                        Support: support@fairmontbank.com
+                    </div>
+
+                </div>
+
+
+                <!-- Customer -->
+
+                <div>
+
+                    <div class="block-label">
+                        Bill to
+                    </div>
+
+                    <div class="customer-name">
+                        {{ customer.full_name }}
+                    </div>
+
+                    <div class="customer-id muted">
+                        Customer ID: {{ customer.customer_id }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Invoice summary -->
+
+            <div class="summary" style="margin-bottom:25px;">
+
+                <div class="block-label">
+                    Invoice summary
+                </div>
+
+                <div class="summary-row">
+
+                    <span>
+                        Invoice number
+                    </span>
+
+                    <strong>
+                        {{ invoice.invoice_number }}
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Billing type
+                    </span>
+
+                    <strong>
+                        {{ invoice.billing_type }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 CHARGES
+                 ========================= -->
+
+            <div class="details">
+
+
+                <!-- Description -->
+
+                <div class="row">
+
+                    <span>
+                        Description
+                    </span>
+
+                    <strong>
+                        {{ invoice.description }}
+                    </strong>
+
+                </div>
+
+
+                <!-- Base amount -->
+
+                <div class="row">
+
+                    <span>
+                        Base amount
+                    </span>
+
+                    <strong>
+                        {{ invoice.currency }}
+                        {{ '%.2f'|format(invoice.amount|float) }}
+                    </strong>
+
+                </div>
+
+
+                <!-- TCC tax -->
+
+                {% if invoice.tcc_tax|float > 0 %}
+
+                <div class="row">
+
+                    <span>
+                        TCC Tax / Government Tax Assessment
+                    </span>
+
+                    <strong>
+                        {{ invoice.currency }}
+                        {{ '%.2f'|format(invoice.tcc_tax|float) }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- Other fee -->
+
+                {% if invoice.other_fee|float > 0 %}
+
+                <div class="row">
+
+                    <span>
+                        Other fee
+                    </span>
+
+                    <strong>
+                        {{ invoice.currency }}
+                        {{ '%.2f'|format(invoice.other_fee|float) }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- Discount -->
+
+                {% if invoice.discount|float > 0 %}
+
+                <div class="row">
+
+                    <span>
+                        Discount
+                    </span>
+
+                    <strong>
+                        - {{ invoice.currency }}
+                        {{ '%.2f'|format(invoice.discount|float) }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- Total -->
+
+                <div class="row total">
+
+                    <span>
+                        Total due
+                    </span>
+
+                    <strong>
+                        {{ invoice.currency }}
+                        {{ '%.2f'|format(invoice.total|float) }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- Tax explanation -->
+
+            {% if invoice.tcc_tax|float > 0 %}
+
+            <div class="tax-note">
+                TCC tax is shown separately from bank service charges for clear billing.
+            </div>
+
+            {% endif %}
+
+
+            <!-- Billing note -->
+
+            {% if invoice.billing_note %}
+
+            <div class="note">
+
+                <strong>
+                    Billing note
+                </strong>
+
+                <br>
+
+                {{ invoice.billing_note }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- Payment reference -->
+
+            {% if invoice.payment_reference %}
+
+            <div class="note">
+
+                <strong>
+                    Payment reference
+                </strong>
+
+                <br>
+
+                {{ invoice.payment_reference }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =========================
+                 PROFESSIONAL FOOTER
+                 ========================= -->
+
+            <div class="footer">
+
+                <div>
+
+                    <strong>
+                        FAIRMONT BANK
+                    </strong>
+
+                    <br>
+
+                    Unit 9, Central Way, Park Royal, London
+
+                    <br>
+
+                    Phone: +1 (731) 733-0071
+
+                    <br>
+
+                    Support:
+                    support@fairmontbank.com
+
+                </div>
+
+
+                <div style="text-align:right;">
+
+                    Fairmont Bank billing record
+
+                    <br>
+
+                    Invoice reference:
+                    {{ invoice.invoice_number }}
+
+                    <br>
+
+                    Thank you for banking with Fairmont Bank.
+
+                </div>
+
+            </div>
+
+
+            <!-- Print button -->
+
+            <div class="actions">
+
+                <button
+                    class="btn"
+                    type="button"
+                    onclick="window.print()">
+                    Print Invoice
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

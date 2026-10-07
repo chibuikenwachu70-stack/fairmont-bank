@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Bills | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(43, 83, 145, 0.28), transparent 38%),
+                linear-gradient(145deg, #061426, #0b1d34 55%, #071426);
+            color: #ffffff;
+        }
+
+        .page {
+            width: min(100%, 720px);
+            margin: 0 auto;
+            padding: 24px 18px 45px;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #dbe9ff;
+            text-decoration: none;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .brand-mark {
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .brand-subtitle {
+            margin-top: 6px;
+            color: #91a7c5;
+            font-size: 12px;
+            letter-spacing: 1.4px;
+        }
+
+        .card {
+            background: rgba(16, 36, 62, 0.78);
+            border: 1px solid rgba(159, 190, 229, 0.16);
+            border-radius: 24px;
+            padding: 25px 20px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(15px);
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 29px;
+        }
+
+        .intro {
+            color: #9fb1c9;
+            line-height: 1.6;
+            margin: 0 0 22px;
+        }
+
+        .balance {
+            background: rgba(7, 22, 40, 0.75);
+            border: 1px solid rgba(159, 190, 229, 0.12);
+            border-radius: 17px;
+            padding: 17px;
+            margin-bottom: 22px;
+        }
+
+        .balance-label {
+            color: #91a7c5;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 7px;
+        }
+
+        .balance-value {
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .error-box {
+            background: rgba(132, 35, 45, 0.25);
+            border: 1px solid rgba(235, 100, 115, 0.35);
+            color: #ffd8dc;
+            border-radius: 15px;
+            padding: 13px 15px;
+            margin-bottom: 18px;
+        }
+
+        .error-box div {
+            margin: 4px 0;
+        }
+
+        label {
+            display: block;
+            margin: 18px 0 8px;
+            font-size: 13px;
+            color: #dbe6f5;
+            font-weight: 600;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 13px;
+            border: 1px solid rgba(160, 188, 222, 0.18);
+            background: rgba(6, 20, 38, 0.82);
+            color: #ffffff;
+            outline: none;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(121, 169, 232, 0.65);
+        }
+
+        select option {
+            background: #0b1d34;
+            color: #ffffff;
+        }
+
+        .hint {
+            color: #8297b4;
+            font-size: 12px;
+            margin-top: 7px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 15px;
+            border: 0;
+            border-radius: 14px;
+            background: #e8eef8;
+            color: #071426;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #ffffff;
+        }
+
+        .secure {
+            text-align: center;
+            color: #7187a4;
+            font-size: 12px;
+            margin-top: 18px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <a class="back" href="{{ url_for('dashboard') }}">← Services</a>
+
+    <div class="brand">
+        <div class="brand-mark">F FAIRMONT BANK</div>
+        <div class="brand-subtitle">EVERYDAY BANKING</div>
+    </div>
+
+    <div class="card">
+
+        <h1>Electric Bills</h1>
+
+        <p class="intro">
+            Pay your electricity bill directly from your Fairmont Bank account.
+        </p>
+
+        <div class="balance">
+            <div class="balance-label">Available balance</div>
+            <div class="balance-value">
+                £{{ "%.2f"|format(customer.account_balance) }}
+            </div>
+        </div>
+
+        {% if errors %}
+        <div class="error-box">
+            {% for error in errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+
+            <label for="provider">Electricity provider</label>
+
+            <input
+                type="text"
+                id="provider"
+                name="provider"
+                placeholder="Enter electricity provider"
+                value="{{ provider|default('') }}"
+                required
+            >
+
+            <label for="meter_number">Meter / account number</label>
+
+            <input
+                type="text"
+                id="meter_number"
+                name="meter_number"
+                placeholder="Enter meter or account number"
+                value="{{ meter_number|default('') }}"
+                required
+            >
+
+            <label for="amount">Payment amount</label>
+
+            <input
+                type="number"
+                id="amount"
+                name="amount"
+                min="0.01"
+                step="0.01"
+                placeholder="0.00"
+                value="{{ amount|default('') }}"
+                required
+            >
+
+            <label for="payment_reference">
+                Payment reference (optional)
+            </label>
+
+            <input
+                type="text"
+                id="payment_reference"
+                name="payment_reference"
+                placeholder="Optional reference"
+                value="{{ payment_reference|default('') }}"
+            >
+
+            <button type="submit">
+                Continue Payment
+            </button>
+
+        </form>
+
+        <div class="secure">
+            Successful electricity payments are recorded in your
+            Fairmont transaction history.
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

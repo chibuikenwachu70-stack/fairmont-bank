@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bank Statements Locked - Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+
+            background:
+                radial-gradient(circle at top left, rgba(35, 76, 125, 0.28), transparent 38%),
+                linear-gradient(180deg, #07182d 0%, #061426 100%);
+
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 520px;
+            padding: 30px 24px;
+            text-align: center;
+
+            background: rgba(13, 34, 59, 0.86);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 20px;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+        }
+
+        .icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.09);
+
+            font-size: 28px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 24px;
+        }
+
+        p {
+            margin: 0 auto 22px;
+            max-width: 430px;
+            color: rgba(255,255,255,0.60);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 13px 20px;
+            border-radius: 13px;
+
+            background: #2e78d1;
+            color: #ffffff;
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .secondary {
+            display: block;
+            margin-top: 14px;
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="icon">
+        🔒
+    </div>
+
+    <h1>Bank Statements Locked</h1>
+
+    <p>
+        Access to your bank statements is currently locked.
+        Your transaction records remain safely stored in your account.
+    </p>
+
+    <a
+        href="{{ url_for('bank_statements_lock_settings') }}"
+        class="button">
+        Unlock Bank Statements
+    </a>
+
+    <a
+        href="{{ url_for('dashboard') }}"
+        class="secondary">
+        Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>

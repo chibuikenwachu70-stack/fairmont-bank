@@ -1,0 +1,489 @@
+
+/* =========================================================
+   FAIRMONT BANK
+   WELCOME / HOME PAGE
+   ========================================================= */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #061225;
+}
+
+.welcome-page {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 50% 10%,
+            rgba(54, 137, 230, 0.28),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 10% 85%,
+            rgba(25, 89, 170, 0.20),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #06152d 0%,
+            #08264d 52%,
+            #041225 100%
+        );
+}
+
+.welcome-page *,
+.welcome-page *::before,
+.welcome-page *::after {
+    box-sizing: border-box;
+}
+
+/* Background glow */
+
+.welcome-page::before {
+    content: "";
+
+    position: absolute;
+
+    width: 520px;
+    height: 520px;
+
+    top: -280px;
+    right: -150px;
+
+    border-radius: 50%;
+
+    background: rgba(66, 153, 225, 0.12);
+
+    filter: blur(15px);
+
+    pointer-events: none;
+}
+
+.welcome-page::after {
+    content: "";
+
+    position: absolute;
+
+    width: 620px;
+    height: 300px;
+
+    bottom: -200px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    background: rgba(18, 80, 155, 0.18);
+
+    filter: blur(30px);
+
+    pointer-events: none;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.welcome-page .welcome-content,
+.welcome-page > .welcome-content {
+    width: 100%;
+    max-width: 680px;
+
+    margin: 0 auto;
+
+    padding:
+        45px
+        28px
+        30px;
+
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+/* =========================================================
+   BRAND MARK
+   ========================================================= */
+
+.welcome-page .brand-mark,
+.welcome-page .welcome-logo,
+.welcome-page .logo-mark,
+.welcome-page .logo {
+    width: 76px;
+    height: 76px;
+
+    margin: 0 auto 20px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 23px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #dcecff
+        );
+
+    color: #0b2b57;
+
+    font-size: 35px;
+    font-weight: 850;
+
+    letter-spacing: -0.04em;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.30),
+        0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* =========================================================
+   BRAND NAME
+   ========================================================= */
+
+.welcome-page .brand-name,
+.welcome-page .bank-name,
+.welcome-page .welcome-brand {
+    color: #ffffff;
+
+    font-size: 28px;
+
+    line-height: 1.1;
+
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   EYEBROW
+   ========================================================= */
+
+.welcome-page .welcome-eyebrow,
+.welcome-page .eyebrow,
+.welcome-page .welcome-label {
+    margin: 25px 0 10px;
+
+    color: #86c8ff;
+
+    font-size: 12px;
+
+    font-weight: 750;
+
+    letter-spacing: 0.18em;
+
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   MAIN TITLE
+   ========================================================= */
+
+.welcome-page h1,
+.welcome-page .welcome-title {
+    margin:
+        0
+        0
+        16px;
+
+    color: #ffffff;
+
+    font-size: clamp(42px, 7vw, 68px);
+
+    line-height: 0.98;
+
+    font-weight: 800;
+
+    letter-spacing: -0.045em;
+}
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.welcome-page p {
+    max-width: 560px;
+
+    margin:
+        0
+        auto
+        30px;
+
+    color: #a9c3df;
+
+    font-size: 17px;
+
+    line-height: 1.65;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.welcome-page .welcome-actions,
+.welcome-page .actions,
+.welcome-page .button-group {
+    width: 100%;
+
+    max-width: 430px;
+
+    display: flex;
+
+    gap: 12px;
+
+    justify-content: center;
+
+    margin-top: 5px;
+}
+
+.welcome-page .welcome-actions a,
+.welcome-page .actions a,
+.welcome-page .button-group a {
+    flex: 1;
+
+    min-height: 54px;
+
+    padding:
+        15px
+        20px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+/* Primary button */
+
+.welcome-page .welcome-actions a:first-child,
+.welcome-page .actions a:first-child,
+.welcome-page .button-group a:first-child {
+    background:
+        linear-gradient(
+            135deg,
+            #2d9fe8,
+            #48c4ef
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 14px 32px rgba(30, 145, 220, 0.25);
+}
+
+/* Secondary button */
+
+.welcome-page .welcome-actions a:nth-child(2),
+.welcome-page .actions a:nth-child(2),
+.welcome-page .button-group a:nth-child(2) {
+    border: 1px solid rgba(151, 203, 246, 0.28);
+
+    background: rgba(255, 255, 255, 0.055);
+
+    color: #dceeff;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.welcome-page .welcome-actions a:hover,
+.welcome-page .actions a:hover,
+.welcome-page .button-group a:hover {
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.welcome-page .welcome-footer {
+    position: absolute;
+
+    z-index: 3;
+
+    left: 0;
+    right: 0;
+
+    bottom: 24px;
+
+    width: 100%;
+
+    padding:
+        0
+        20px;
+
+    text-align: center;
+
+    color: #7693b4;
+
+    font-size: 12px;
+
+    letter-spacing: 0.02em;
+}
+
+.welcome-page .footer-dot {
+    color: #55bdf0;
+
+    margin-right: 6px;
+}
+
+/* =========================================================
+   GENERAL LINKS
+   ========================================================= */
+
+.welcome-page a {
+    text-decoration: none;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .welcome-page {
+        min-height: 100dvh;
+    }
+
+    .welcome-page .welcome-content,
+    .welcome-page > .welcome-content {
+        padding:
+            30px
+            18px
+            90px;
+    }
+
+    .welcome-page .brand-mark,
+    .welcome-page .welcome-logo,
+    .welcome-page .logo-mark,
+    .welcome-page .logo {
+        width: 65px;
+        height: 65px;
+
+        margin-bottom: 17px;
+
+        border-radius: 20px;
+
+        font-size: 30px;
+    }
+
+    .welcome-page .brand-name,
+    .welcome-page .bank-name,
+    .welcome-page .welcome-brand {
+        font-size: 23px;
+    }
+
+    .welcome-page h1,
+    .welcome-page .welcome-title {
+        font-size: 42px;
+    }
+
+    .welcome-page p {
+        font-size: 15px;
+
+        line-height: 1.55;
+    }
+
+    .welcome-page .welcome-actions,
+    .welcome-page .actions,
+    .welcome-page .button-group {
+        flex-direction: column;
+
+        max-width: 360px;
+    }
+
+    .welcome-page .welcome-actions a,
+    .welcome-page .actions a,
+    .welcome-page .button-group a {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 390px) {
+
+    .welcome-page .welcome-content,
+    .welcome-page > .welcome-content {
+        padding:
+            24px
+            14px
+            85px;
+    }
+
+    .welcome-page h1,
+    .welcome-page .welcome-title {
+        font-size: 36px;
+    }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .welcome-page *,
+    .welcome-page *::before,
+    .welcome-page *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}

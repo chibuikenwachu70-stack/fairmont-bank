@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fairmont Bank — Customer Management</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #071426;
+            color: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        .header {
+            min-height: 76px;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: #08182b;
+            border-bottom: 1px solid rgba(184, 149, 74, 0.18);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .back-link {
+            color: #9fb3cc;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            color: #d8b96a;
+        }
+
+        .logo {
+            display: block;
+            width: 175px;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 1px solid rgba(255, 255, 255, 0.10);
+            padding-left: 18px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .header-title p {
+            margin: 4px 0 0;
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .admin-info {
+            color: #9fb3cc;
+            font-size: 12px;
+        }
+
+        .admin-info strong {
+            color: #d8b96a;
+        }
+
+        /* CONTENT */
+
+        .content {
+            padding: 28px;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        .page-intro {
+            margin-bottom: 22px;
+        }
+
+        .page-intro h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .page-intro p {
+            margin: 7px 0 0;
+            color: #71869e;
+            font-size: 12px;
+        }
+
+        /* SEARCH */
+
+        .search-panel {
+            margin-bottom: 20px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 0;
+            height: 46px;
+            padding: 0 14px;
+            border: 1px solid rgba(159, 179, 204, 0.18);
+            border-radius: 9px;
+            background: rgba(255, 255, 255, 0.045);
+            color: #ffffff;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .search-input::placeholder {
+            color: #637991;
+        }
+
+        .search-input:focus {
+            border-color: rgba(184, 149, 74, 0.6);
+        }
+
+        .search-button {
+            height: 46px;
+            padding: 0 22px;
+            border: 0;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #b8954a, #d8b96a);
+            color: #081426;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .clear-link {
+            height: 46px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #9fb3cc;
+            font-size: 12px;
+        }
+
+        .clear-link:hover {
+            color: #d8b96a;
+        }
+
+        /* CUSTOMER TABLE */
+
+        .table-panel {
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        .table-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .table-header strong {
+            font-size: 13px;
+        }
+
+        .customer-count {
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 13px 15px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.025);
+            color: #71869e;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.045);
+            color: #cbd7e3;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.018);
+        }
+
+        .customer-name {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .customer-id {
+            margin-top: 4px;
+            color: #637991;
+            font-size: 9px;
+        }
+
+        .account-number {
+            color: #aebed0;
+            font-family: Consolas, monospace;
+            font-size: 11px;
+        }
+
+        .balance {
+            color: #d8b96a;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .status-active {
+            color: #9bd5b4;
+            background: rgba(74, 180, 125, 0.09);
+            border: 1px solid rgba(74, 180, 125, 0.20);
+        }
+
+        .status-other {
+            color: #e0b6b6;
+            background: rgba(190, 82, 82, 0.08);
+            border: 1px solid rgba(190, 82, 82, 0.18);
+        }
+
+        .view-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 34px;
+            padding: 0 13px;
+            border-radius: 8px;
+            border: 1px solid rgba(184, 149, 74, 0.28);
+            background: rgba(184, 149, 74, 0.07);
+            color: #d8b96a;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .view-button:hover {
+            background: rgba(184, 149, 74, 0.13);
+        }
+
+        .empty {
+            padding: 55px 20px;
+            text-align: center;
+            color: #71869e;
+            font-size: 12px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 15px 17px;
+                align-items: flex-start;
+            }
+
+            .header-left {
+                gap: 12px;
+            }
+
+            .logo {
+                width: 145px;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .admin-info {
+                display: none;
+            }
+
+            .content {
+                padding: 18px 14px;
+            }
+
+            .page-intro h2 {
+                font-size: 19px;
+            }
+
+            .search-form {
+                flex-wrap: wrap;
+            }
+
+            .search-input {
+                flex: 1 1 100%;
+            }
+
+            .search-button,
+            .clear-link {
+                flex: 0 0 auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="back-link">
+                ← Dashboard
+            </a>
+
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank"
+                class="logo">
+
+            <div class="header-title">
+                <h1>Customer Management</h1>
+                <p>Customer administration</p>
+            </div>
+
+        </div>
+
+        <div class="admin-info">
+            Administrator:
+            <strong>{{ admin.username }}</strong>
+        </div>
+
+    </header>
+
+
+    <main class="content">
+
+        <section class="page-intro">
+
+            <h2>Customer Management</h2>
+
+            <p>
+                View customer accounts and access individual customer profiles.
+            </p>
+
+        </section>
+
+
+        <section class="search-panel">
+
+            <form
+                method="GET"
+                action="{{ url_for('admin_customers') }}"
+                class="search-form">
+
+                <input
+                    type="text"
+                    name="search"
+                    class="search-input"
+                    value="{{ search }}"
+                    placeholder="Search by name, Customer ID, account number, email or phone...">
+
+                <button
+                    type="submit"
+                    class="search-button">
+                    Search
+                </button>
+
+                {% if search %}
+                    <a
+                        href="{{ url_for('admin_customers') }}"
+                        class="clear-link">
+                        Clear
+                    </a>
+                {% endif %}
+
+            </form>
+
+        </section>
+
+
+        <section class="table-panel">
+
+            <div class="table-header">
+
+                <strong>Customer Accounts</strong>
+
+                <span class="customer-count">
+                    {{ customers|length }} customer{% if customers|length != 1 %}s{% endif %}
+                </span>
+
+            </div>
+
+
+            {% if customers %}
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Customer</th>
+                                <th>Account Number</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Account Type</th>
+                                <th>Country</th>
+                                <th>Status</th>
+                                <th>Balance</th>
+                                <th></th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for customer in customers %}
+
+                                <tr>
+
+                                    <td>
+                                        <div class="customer-name">
+                                            {{ customer.full_name }}
+                                        </div>
+
+                                        <div class="customer-id">
+                                            {{ customer.customer_id }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="account-number">
+                                            {{ customer.account_number or "Not assigned" }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        {{ customer.email }}
+                                    </td>
+
+                                    <td>
+                                        {{ customer.phone }}
+                                    </td>
+
+                                    <td>
+                                        {{ customer.account_type|title }}
+                                    </td>
+
+                                    <td>
+                                        {{ customer.country|title }}
+                                    </td>
+
+                                    <td>
+
+                                        {% if customer.account_status == "Active" %}
+
+                                            <span class="status status-active">
+                                                Active
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="status status-other">
+                                                {{ customer.account_status }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        <span class="balance">
+                                            {{ customer.preferred_currency_display or "GBP" }}
+                                            {{ "{:,.2f}".format(customer.account_balance or 0) }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+
+                                        <a
+                                            href="{{ url_for(
+                                                'admin_customer_profile',
+                                                customer_id=customer.id
+                                            ) }}"
+                                            class="view-button">
+                                            View
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty">
+
+                    {% if search %}
+                        No customers matched "{{ search }}".
+                    {% else %}
+                        No customer accounts were found.
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

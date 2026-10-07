@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bank Statements Lock & Unlock - Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(35, 76, 125, 0.28), transparent 38%),
+                linear-gradient(180deg, #07182d 0%, #061426 100%);
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 22px 18px 45px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .back {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #ffffff;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
+            font-size: 22px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            margin: 5px 0 0;
+            color: rgba(255,255,255,0.58);
+            font-size: 13px;
+        }
+
+        .card {
+            padding: 22px;
+            border-radius: 18px;
+            background: rgba(13, 34, 59, 0.82);
+            border: 1px solid rgba(255,255,255,0.09);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+        }
+
+        .status-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.045);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .status-label {
+            margin: 0 0 6px;
+            color: rgba(255,255,255,0.55);
+            font-size: 12px;
+        }
+
+        .status {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .status.unlocked {
+            color: #78e3a7;
+        }
+
+        .status.locked {
+            color: #ffb4bd;
+        }
+
+        .description {
+            margin: 0 0 22px;
+            color: rgba(255,255,255,0.62);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        button {
+            width: 100%;
+            border: 0;
+            border-radius: 13px;
+            padding: 14px 18px;
+            background: #2e78d1;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.92;
+        }
+
+        .warning {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.52);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                padding: 18px 14px 35px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .status-box {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+
+        <a href="{{ url_for('settings') }}" class="back">
+            ‹
+        </a>
+
+        <div>
+            <h1>Bank Statements</h1>
+            <p class="subtitle">
+                Lock or unlock access to your bank statements
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="status-box">
+
+            <div>
+                <p class="status-label">
+                    Current Status
+                </p>
+
+                {% if customer.bank_statements_locked %}
+                    <p class="status locked">
+                        Locked
+                    </p>
+                {% else %}
+                    <p class="status unlocked">
+                        Unlocked
+                    </p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <p class="description">
+            When bank statements are locked, access to your Bank Statements
+            page will be restricted. Your existing transaction records remain
+            safely stored and are not deleted.
+        </p>
+
+        <form method="POST">
+
+            {% if customer.bank_statements_locked %}
+
+                <button type="submit">
+                    Unlock Bank Statements
+                </button>
+
+            {% else %}
+
+                <button type="submit">
+                    Lock Bank Statements
+                </button>
+
+            {% endif %}
+
+        </form>
+
+        <div class="warning">
+            Locking statements only controls access to the statement page.
+            It does not delete, modify, or remove your transaction history.
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

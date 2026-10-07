@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Bill Payment | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(43, 83, 145, 0.28), transparent 38%),
+                linear-gradient(145deg, #061426, #0b1d34 55%, #071426);
+            color: #ffffff;
+        }
+
+        .page {
+            width: min(100%, 680px);
+            margin: 0 auto;
+            padding: 35px 18px 45px;
+        }
+
+        .card {
+            background: rgba(16, 36, 62, 0.82);
+            border: 1px solid rgba(159, 190, 229, 0.16);
+            border-radius: 24px;
+            padding: 28px 20px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+            text-align: center;
+        }
+
+        .success {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 27px;
+        }
+
+        .intro {
+            color: #9fb1c9;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .details {
+            text-align: left;
+            background: rgba(7, 22, 40, 0.72);
+            border-radius: 17px;
+            padding: 5px 16px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(159, 190, 229, 0.1);
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+        }
+
+        .label {
+            color: #8297b4;
+            font-size: 13px;
+        }
+
+        .value {
+            text-align: right;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .amount {
+            font-size: 21px;
+        }
+
+        .actions {
+            display: grid;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .button {
+            display: block;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 13px;
+            font-weight: 700;
+        }
+
+        .primary {
+            background: #e8eef8;
+            color: #071426;
+        }
+
+        .secondary {
+            background: rgba(255,255,255,0.06);
+            color: #dbe6f5;
+            border: 1px solid rgba(159, 190, 229, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="card">
+
+        <div class="success">✓</div>
+
+        <h1>Electric Bill Payment Complete</h1>
+
+        <p class="intro">
+            Your electricity payment has been recorded successfully.
+        </p>
+
+        <div class="details">
+
+            <div class="row">
+                <span class="label">Provider</span>
+                <span class="value">{{ provider }}</span>
+            </div>
+
+            <div class="row">
+                <span class="label">Meter / account number</span>
+                <span class="value">{{ meter_number }}</span>
+            </div>
+
+            <div class="row">
+                <span class="label">Amount</span>
+                <span class="value amount">
+                    £{{ "%.2f"|format(amount) }}
+                </span>
+            </div>
+
+            {% if payment_reference %}
+            <div class="row">
+                <span class="label">Payment reference</span>
+                <span class="value">{{ payment_reference }}</span>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <span class="label">Transaction reference</span>
+                <span class="value">{{ transaction_reference }}</span>
+            </div>
+
+            <div class="row">
+                <span class="label">Status</span>
+                <span class="value">Completed</span>
+            </div>
+
+            <div class="row">
+                <span class="label">New balance</span>
+                <span class="value">
+                    £{{ "%.2f"|format(new_balance) }}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="actions">
+
+            <a
+                class="button primary"
+                href="/transaction/{{ transaction_reference }}">
+                View Transaction
+            </a>
+
+            <a
+                class="button secondary"
+                href="/transactions">
+                Transaction History
+            </a>
+
+            <a
+                class="button secondary"
+                href="{{ url_for('dashboard') }}">
+                Back to Services
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

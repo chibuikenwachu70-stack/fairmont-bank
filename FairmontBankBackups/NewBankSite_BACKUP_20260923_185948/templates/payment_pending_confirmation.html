@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Submitted - Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(184,149,74,0.12), transparent 30%),
+                #07111f;
+            color: #eef3f8;
+        }
+
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 34px;
+        }
+
+        .logo img {
+            width: 210px;
+            max-width: 80%;
+            height: auto;
+        }
+
+        .card {
+            background: rgba(10, 24, 39, 0.94);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 34px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: rgba(184,149,74,0.12);
+            border: 1px solid rgba(184,149,74,0.30);
+            color: #d8b96a;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 28px;
+        }
+
+        .intro {
+            margin: 0 0 26px;
+            color: #aebdcd;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .notice {
+            padding: 15px 16px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            background: rgba(184,149,74,0.08);
+            border: 1px solid rgba(184,149,74,0.22);
+            color: #d8b96a;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .detail {
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .label {
+            color: #8193a7;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 6px;
+        }
+
+        .value {
+            color: #eef3f8;
+            font-size: 14px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .amount {
+            color: #d8b96a;
+            font-size: 21px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .primary {
+            background: #d8b96a;
+            color: #07111f;
+        }
+
+        .secondary {
+            color: #d8b96a;
+            border: 1px solid rgba(184,149,74,0.30);
+            background: rgba(184,149,74,0.06);
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                padding: 24px 14px;
+            }
+
+            .card {
+                padding: 24px 20px;
+            }
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+
+        <div class="logo">
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank">
+        </div>
+
+        <section class="card">
+
+            <div class="icon">✓</div>
+
+            <h1>Payment Submitted for Approval</h1>
+
+            <p class="intro">
+                Your payment request has been securely submitted to Fairmont Bank
+                for review. The payment has not been completed yet and your account
+                balance has not been changed.
+            </p>
+
+            <div class="notice">
+                Please allow the bank's authorized support team to review the
+                payment. Once approved, the transaction will be posted to your
+                account.
+            </div>
+
+            <div class="details">
+
+                <div class="detail">
+                    <div class="label">Payment Reference</div>
+                    <div class="value">
+                        {{ approval.payment_reference }}
+                    </div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Status</div>
+                    <div class="value">
+                        Pending Approval
+                    </div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Payment Type</div>
+                    <div class="value">
+                        {{ approval.payment_type }}
+                    </div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Amount</div>
+                    <div class="value amount">
+                        £{{ "{:,.2f}".format(amount) }}
+                    </div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Recipient / Provider</div>
+                    <div class="value">
+                        {{ recipient_name }}
+                    </div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Reference</div>
+                    <div class="value">
+                        {{ reference or "Not provided" }}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="actions">
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="button primary">
+                    Return to Dashboard
+                </a>
+
+                <a
+                    href="{{ url_for('transactions') }}"
+                    class="button secondary">
+                    View Transactions
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+</body>
+</html>

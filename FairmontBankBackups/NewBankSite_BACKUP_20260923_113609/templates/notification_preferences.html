@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notification Preferences | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(35, 83, 145, 0.22), transparent 32%),
+                linear-gradient(145deg, #061426, #0a1c32 55%, #071426);
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 24px 18px 40px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .back-button {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            text-decoration: none;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
+            font-size: 24px;
+        }
+
+        .topbar-text h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .topbar-text p {
+            margin: 5px 0 0;
+            color: #9fb0c5;
+            font-size: 13px;
+        }
+
+        .intro {
+            margin-bottom: 18px;
+        }
+
+        .intro h2 {
+            margin: 0 0 7px;
+            font-size: 18px;
+        }
+
+        .intro p {
+            margin: 0;
+            color: #9fb0c5;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .preferences-card {
+            background: rgba(15, 35, 59, 0.88);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+        }
+
+        .preference-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 20px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .preference-row:last-child {
+            border-bottom: none;
+        }
+
+        .preference-info {
+            flex: 1;
+        }
+
+        .preference-info h3 {
+            margin: 0 0 6px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .preference-info p {
+            margin: 0;
+            color: #91a3b8;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .switch {
+            position: relative;
+            width: 52px;
+            height: 30px;
+            flex: 0 0 auto;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #33465d;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            left: 4px;
+            top: 4px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .switch input:checked + .slider {
+            background: #2f8cff;
+        }
+
+        .switch input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .save-area {
+            margin-top: 18px;
+        }
+
+        .save-button {
+            width: 100%;
+            border: 0;
+            border-radius: 13px;
+            padding: 15px;
+            background: #1f78e5;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background: #2787f5;
+        }
+
+        .note {
+            margin-top: 14px;
+            color: #8295aa;
+            font-size: 12px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        @media (max-width: 520px) {
+            .page {
+                padding: 18px 14px 32px;
+            }
+
+            .preference-row {
+                padding: 18px 15px;
+            }
+
+            .preference-info h3 {
+                font-size: 14px;
+            }
+
+            .preference-info p {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="topbar">
+        <a href="{{ url_for('settings') }}" class="back-button" aria-label="Back">
+            ‹
+        </a>
+
+        <div class="topbar-text">
+            <h1>Notification Preferences</h1>
+            <p>Manage your Fairmont Bank notifications</p>
+        </div>
+    </div>
+
+    <div class="intro">
+        <h2>Choose your notifications</h2>
+        <p>
+            Select the types of notifications you would like to receive
+            for your account.
+        </p>
+    </div>
+
+    <form method="POST">
+
+        <div class="preferences-card">
+
+            <div class="preference-row">
+                <div class="preference-info">
+                    <h3>Transaction Notifications</h3>
+                    <p>
+                        Receive notifications about payments, transfers,
+                        deposits and other account transactions.
+                    </p>
+                </div>
+
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        name="transaction_notifications"
+                        {% if customer.transaction_notifications %}checked{% endif %}
+                    >
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-row">
+                <div class="preference-info">
+                    <h3>Security Notifications</h3>
+                    <p>
+                        Receive important security and account-access
+                        notifications.
+                    </p>
+                </div>
+
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        name="security_notifications"
+                        {% if customer.security_notifications %}checked{% endif %}
+                    >
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-row">
+                <div class="preference-info">
+                    <h3>Account Notifications</h3>
+                    <p>
+                        Receive important information about your account
+                        and banking services.
+                    </p>
+                </div>
+
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        name="account_notifications"
+                        {% if customer.account_notifications %}checked{% endif %}
+                    >
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-row">
+                <div class="preference-info">
+                    <h3>Promotional Notifications</h3>
+                    <p>
+                        Receive optional information about offers,
+                        promotions and new services.
+                    </p>
+                </div>
+
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        name="promotional_notifications"
+                        {% if customer.promotional_notifications %}checked{% endif %}
+                    >
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+        </div>
+
+        <div class="save-area">
+            <button type="submit" class="save-button">
+                Save Preferences
+            </button>
+        </div>
+
+        <div class="note">
+            Your notification preferences apply to this Fairmont Bank account.
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

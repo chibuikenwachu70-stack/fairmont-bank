@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Transaction Details | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <main class="transaction-page">
+
+        <div class="transaction-shell">
+
+            <header class="transaction-header">
+
+                <a
+                    href="/transactions"
+                    class="transaction-back-button">
+
+                    ←
+
+                </a>
+
+                <div>
+
+                    <p class="transaction-eyebrow">
+                        FAIRMONT BANK
+                    </p>
+
+                    <h1>
+                        Transaction Details
+                    </h1>
+
+                </div>
+
+            </header>
+
+
+            <section class="transaction-detail-card">
+
+                <div class="transaction-detail-status">
+
+                    {% if transaction.direction == "Credit" %}
+
+                        <div class="transaction-large-icon transaction-credit">
+                            ↓
+                        </div>
+
+                    {% else %}
+
+                        <div class="transaction-large-icon transaction-debit">
+                            ↑
+                        </div>
+
+                    {% endif %}
+
+
+                    <p class="transaction-detail-label">
+                        {{ transaction.status }}
+                    </p>
+
+                    <h2>
+
+                        {% if transaction.direction == "Credit" %}
+                            +
+                        {% else %}
+                            -
+                        {% endif %}
+
+                        £{{ "{:,.2f}".format(transaction.amount) }}
+
+                    </h2>
+
+                    <span>
+                        {{ transaction.description }}
+                    </span>
+
+                </div>
+
+
+                <div class="transaction-detail-list">
+
+
+                    <div class="transaction-detail-row">
+
+                        <span>
+                            Transaction reference
+                        </span>
+
+                        <strong>
+                            {{ transaction.transaction_reference }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="transaction-detail-row">
+
+                        <span>
+                            Transaction type
+                        </span>
+
+                        <strong>
+                            {{ transaction.transaction_type }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="transaction-detail-row">
+
+                        <span>
+                            Direction
+                        </span>
+
+                        <strong>
+                            {{ transaction.direction }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="transaction-detail-row">
+
+                        <span>
+                            Date and time
+                        </span>
+
+                        <strong>
+                            {{ transaction.created_at.strftime("%d %B %Y, %H:%M") }}
+                        </strong>
+
+                    </div>
+
+
+                    {% if transaction.counterparty %}
+
+                    <div class="transaction-detail-row">
+
+                        <span>
+                            Other party
+                        </span>
+
+                        <strong>
+                            {{ transaction.counterparty }}
+                        </strong>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <div class="transaction-detail-row">
+
+                        <span>
+                            Balance after transaction
+                        </span>
+
+                        <strong>
+                            £{{ "{:,.2f}".format(transaction.balance_after) }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="transaction-detail-row">
+
+                        <span>
+                            Status
+                        </span>
+
+                        <strong class="transaction-status-value">
+                            {{ transaction.status }}
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <a
+                href="/transactions"
+                class="transaction-dashboard-button">
+
+                Back to transaction history
+
+            </a>
+
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

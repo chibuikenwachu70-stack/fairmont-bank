@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Transfer | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(42, 90, 150, 0.28), transparent 35%),
+                linear-gradient(145deg, #06111f, #0a1727 55%, #071321);
+            color: #eef5ff;
+            padding: 20px;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .back {
+            color: #b8d5ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back:hover {
+            color: white;
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .card {
+            background: rgba(10, 25, 43, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+            backdrop-filter: blur(18px);
+        }
+
+        .heading {
+            margin-bottom: 24px;
+        }
+
+        .heading h1 {
+            margin: 0 0 8px;
+            font-size: 27px;
+        }
+
+        .heading p {
+            margin: 0;
+            color: #91a8c3;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .balance {
+            margin-bottom: 22px;
+            padding: 15px 17px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .balance-label {
+            color: #8da6c2;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .balance-value {
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            margin: 25px 0 13px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #dceaff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12px;
+            color: #9eb4cc;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            background: rgba(3, 12, 22, 0.68);
+            color: #f1f6ff;
+            border-radius: 13px;
+            padding: 13px 14px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: rgba(103, 169, 255, 0.62);
+            box-shadow: 0 0 0 3px rgba(68, 133, 207, 0.12);
+        }
+
+        textarea {
+            min-height: 82px;
+            resize: vertical;
+        }
+
+        .picker-trigger {
+            width: 100%;
+            min-height: 47px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            background: rgba(3, 12, 22, 0.68);
+            color: #f1f6ff;
+            border-radius: 13px;
+            padding: 13px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .picker-trigger:hover {
+            border-color: rgba(103, 169, 255, 0.5);
+        }
+
+        .picker-placeholder {
+            color: #7389a2;
+        }
+
+        .picker-arrow {
+            color: #8ba6c4;
+            font-size: 12px;
+        }
+
+        .hidden-select {
+            display: none;
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 15px;
+            border: 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2f73c7, #3c8ce0);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            filter: brightness(1.08);
+        }
+
+        .notice {
+            margin-top: 17px;
+            padding: 13px 14px;
+            border-radius: 13px;
+            background: rgba(52, 105, 166, 0.09);
+            border: 1px solid rgba(91, 157, 224, 0.12);
+            color: #8fa9c5;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .flash {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(173, 61, 61, 0.15);
+            border: 1px solid rgba(229, 100, 100, 0.25);
+            color: #ffc2c2;
+            font-size: 13px;
+        }
+
+        /* ======================================================
+           SHARED PICKER
+           ====================================================== */
+
+        .picker-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.58);
+            z-index: 9000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .picker-overlay.open {
+            display: flex;
+        }
+
+        .picker-modal {
+            width: 100%;
+            max-width: 480px;
+            max-height: min(650px, calc(100vh - 40px));
+            background: #0b1a2d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .picker-header {
+            flex: 0 0 auto;
+            padding: 16px;
+            background: #0b1a2d;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            z-index: 2;
+        }
+
+        .picker-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .picker-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .picker-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            color: #d6e4f5;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .picker-search {
+            width: 100%;
+            height: 45px;
+            margin: 0;
+            background: rgba(0, 0, 0, 0.28);
+        }
+
+        .picker-options {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 7px;
+            scrollbar-width: thin;
+        }
+
+        .picker-option {
+            width: 100%;
+            padding: 13px 14px;
+            border: 0;
+            border-radius: 11px;
+            background: transparent;
+            color: #dce9f8;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .picker-option:hover {
+            background: rgba(67, 133, 204, 0.16);
+        }
+
+        .picker-option.selected {
+            background: rgba(67, 133, 204, 0.22);
+            color: #ffffff;
+        }
+
+        .empty-option {
+            padding: 18px 14px;
+            color: #758ba4;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 18px;
+                border-radius: 20px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .heading h1 {
+                font-size: 24px;
+            }
+
+            .picker-overlay {
+                padding: 12px;
+            }
+
+            .picker-modal {
+                max-height: calc(100vh - 24px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="topbar">
+        <a class="back" href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+        <div class="brand">Fairmont Bank</div>
+    </div>
+
+    <div class="card">
+
+        <div class="heading">
+            <h1>International Transfer</h1>
+            <p>
+                Send a payment to a bank account outside Fairmont Bank.
+                Enter the recipient and banking details carefully before submitting.
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="balance">
+            <div class="balance-label">Available Balance</div>
+            <div class="balance-value">
+                £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('international_transfer') }}" id="internationalForm">
+
+            <div class="section-title">Destination</div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>Country *</label>
+
+                    <button
+                        type="button"
+                        class="picker-trigger"
+                        data-picker="country"
+                        id="countryTrigger"
+                    >
+                        <span id="countryDisplay" class="picker-placeholder">
+                            Select country
+                        </span>
+                        <span class="picker-arrow">▼</span>
+                    </button>
+
+                    <select name="country" id="countrySelect" class="hidden-select" required>
+                        <option value="">Select country</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Currency *</label>
+
+                    <button
+                        type="button"
+                        class="picker-trigger"
+                        data-picker="currency"
+                        id="currencyTrigger"
+                    >
+                        <span id="currencyDisplay" class="picker-placeholder">
+                            Select currency
+                        </span>
+                        <span class="picker-arrow">▼</span>
+                    </button>
+
+                    <select name="currency" id="currencySelect" class="hidden-select" required>
+                        <option value="">Select currency</option>
+                    </select>
+                </div>
+
+                <div class="field full">
+                    <label>Bank *</label>
+
+                    <button
+                        type="button"
+                        class="picker-trigger"
+                        data-picker="bank"
+                        id="bankTrigger"
+                    >
+                        <span id="bankDisplay" class="picker-placeholder">
+                            Select country first
+                        </span>
+                        <span class="picker-arrow">▼</span>
+                    </button>
+
+                    <select name="bank_name" id="bankSelect" class="hidden-select" required>
+                        <option value="">Select bank</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="section-title">Recipient Details</div>
+
+            <div class="grid">
+
+                <div class="field full">
+                    <label>Recipient Full Name *</label>
+                    <input
+                        type="text"
+                        name="recipient_name"
+                        placeholder="Enter recipient's full name"
+                        required
+                    >
+                </div>
+
+                <div class="field full">
+                    <label>Recipient Address *</label>
+                    <textarea
+                        name="recipient_address"
+                        placeholder="Enter recipient's full address"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Account Number / IBAN *</label>
+                    <input
+                        type="text"
+                        name="account_number"
+                        placeholder="Account number or IBAN"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label>SWIFT / BIC *</label>
+                    <input
+                        type="text"
+                        name="swift_bic"
+                        placeholder="SWIFT / BIC"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Local Bank Code</label>
+                    <input
+                        type="text"
+                        name="local_bank_code"
+                        placeholder="Optional local bank code"
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Amount *</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+                </div>
+
+                <div class="field full">
+                    <label>Payment Reference</label>
+                    <input
+                        type="text"
+                        name="reference"
+                        maxlength="120"
+                        placeholder="Optional payment reference"
+                    >
+                </div>
+
+            </div>
+
+            <button type="submit" class="submit-button">
+                Review International Transfer
+            </button>
+
+        </form>
+
+        <div class="notice">
+            International transfers are recorded as pending for processing.
+            Your available balance is not debited by this submission step.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     SHARED PICKER POPUP
+     ============================================================ -->
+
+<div class="picker-overlay" id="pickerOverlay">
+
+    <div class="picker-modal" id="pickerModal">
+
+        <div class="picker-header">
+
+            <div class="picker-header-row">
+                <div class="picker-title" id="pickerTitle">
+                    Select
+                </div>
+
+                <button
+                    type="button"
+                    class="picker-close"
+                    id="pickerClose"
+                >
+                    ×
+                </button>
+            </div>
+
+            <input
+                type="text"
+                id="pickerSearch"
+                class="picker-search"
+                placeholder="Search..."
+                autocomplete="off"
+            >
+
+        </div>
+
+        <div class="picker-options" id="pickerOptions"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+const COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+
+const BANKS_BY_COUNTRY = {"United Kingdom": ["Allied Irish Bank (GB)", "Bank of Ireland UK", "Bank of Scotland", "Barclays Bank", "Birmingham Bank", "Card One Money", "Cashplus Bank", "Chase UK", "Citibank UK", "ClearBank", "C. Hoare & Co.", "Co-operative Bank", "Coutts", "Danske Bank", "First Direct", "Halifax", "Handelsbanken UK", "HSBC UK", "Investec Bank", "Lloyds Bank", "Metro Bank", "Monzo Bank", "Nationwide Building Society", "NatWest", "Revolut", "Royal Bank of Scotland", "Santander UK", "Skipton Building Society", "Starling Bank", "TSB Bank", "Ulster Bank", "Virgin Money", "Yorkshire Building Society", "Zopa Bank", "Other UK Bank or Building Society"], "United States": ["JPMorgan Chase", "Bank of America", "Wells Fargo", "Citibank", "U.S. Bank", "PNC Bank", "Truist", "Capital One", "TD Bank", "Goldman Sachs Bank USA", "Other US Bank"], "Canada": ["Royal Bank of Canada", "Toronto-Dominion Bank", "Bank of Montreal", "Bank of Nova Scotia", "Canadian Imperial Bank of Commerce", "National Bank of Canada", "Desjardins", "Other Canadian Bank"], "Kenya": ["KCB Bank Kenya", "Equity Bank Kenya", "Co-operative Bank of Kenya", "Absa Bank Kenya", "NCBA Bank Kenya", "Stanbic Bank Kenya", "I&M Bank", "Diamond Trust Bank", "Family Bank", "Sidian Bank", "Prime Bank", "Other Kenyan Bank"], "Nigeria": ["Access Bank", "Guaranty Trust Bank", "Zenith Bank", "First Bank of Nigeria", "United Bank for Africa", "Fidelity Bank", "Union Bank of Nigeria", "Stanbic IBTC Bank", "First City Monument Bank", "Sterling Bank", "Other Nigerian Bank"], "Ghana": ["GCB Bank", "Ecobank Ghana", "Absa Bank Ghana", "Stanbic Bank Ghana", "Standard Chartered Bank Ghana", "Fidelity Bank Ghana", "CalBank", "United Bank for Africa Ghana", "Other Ghanaian Bank"], "South Africa": ["Standard Bank", "First National Bank", "Absa Bank South Africa", "Nedbank", "Capitec Bank", "Investec Bank South Africa", "African Bank", "TymeBank", "Discovery Bank", "Other South African Bank"], "Suriname": ["De Surinaamsche Bank", "Republic Bank Suriname", "Hakrinbank", "Surinaamse Volkscredietbank", "Finabank", "Surichange Bank", "GODO Coöperatieve Spaar- en Kredietbank", "Trustbank Amanah", "Other Surinamese Bank"], "India": ["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank", "IndusInd Bank", "Bank of Baroda", "Punjab National Bank", "Canara Bank", "Union Bank of India", "Other Indian Bank"], "Australia": ["Commonwealth Bank", "Westpac", "ANZ", "National Australia Bank", "Macquarie Bank", "Bendigo Bank", "ING Australia", "Other Australian Bank"], "Germany": ["Deutsche Bank", "Commerzbank", "DZ Bank", "KfW", "ING Germany", "N26", "DKB", "Other German Bank"], "France": ["BNP Paribas", "Crédit Agricole", "Société Générale", "BPCE", "La Banque Postale", "Crédit Mutuel", "HSBC Continental Europe", "Other French Bank"], "Netherlands": ["ING Bank", "ABN AMRO", "Rabobank", "de Volksbank", "Triodos Bank", "Other Dutch Bank"], "Ireland": ["AIB", "Bank of Ireland", "Permanent TSB", "EBS", "Revolut Bank Ireland", "Other Irish Bank"], "Switzerland": ["UBS", "Credit Suisse", "Julius Baer", "Zürcher Kantonalbank", "Raiffeisen Switzerland", "Other Swiss Bank"], "United Arab Emirates": ["Emirates NBD", "First Abu Dhabi Bank", "Abu Dhabi Commercial Bank", "Mashreq", "Dubai Islamic Bank", "Abu Dhabi Islamic Bank", "RAKBANK", "Other UAE Bank"], "Saudi Arabia": ["Saudi National Bank", "Al Rajhi Bank", "Riyad Bank", "Saudi Awwal Bank", "Banque Saudi Fransi", "Arab National Bank", "Bank AlJazira", "Other Saudi Bank"], "Qatar": ["Qatar National Bank", "Qatar Islamic Bank", "Commercial Bank Qatar", "Doha Bank", "Masraf Al Rayan", "Dukhan Bank", "Other Qatari Bank"], "Singapore": ["DBS Bank", "OCBC Bank", "United Overseas Bank", "Standard Chartered Singapore", "Citibank Singapore", "HSBC Singapore", "Maybank Singapore", "Other Singaporean Bank"], "Japan": ["MUFG Bank", "Sumitomo Mitsui Banking Corporation", "Mizuho Bank", "Resona Bank", "Japan Post Bank", "Other Japanese Bank"], "China": ["Industrial and Commercial Bank of China", "China Construction Bank", "Bank of China", "Agricultural Bank of China", "Bank of Communications", "China Merchants Bank", "Other Chinese Bank"], "Brazil": ["Banco do Brasil", "Itaú Unibanco", "Bradesco", "Caixa Econômica Federal", "Santander Brasil", "BTG Pactual", "Other Brazilian Bank"], "Mexico": ["BBVA México", "Banorte", "Santander México", "HSBC México", "Citibanamex", "Scotiabank México", "Other Mexican Bank"]};
+
+const CURRENCIES = [{"code": "GBP", "name": "British Pound Sterling"}, {"code": "EUR", "name": "Euro"}, {"code": "USD", "name": "US Dollar"}, {"code": "CAD", "name": "Canadian Dollar"}, {"code": "AUD", "name": "Australian Dollar"}, {"code": "NZD", "name": "New Zealand Dollar"}, {"code": "CHF", "name": "Swiss Franc"}, {"code": "JPY", "name": "Japanese Yen"}, {"code": "CNY", "name": "Chinese Yuan"}, {"code": "SGD", "name": "Singapore Dollar"}, {"code": "INR", "name": "Indian Rupee"}, {"code": "AED", "name": "UAE Dirham"}, {"code": "SAR", "name": "Saudi Riyal"}, {"code": "QAR", "name": "Qatari Riyal"}, {"code": "ZAR", "name": "South African Rand"}, {"code": "KES", "name": "Kenyan Shilling"}, {"code": "NGN", "name": "Nigerian Naira"}, {"code": "GHS", "name": "Ghanaian Cedi"}, {"code": "TZS", "name": "Tanzanian Shilling"}, {"code": "UGX", "name": "Ugandan Shilling"}, {"code": "BRL", "name": "Brazilian Real"}, {"code": "MXN", "name": "Mexican Peso"}, {"code": "SRD", "name": "Surinamese Dollar"}, {"code": "THB", "name": "Thai Baht"}, {"code": "MYR", "name": "Malaysian Ringgit"}, {"code": "IDR", "name": "Indonesian Rupiah"}, {"code": "KRW", "name": "South Korean Won"}, {"code": "TRY", "name": "Turkish Lira"}, {"code": "PLN", "name": "Polish Zloty"}, {"code": "SEK", "name": "Swedish Krona"}, {"code": "NOK", "name": "Norwegian Krone"}, {"code": "DKK", "name": "Danish Krone"}, {"code": "CZK", "name": "Czech Koruna"}, {"code": "HUF", "name": "Hungarian Forint"}, {"code": "RON", "name": "Romanian Leu"}, {"code": "ILS", "name": "Israeli New Shekel"}];
+
+
+let activePicker = null;
+
+const overlay = document.getElementById("pickerOverlay");
+const pickerTitle = document.getElementById("pickerTitle");
+const pickerSearch = document.getElementById("pickerSearch");
+const pickerOptions = document.getElementById("pickerOptions");
+const pickerClose = document.getElementById("pickerClose");
+
+const countrySelect = document.getElementById("countrySelect");
+const bankSelect = document.getElementById("bankSelect");
+const currencySelect = document.getElementById("currencySelect");
+
+const countryDisplay = document.getElementById("countryDisplay");
+const bankDisplay = document.getElementById("bankDisplay");
+const currencyDisplay = document.getElementById("currencyDisplay");
+
+
+function fillNativeSelect(selectElement, items, valueKey = null, labelKey = null) {
+    selectElement.innerHTML = "";
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select";
+    selectElement.appendChild(placeholder);
+
+    items.forEach(item => {
+        const option = document.createElement("option");
+
+        if (valueKey) {
+            option.value = item[valueKey];
+            option.textContent = labelKey
+                ? item[labelKey]
+                : item[valueKey];
+        } else {
+            option.value = item;
+            option.textContent = item;
+        }
+
+        selectElement.appendChild(option);
+    });
+}
+
+
+function updateBankList() {
+    const country = countrySelect.value;
+
+    bankSelect.innerHTML = "";
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = country
+        ? "Select bank"
+        : "Select country first";
+
+    bankSelect.appendChild(placeholder);
+
+    bankDisplay.textContent = country
+        ? "Select bank"
+        : "Select country first";
+
+    bankDisplay.classList.add("picker-placeholder");
+
+    if (!country) {
+        return;
+    }
+
+    let banks = BANKS_BY_COUNTRY[country];
+
+    if (!banks || banks.length === 0) {
+        banks = ["Other bank in " + country];
+    }
+
+    banks.forEach(bank => {
+        const option = document.createElement("option");
+        option.value = bank;
+        option.textContent = bank;
+        bankSelect.appendChild(option);
+    });
+}
+
+
+function getPickerItems(type) {
+    if (type === "country") {
+        return COUNTRIES.map(country => ({
+            value: country,
+            label: country
+        }));
+    }
+
+    if (type === "bank") {
+        const country = countrySelect.value;
+
+        if (!country) {
+            return [];
+        }
+
+        let banks = BANKS_BY_COUNTRY[country];
+
+        if (!banks || banks.length === 0) {
+            banks = ["Other bank in " + country];
+        }
+
+        return banks.map(bank => ({
+            value: bank,
+            label: bank
+        }));
+    }
+
+    if (type === "currency") {
+        return CURRENCIES.map(currency => ({
+            value: currency.code,
+            label: currency.code + " — " + currency.name
+        }));
+    }
+
+    return [];
+}
+
+
+function openPicker(type) {
+    activePicker = type;
+
+    if (type === "country") {
+        pickerTitle.textContent = "Select Country";
+        pickerSearch.placeholder = "Search countries...";
+    }
+
+    if (type === "bank") {
+        pickerTitle.textContent = "Select Bank";
+        pickerSearch.placeholder = "Search banks...";
+
+        if (!countrySelect.value) {
+            pickerOptions.innerHTML =
+                '<div class="empty-option">Please select a country first.</div>';
+            overlay.classList.add("open");
+            pickerSearch.value = "";
+            pickerSearch.disabled = true;
+            return;
+        }
+    }
+
+    if (type === "currency") {
+        pickerTitle.textContent = "Select Currency";
+        pickerSearch.placeholder = "Search currencies...";
+    }
+
+    pickerSearch.disabled = false;
+    pickerSearch.value = "";
+
+    renderPickerOptions("");
+
+    overlay.classList.add("open");
+
+    setTimeout(() => {
+        pickerSearch.focus();
+    }, 40);
+}
+
+
+function closePicker() {
+    activePicker = null;
+    overlay.classList.remove("open");
+    pickerSearch.value = "";
+    pickerSearch.disabled = false;
+}
+
+
+function renderPickerOptions(searchTerm) {
+    pickerOptions.innerHTML = "";
+
+    const items = getPickerItems(activePicker);
+
+    const normalizedSearch = searchTerm
+        .trim()
+        .toLowerCase();
+
+    const filtered = items.filter(item =>
+        item.label.toLowerCase().includes(normalizedSearch)
+    );
+
+    if (filtered.length === 0) {
+        pickerOptions.innerHTML =
+            '<div class="empty-option">No matching options found.</div>';
+        return;
+    }
+
+    const currentValue =
+        activePicker === "country"
+            ? countrySelect.value
+            : activePicker === "bank"
+                ? bankSelect.value
+                : currencySelect.value;
+
+    filtered.forEach(item => {
+
+        const option = document.createElement("button");
+
+        option.type = "button";
+        option.className = "picker-option";
+
+        if (item.value === currentValue) {
+            option.classList.add("selected");
+        }
+
+        option.textContent = item.label;
+
+        option.addEventListener("click", () => {
+            selectPickerValue(item.value);
+        });
+
+        pickerOptions.appendChild(option);
+    });
+}
+
+
+function selectPickerValue(value) {
+
+    if (activePicker === "country") {
+
+        countrySelect.value = value;
+
+        countryDisplay.textContent = value;
+        countryDisplay.classList.remove("picker-placeholder");
+
+        updateBankList();
+
+    } else if (activePicker === "bank") {
+
+        bankSelect.value = value;
+
+        bankDisplay.textContent = value;
+        bankDisplay.classList.remove("picker-placeholder");
+
+    } else if (activePicker === "currency") {
+
+        currencySelect.value = value;
+
+        const currency = CURRENCIES.find(
+            item => item.code === value
+        );
+
+        currencyDisplay.textContent = currency
+            ? currency.code + " — " + currency.name
+            : value;
+
+        currencyDisplay.classList.remove("picker-placeholder");
+    }
+
+    closePicker();
+}
+
+
+document.querySelectorAll(".picker-trigger").forEach(trigger => {
+
+    trigger.addEventListener("click", () => {
+
+        const type = trigger.dataset.picker;
+
+        if (type === "bank" && !countrySelect.value) {
+            openPicker("bank");
+            return;
+        }
+
+        openPicker(type);
+    });
+});
+
+
+pickerSearch.addEventListener("input", () => {
+
+    if (!activePicker) {
+        return;
+    }
+
+    renderPickerOptions(pickerSearch.value);
+});
+
+
+pickerClose.addEventListener("click", closePicker);
+
+
+overlay.addEventListener("click", event => {
+
+    if (event.target === overlay) {
+        closePicker();
+    }
+});
+
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape" && overlay.classList.contains("open")) {
+        closePicker();
+    }
+});
+
+
+fillNativeSelect(
+    countrySelect,
+    COUNTRIES
+);
+
+fillNativeSelect(
+    currencySelect,
+    CURRENCIES,
+    "code",
+    "name"
+);
+
+updateBankList();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fairmont Bank</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+
+<style id="fairmont-universal-logo">
+.fairmont-page-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto 20px auto;
+}
+
+.fairmont-page-logo {
+    display: block;
+    width: 190px;
+    max-width: 75%;
+    height: auto;
+    object-fit: contain;
+}
+</style>
+
+
+<style id="fairmont-professional-page-logo">
+.fairmont-page-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto 24px auto;
+}
+
+.fairmont-page-logo {
+    display: block;
+    width: 250px;
+    max-width: 82%;
+    height: auto;
+    object-fit: contain;
+}
+
+@media (max-width: 600px) {
+    .fairmont-page-logo {
+        width: 220px;
+        max-width: 84%;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+    <main class="welcome-page">
+
+        <div class="welcome-overlay"></div>
+
+        <section class="welcome-content">
+
+            <div class="brand">
+                <div class="fairmont-page-brand">
+    <img
+        src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+        alt="Fairmont Bank"
+        class="fairmont-page-logo">
+</div>
+            </div>
+
+            <div class="welcome-message">
+                <p class="eyebrow">WELCOME TO FAIRMONT</p>
+
+                <h1>
+                    Banking made<br>
+                    simple.
+                </h1>
+
+                <p class="welcome-text">
+                    Secure, convenient banking designed around you.
+                </p>
+            </div>
+
+            <div class="welcome-actions">
+
+                <a href="/login" class="primary-button">
+                    Sign in
+                </a>
+
+                <a href="/open-account" class="secondary-button">
+                    Open an account
+                </a>
+
+            </div>
+
+            <div class="welcome-footer">
+                <span>Secure banking</span>
+                <span class="footer-dot">•</span>
+                <span>Fairmont Bank</span>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

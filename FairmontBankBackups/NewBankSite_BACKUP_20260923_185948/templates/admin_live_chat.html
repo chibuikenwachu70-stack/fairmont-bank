@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fairmont Bank — Live Chat Administration</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #071426;
+            color: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+
+        .header {
+            height: 76px;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: #08182b;
+            border-bottom: 1px solid rgba(184, 149, 74, 0.18);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            min-width: 0;
+        }
+
+        .back-link {
+            color: #9fb3cc;
+            text-decoration: none;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .back-link:hover {
+            color: #d8b96a;
+        }
+
+        .logo {
+            display: block;
+            width: 175px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 1px solid rgba(255, 255, 255, 0.10);
+            padding-left: 22px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            margin: 4px 0 0;
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .admin-info {
+            color: #9fb3cc;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .admin-info strong {
+            color: #d8b96a;
+        }
+
+        /* CHAT AREA */
+
+        .chat-layout {
+            flex: 1;
+            min-height: calc(100vh - 76px);
+            display: grid;
+            grid-template-columns: 330px minmax(0, 1fr);
+        }
+
+        /* CONVERSATIONS */
+
+        .conversation-panel {
+            background: #091a2e;
+            border-right: 1px solid rgba(255, 255, 255, 0.065);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .conversation-header {
+            padding: 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .conversation-header h2 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .conversation-header p {
+            margin: 6px 0 0;
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .conversation-item {
+            display: block;
+            padding: 16px 18px;
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+            transition: background 0.2s;
+        }
+
+        .conversation-item:hover {
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .conversation-item.selected {
+            background: rgba(184, 149, 74, 0.09);
+            border-left: 3px solid #b8954a;
+            padding-left: 15px;
+        }
+
+        .conversation-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 7px;
+        }
+
+        .customer-name {
+            color: #dce6f2;
+            font-size: 13px;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .conversation-time {
+            color: #637991;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .conversation-subject {
+            color: #9fb3cc;
+            font-size: 11px;
+            margin-bottom: 7px;
+        }
+
+        .conversation-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .customer-id {
+            color: #647b94;
+            font-size: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 7px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-open {
+            background: rgba(105, 174, 130, 0.10);
+            color: #91c39f;
+            border: 1px solid rgba(105, 174, 130, 0.20);
+        }
+
+        .status-closed {
+            background: rgba(150, 165, 180, 0.08);
+            color: #8497aa;
+            border: 1px solid rgba(150, 165, 180, 0.14);
+        }
+
+        .empty-conversations {
+            padding: 35px 22px;
+            text-align: center;
+            color: #6d8299;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* CHAT */
+
+        .chat-panel {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background:
+                radial-gradient(circle at top right, rgba(184, 149, 74, 0.055), transparent 35%),
+                #071426;
+        }
+
+        .chat-header {
+            min-height: 82px;
+            padding: 17px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+        }
+
+        .chat-customer {
+            min-width: 0;
+        }
+
+        .chat-customer-name {
+            margin: 0;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .chat-customer-id {
+            margin-top: 5px;
+            color: #71869e;
+            font-size: 11px;
+        }
+
+        .chat-subject {
+            margin-top: 4px;
+            color: #9fb3cc;
+            font-size: 11px;
+        }
+
+        .chat-status {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .chat-status-label {
+            color: #657b93;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .message-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-row.customer {
+            justify-content: flex-start;
+        }
+
+        .message-row.support {
+            justify-content: flex-end;
+        }
+
+        .message {
+            max-width: min(72%, 650px);
+            padding: 12px 15px;
+            border-radius: 13px;
+            line-height: 1.55;
+            font-size: 13px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .message.customer {
+            background: rgba(255, 255, 255, 0.055);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: #d9e3ef;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.support {
+            background: rgba(184, 149, 74, 0.13);
+            border: 1px solid rgba(184, 149, 74, 0.20);
+            color: #eee2c2;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-info {
+            margin-top: 6px;
+            color: #637990;
+            font-size: 9px;
+        }
+
+        .message-row.support .message-info {
+            text-align: right;
+        }
+
+        .no-conversation {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .no-conversation-inner {
+            max-width: 390px;
+        }
+
+        .no-conversation-icon {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(184, 149, 74, 0.09);
+            border: 1px solid rgba(184, 149, 74, 0.18);
+            color: #d8b96a;
+            font-size: 21px;
+        }
+
+        .no-conversation h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .no-conversation p {
+            margin: 8px 0 0;
+            color: #71869e;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* COMPOSER */
+
+        .composer {
+            padding: 17px 25px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.065);
+            background: rgba(7, 20, 38, 0.96);
+        }
+
+        .composer form {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .composer textarea {
+            flex: 1;
+            min-height: 48px;
+            max-height: 130px;
+            resize: vertical;
+            padding: 13px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(159, 179, 204, 0.18);
+            background: rgba(255, 255, 255, 0.045);
+            color: #ffffff;
+            outline: none;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .composer textarea::placeholder {
+            color: #637991;
+        }
+
+        .composer textarea:focus {
+            border-color: rgba(184, 149, 74, 0.65);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .send-button {
+            height: 48px;
+            padding: 0 20px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #b8954a, #d8b96a);
+            color: #081426;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .send-button:hover {
+            opacity: 0.93;
+        }
+
+        .composer-note {
+            margin-top: 7px;
+            color: #566c83;
+            font-size: 9px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 850px) {
+            .header {
+                height: auto;
+                min-height: 76px;
+                padding: 16px 18px;
+                flex-wrap: wrap;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .chat-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .conversation-panel {
+                max-height: 270px;
+                border-right: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+            }
+
+            .conversation-list {
+                max-height: 190px;
+            }
+
+            .chat-panel {
+                min-height: 600px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header-left {
+                gap: 12px;
+            }
+
+            .logo {
+                width: 145px;
+            }
+
+            .admin-info {
+                display: none;
+            }
+
+            .conversation-header {
+                padding: 17px;
+            }
+
+            .chat-header {
+                padding: 16px;
+            }
+
+            .messages {
+                padding: 20px 15px;
+            }
+
+            .message {
+                max-width: 86%;
+            }
+
+            .composer {
+                padding: 13px 15px 16px;
+            }
+
+            .composer form {
+                align-items: stretch;
+            }
+
+            .send-button {
+                padding: 0 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="back-link">
+                ← Dashboard
+            </a>
+
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank"
+                class="logo">
+
+            <div class="header-title">
+                <h1>Live Chat Support</h1>
+                <p>Customer support administration</p>
+            </div>
+
+        </div>
+
+        <div class="admin-info">
+            Administrator:
+            <strong>{{ admin.username }}</strong>
+        </div>
+
+    </header>
+
+
+    <div class="chat-layout">
+
+        <!-- CONVERSATION LIST -->
+
+        <aside class="conversation-panel">
+
+            <div class="conversation-header">
+                <h2>Customer Conversations</h2>
+                <p>
+                    Select a conversation to view and respond.
+                </p>
+            </div>
+
+            <div class="conversation-list">
+
+                {% if conversations %}
+
+                    {% for conversation in conversations %}
+
+                        {% set customer = customers.get(conversation.id) %}
+
+                        <a
+                            href="{{ url_for('admin_live_chat', conversation_id=conversation.id) }}"
+                            class="conversation-item {% if selected_conversation and selected_conversation.id == conversation.id %}selected{% endif %}">
+
+                            <div class="conversation-top">
+
+                                <div class="customer-name">
+                                    {% if customer %}
+                                        {{ customer.full_name }}
+                                    {% else %}
+                                        Customer
+                                    {% endif %}
+                                </div>
+
+                                <div class="conversation-time">
+                                    {{ conversation.updated_at.strftime('%d %b %H:%M') }}
+                                </div>
+
+                            </div>
+
+                            <div class="conversation-subject">
+                                {{ conversation.subject }}
+                            </div>
+
+                            <div class="conversation-meta">
+
+                                <span class="customer-id">
+                                    {% if customer %}
+                                        {{ customer.customer_id }}
+                                    {% else %}
+                                        Customer unavailable
+                                    {% endif %}
+                                </span>
+
+                                {% if conversation.status == "Open" %}
+                                    <span class="status status-open">
+                                        Open
+                                    </span>
+                                {% else %}
+                                    <span class="status status-closed">
+                                        Closed
+                                    </span>
+                                {% endif %}
+
+                            </div>
+
+                        </a>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-conversations">
+                        No customer conversations are available yet.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </aside>
+
+
+        <!-- CHAT PANEL -->
+
+        <main class="chat-panel">
+
+            {% if selected_conversation %}
+
+                {% set selected_customer = customers.get(selected_conversation.id) %}
+
+                <div class="chat-header">
+
+                    <div class="chat-customer">
+
+                        <h2 class="chat-customer-name">
+                            {% if selected_customer %}
+                                {{ selected_customer.full_name }}
+                            {% else %}
+                                Customer
+                            {% endif %}
+                        </h2>
+
+                        <div class="chat-customer-id">
+                            Customer ID:
+                            {% if selected_customer %}
+                                {{ selected_customer.customer_id }}
+                            {% else %}
+                                Unavailable
+                            {% endif %}
+                        </div>
+
+                        <div class="chat-subject">
+                            {{ selected_conversation.subject }}
+                        </div>
+
+                    </div>
+
+                    <div class="chat-status">
+
+                        <div class="chat-status-label">
+                            Conversation Status
+                        </div>
+
+                        {% if selected_conversation.status == "Open" %}
+                            <span class="status status-open">
+                                Open
+                            </span>
+                        {% else %}
+                            <span class="status status-closed">
+                                Closed
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="messages">
+
+                    {% if messages %}
+
+                        {% for message in messages %}
+
+                            <div class="message-row {{ message.sender_type }}">
+
+                                <div>
+
+                                    <div class="message {{ message.sender_type }}">
+                                        {{ message.message }}
+                                    </div>
+
+                                    <div class="message-info">
+
+                                        {% if message.sender_type == "customer" %}
+                                            Customer
+                                        {% else %}
+                                            Fairmont Bank Support
+                                        {% endif %}
+
+                                        ·
+                                        {{ message.created_at.strftime('%d %b %Y, %H:%M') }}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="no-conversation">
+                            <div class="no-conversation-inner">
+
+                                <div class="no-conversation-icon">
+                                    ?
+                                </div>
+
+                                <h2>No messages yet</h2>
+
+                                <p>
+                                    This conversation has been created,
+                                    but no messages have been exchanged yet.
+                                </p>
+
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="composer">
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('admin_live_chat') }}">
+
+                        <input
+                            type="hidden"
+                            name="conversation_id"
+                            value="{{ selected_conversation.id }}">
+
+                        <textarea
+                            name="message"
+                            maxlength="2000"
+                            placeholder="Write a response to the customer..."
+                            required></textarea>
+
+                        <button
+                            type="submit"
+                            class="send-button">
+                            Send
+                        </button>
+
+                    </form>
+
+                    <div class="composer-note">
+                        Maximum 2,000 characters per message.
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="no-conversation">
+
+                    <div class="no-conversation-inner">
+
+                        <div class="no-conversation-icon">
+                            ?
+                        </div>
+
+                        <h2>Select a Conversation</h2>
+
+                        <p>
+                            Choose a customer conversation from the
+                            left panel to view the messages and respond.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </main>
+
+    </div>
+
+</div>
+
+</body>
+</html>

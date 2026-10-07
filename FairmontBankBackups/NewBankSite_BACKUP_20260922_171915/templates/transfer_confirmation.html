@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Transfer Complete | Fairmont Bank</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body class="transaction-page">
+
+<div class="transaction-shell">
+
+    <div class="transaction-header">
+
+        <a
+            href="/dashboard"
+            class="transaction-back-button"
+            aria-label="Back to dashboard"
+        >
+            ‹
+        </a>
+
+        <div>
+
+            <div class="transaction-eyebrow">
+                PAYMENT COMPLETE
+            </div>
+
+            <h1>
+                Transfer Complete
+            </h1>
+
+        </div>
+
+    </div>
+
+
+    <div class="transaction-detail-card">
+
+        <div class="transaction-detail-status">
+
+            <div class="transaction-large-icon transaction-credit">
+                ✓
+            </div>
+
+            <div class="transaction-detail-label">
+                Amount Sent
+            </div>
+
+            <h2>
+                £{{ "{:,.2f}".format(transaction.amount) }}
+            </h2>
+
+            <span>
+                Completed successfully
+            </span>
+
+        </div>
+
+
+        <div class="transaction-detail-list">
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Recipient
+                </span>
+
+                <strong>
+                    {{ recipient.full_name }}
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Customer ID
+                </span>
+
+                <strong>
+                    {{ recipient.customer_id }}
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Transaction Type
+                </span>
+
+                <strong>
+                    {{ transaction.transaction_type }}
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Direction
+                </span>
+
+                <strong>
+                    {{ transaction.direction }}
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Reference
+                </span>
+
+                <strong>
+                    {{ transaction.transaction_reference }}
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Date & Time
+                </span>
+
+                <strong>
+                    {{ transaction.created_at.strftime("%d %b %Y, %H:%M") }}
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Balance After
+                </span>
+
+                <strong>
+                    £{{ "{:,.2f}".format(transaction.balance_after) }}
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-detail-row">
+
+                <span>
+                    Status
+                </span>
+
+                <strong class="transaction-status-value">
+                    {{ transaction.status }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <a
+        href="/dashboard"
+        class="transaction-dashboard-button"
+    >
+        Return to Dashboard
+    </a>
+
+
+    <a
+        href="/transactions"
+        class="transaction-dashboard-button"
+    >
+        View Transaction History
+    </a>
+
+</div>
+
+</body>
+
+</html>

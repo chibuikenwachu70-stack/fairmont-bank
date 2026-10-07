@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+<title>Login OTP - Fairmont Bank</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(35, 76, 125, 0.28),
+            transparent 38%
+        ),
+        linear-gradient(
+            180deg,
+            #07182d 0%,
+            #061426 100%
+        );
+
+    color: #ffffff;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.otp-page {
+
+    width: 100%;
+
+    max-width: 620px;
+
+    margin: 0 auto;
+
+    padding:
+        22px 18px 45px;
+}
+
+.otp-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 25px;
+}
+
+.back-button {
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
+
+    color: #ffffff;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.10);
+
+    font-size: 22px;
+}
+
+.otp-title {
+
+    margin: 0;
+
+    font-size: 24px;
+
+    font-weight: 700;
+}
+
+.otp-subtitle {
+
+    margin: 4px 0 0;
+
+    color:
+        rgba(255,255,255,0.60);
+
+    font-size: 13px;
+}
+
+.otp-card {
+
+    background:
+        rgba(13, 34, 59, 0.84);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.09);
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(0,0,0,0.18);
+}
+
+.otp-card-title {
+
+    margin: 0 0 7px;
+
+    font-size: 17px;
+
+    font-weight: 600;
+}
+
+.otp-description {
+
+    margin: 0 0 22px;
+
+    color:
+        rgba(255,255,255,0.55);
+
+    font-size: 12px;
+
+    line-height: 1.55;
+}
+
+.otp-status {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 17px;
+
+    margin-bottom: 20px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,0.045);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.07);
+}
+
+.status-title {
+
+    margin: 0 0 4px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.status-text {
+
+    margin: 0;
+
+    color:
+        rgba(255,255,255,0.50);
+
+    font-size: 11px;
+}
+
+.toggle {
+
+    position: relative;
+
+    width: 54px;
+
+    height: 30px;
+
+    flex-shrink: 0;
+}
+
+.toggle input {
+
+    opacity: 0;
+
+    width: 0;
+
+    height: 0;
+}
+
+.slider {
+
+    position: absolute;
+
+    inset: 0;
+
+    cursor: pointer;
+
+    border-radius: 30px;
+
+    background:
+        rgba(255,255,255,0.16);
+
+    transition:
+        0.2s;
+}
+
+.slider:before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 22px;
+
+    height: 22px;
+
+    left: 4px;
+
+    top: 4px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    transition:
+        0.2s;
+}
+
+.toggle input:checked + .slider {
+
+    background:
+        #2672ad;
+}
+
+.toggle input:checked + .slider:before {
+
+    transform:
+        translateX(24px);
+}
+
+.save-button {
+
+    width: 100%;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background:
+        #1f5d96;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.save-button:hover {
+
+    background:
+        #276da9;
+}
+
+.message {
+
+    margin-bottom: 18px;
+
+    padding: 13px 14px;
+
+    border-radius: 11px;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+}
+
+.success-message {
+
+    background:
+        rgba(65,155,105,0.15);
+
+    border:
+        1px solid
+        rgba(90,190,130,0.22);
+
+    color:
+        #9de0b7;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="otp-page">
+
+    <div class="otp-header">
+
+        <a
+            href="{{ url_for('settings') }}"
+            class="back-button">
+
+            ‹
+
+        </a>
+
+        <div>
+
+            <h1 class="otp-title">
+                Login OTP
+            </h1>
+
+            <p class="otp-subtitle">
+                Manage one-time password protection
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="otp-card">
+
+        {% with messages =
+            get_flashed_messages(
+                with_categories=true
+            )
+        %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="message success-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <h2 class="otp-card-title">
+            Login OTP Verification
+        </h2>
+
+        <p class="otp-description">
+            Enable or disable an additional one-time
+            password verification step for your account.
+        </p>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('login_otp_settings') }}">
+
+            <div class="otp-status">
+
+                <div>
+
+                    <p class="status-title">
+                        Login OTP
+                    </p>
+
+                    <p class="status-text">
+
+                        {% if customer.login_otp_enabled %}
+                            Currently enabled
+                        {% else %}
+                            Currently disabled
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+
+                <label class="toggle">
+
+                    <input
+                        type="checkbox"
+                        name="login_otp_enabled"
+                        {% if customer.login_otp_enabled %}
+                            checked
+                        {% endif %}>
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="save-button">
+
+                Save Login OTP Setting
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

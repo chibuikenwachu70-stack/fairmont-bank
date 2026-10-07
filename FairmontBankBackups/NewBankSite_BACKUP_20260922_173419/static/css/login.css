@@ -1,0 +1,216 @@
+
+/* =========================================================
+   FAIRMONT BANK LOGIN
+   BRAND BANNER CORRECTION
+   ========================================================= */
+
+/*
+   The HTML contains a dedicated .login-brand section.
+   The previous layout left this section visible as a large
+   rectangular banner.
+
+   Remove the banner container itself.
+*/
+
+.login-page .login-shell .login-brand {
+    display: none !important;
+}
+
+/*
+   Keep the actual login content centered.
+*/
+
+.login-page .login-shell {
+    width: 100%;
+    max-width: 620px;
+
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    margin: 0 auto;
+    padding: 34px 24px 28px;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/*
+   Login content.
+*/
+
+.login-page .login-shell > section,
+.login-page .login-shell > .login-content,
+.login-page .login-shell > .login-form,
+.login-page .login-shell > .login-card {
+    width: 100%;
+    max-width: 480px;
+}
+
+/*
+   Main intro.
+*/
+
+.login-page .login-intro {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.login-page .login-intro h1,
+.login-page .login-intro h2,
+.login-page .login-intro h3 {
+    color: #ffffff !important;
+}
+
+.login-page .login-intro p {
+    color: #b6cbe3;
+}
+
+/*
+   Keep the form full width.
+*/
+
+.login-page form {
+    width: 100%;
+    max-width: 480px;
+}
+
+/*
+   Input styling.
+*/
+
+.login-page input[type="text"],
+.login-page input[type="password"],
+.login-page input[type="email"],
+.login-page input:not([type]),
+.login-page select,
+.login-page textarea {
+    width: 100%;
+
+    min-height: 53px;
+
+    padding: 14px 15px;
+
+    border: 1px solid rgba(160, 205, 245, 0.28);
+
+    border-radius: 14px;
+
+    background: rgba(15, 52, 94, 0.58);
+
+    color: #ffffff;
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.login-page input::placeholder {
+    color: rgba(225, 239, 255, 0.68);
+}
+
+.login-page input:focus,
+.login-page select:focus,
+.login-page textarea:focus {
+    border-color: rgba(96, 180, 255, 0.9);
+
+    background: rgba(10, 43, 82, 0.78);
+
+    box-shadow:
+        0 0 0 3px rgba(50, 140, 230, 0.14);
+}
+
+/*
+   Buttons.
+*/
+
+.login-page button,
+.login-page input[type="submit"] {
+    border: 0;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2d9fe8,
+            #48c4ef
+        );
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 12px 30px rgba(30, 145, 220, 0.25);
+}
+
+/*
+   Links.
+*/
+
+.login-page a {
+    color: #9ed5ff;
+    text-decoration: none;
+}
+
+.login-page a:hover {
+    color: #ffffff;
+}
+
+/*
+   Security notice.
+*/
+
+.login-page .security,
+.login-page .secure,
+.login-page .security-notice {
+    color: #a9c5e2;
+}
+
+/*
+   Mobile.
+*/
+
+@media (max-width: 600px) {
+
+    .login-page .login-shell {
+        min-height: 100dvh;
+
+        padding:
+            26px
+            18px
+            20px;
+    }
+
+    .login-page .login-intro,
+    .login-page form {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 390px) {
+
+    .login-page .login-shell {
+        padding:
+            22px
+            14px
+            18px;
+    }
+}
