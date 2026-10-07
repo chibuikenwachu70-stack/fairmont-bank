@@ -19,10 +19,6 @@
 
 
 
-
-
-
-
 <style id="fairmont-login-logo-match-dashboard">
 .login-brand {
     display: flex;
@@ -47,43 +43,12 @@
     }
 }
 
-.login-live-chat {
-    width: 100%;
-    margin: 16px 0 14px 0;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    border: 1px solid rgba(184, 149, 74, 0.28);
-    border-radius: 12px;
-    background: rgba(184, 149, 74, 0.07);
-}
-
-.login-live-chat-label {
-    color: #9fb3cc;
-    font-size: 13px;
-}
-
-.login-live-chat-link {
-    color: #d8b96a;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.login-live-chat-link:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 600px) {
-    .login-live-chat {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
 </style>
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/language.css') }}">
+<div id="google_translate_element" aria-hidden="true"></div>
+<script src="{{ url_for('static', filename='js/language.js') }}"></script>
 
 </head>
 
@@ -241,20 +206,7 @@
             </div>
 
 
-                        <div class="login-live-chat">
-                <span class="login-live-chat-label">
-                    Need help?
-                </span>
-
-                <a
-                    href="/live-chat"
-                    class="login-live-chat-link">
-                    Live Chat with Fairmont Bank Support
-                </a>
-            </div>
-
-
-<div class="security-note">
+            <div class="security-note">
 
                 <span class="security-icon">
                     ✓
@@ -269,6 +221,594 @@
         </div>
 
     </main>
+
+<!-- Connected Fairmont Bank Live Chat -->
+<div id="fairmont-live-chat" aria-live="polite">
+
+    <button id="fairmont-chat-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="fairmont-chat-window">
+
+        <span class="fairmont-chat-icon" aria-hidden="true">●</span>
+        <span class="fairmont-chat-status-dot" aria-hidden="true"></span>
+        <span>Live Chat</span>
+
+    </button>
+
+
+    <section id="fairmont-chat-window"
+             role="dialog"
+             aria-label="Fairmont Bank Support"
+             hidden>
+
+        <header class="fairmont-chat-header">
+
+            <div>
+                <strong>Fairmont Bank Support</strong>
+
+                <small>
+                    <span class="fairmont-online-dot"></span>
+                    Customer Support
+                </small>
+            </div>
+
+            <button id="fairmont-chat-close"
+                    type="button"
+                    aria-label="Close chat">
+                ×
+            </button>
+
+        </header>
+
+
+        <div id="fairmont-chat-messages"
+             class="fairmont-chat-messages">
+
+            <div class="fairmont-message bot">
+                <strong>Fairmont Bank Support</strong>
+
+                <p>
+                    Hello. How can we help you today?
+                </p>
+            </div>
+
+        </div>
+
+
+        <form id="fairmont-chat-form"
+              class="fairmont-chat-composer">
+
+            <textarea
+                id="fairmont-chat-input"
+                rows="2"
+                maxlength="2000"
+                placeholder="Type your message..."
+                aria-label="Type your message"
+                required></textarea>
+
+            <button
+                id="fairmont-chat-send"
+                type="submit">
+                Send
+            </button>
+
+        </form>
+
+
+        <div id="fairmont-chat-form-status"
+             class="fairmont-chat-status-text">
+        </div>
+
+    </section>
+
+</div>
+
+
+<style id="fairmont-connected-login-chat">
+
+#fairmont-live-chat {
+    position: fixed;
+    right: 24px;
+    top: 100px;
+    z-index: 2147483647;
+    font-family: inherit;
+}
+
+#fairmont-chat-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 54px;
+    padding: 0 20px;
+    border: 3px solid #fff;
+    border-radius: 30px;
+    background: #e0b44f;
+    color: #081a2b;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0,0,0,.28);
+}
+
+.fairmont-chat-icon {
+    width: 12px;
+    height: 12px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #081a2b;
+    color: #081a2b;
+}
+
+.fairmont-chat-status-dot {
+    width: 8px;
+    height: 8px;
+    margin-left: -15px;
+    border-radius: 50%;
+    background: #21b66f;
+    border: 2px solid #e0b44f;
+}
+
+#fairmont-chat-window {
+    position: absolute;
+    right: 0;
+    top: 64px;
+    width: 390px;
+    max-width: calc(100vw - 32px);
+    background: #fff;
+    color: #172235;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0,0,0,.28);
+    border: 1px solid #d7dee6;
+}
+
+.fairmont-chat-header {
+    padding: 16px 18px;
+    background: #08253b;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fairmont-chat-header strong {
+    display: block;
+    font-size: 15px;
+}
+
+.fairmont-chat-header small {
+    display: block;
+    margin-top: 4px;
+    opacity: .8;
+}
+
+.fairmont-online-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 4px;
+    border-radius: 50%;
+    background: #21b66f;
+}
+
+#fairmont-chat-close {
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.fairmont-chat-messages {
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f5f7fa;
+}
+
+.fairmont-message {
+    margin-bottom: 10px;
+    padding: 11px 13px;
+    border-radius: 11px;
+    background: #fff;
+    border: 1px solid #e0e6ec;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.fairmont-message p {
+    margin: 5px 0 0;
+}
+
+.fairmont-message.user {
+    background: #e0b44f;
+    border-color: #e0b44f;
+    margin-left: 35px;
+}
+
+.fairmont-chat-composer {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #e5e9ee;
+    background: #fff;
+}
+
+#fairmont-chat-input {
+    flex: 1;
+    min-width: 0;
+    min-height: 48px;
+    resize: vertical;
+    border: 1px solid #ccd5df;
+    border-radius: 10px;
+    padding: 10px;
+    font: inherit;
+    color: #172235;
+    background: #fff;
+}
+
+#fairmont-chat-send {
+    align-self: stretch;
+    border: 0;
+    border-radius: 10px;
+    padding: 0 16px;
+    background: #d9aa3f;
+    color: #102338;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#fairmont-chat-send:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.fairmont-chat-status-text {
+    min-height: 24px;
+    padding: 0 13px 10px;
+    color: #647487;
+    font-size: 11px;
+}
+
+@media (max-width: 600px) {
+
+    #fairmont-live-chat {
+        right: 14px;
+        top: 82px;
+    }
+
+    #fairmont-chat-window {
+        width: calc(100vw - 28px);
+    }
+
+    .fairmont-chat-composer {
+        flex-direction: column;
+    }
+
+    #fairmont-chat-send {
+        min-height: 44px;
+    }
+
+}
+
+</style>
+
+
+<script>
+
+(function () {
+
+    const button =
+        document.getElementById("fairmont-chat-button");
+
+    const windowEl =
+        document.getElementById("fairmont-chat-window");
+
+    const close =
+        document.getElementById("fairmont-chat-close");
+
+    const messages =
+        document.getElementById("fairmont-chat-messages");
+
+    const form =
+        document.getElementById("fairmont-chat-form");
+
+    const input =
+        document.getElementById("fairmont-chat-input");
+
+    const send =
+        document.getElementById("fairmont-chat-send");
+
+    const status =
+        document.getElementById("fairmont-chat-form-status");
+
+
+    if (
+        !button ||
+        !windowEl ||
+        !messages ||
+        !form
+    ) {
+        return;
+    }
+
+
+    let lastMessageId = 0;
+
+
+    function openChat() {
+
+        windowEl.hidden = false;
+
+        button.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        input.focus();
+
+    }
+
+
+    function closeChat() {
+
+        windowEl.hidden = true;
+
+        button.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+    }
+
+
+    function appendMessage(
+        text,
+        type,
+        id
+    ) {
+
+        if (
+            id &&
+            document.querySelector(
+                '#fairmont-chat-messages [data-message-id="' +
+                id +
+                '"]'
+            )
+        ) {
+            return;
+        }
+
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "fairmont-message " +
+            (
+                type === "user"
+                    ? "user"
+                    : "bot"
+            );
+
+
+        if (id) {
+
+            item.dataset.messageId =
+                id;
+
+        }
+
+
+        const label =
+            document.createElement("strong");
+
+        label.textContent =
+            type === "user"
+                ? "You"
+                : "Fairmont Bank Support";
+
+
+        const body =
+            document.createElement("p");
+
+        body.textContent =
+            text;
+
+
+        item.appendChild(label);
+
+        item.appendChild(body);
+
+        messages.appendChild(item);
+
+
+        messages.scrollTop =
+            messages.scrollHeight;
+
+
+        if (id) {
+
+            lastMessageId =
+                Math.max(
+                    lastMessageId,
+                    Number(id)
+                );
+
+        }
+
+    }
+
+
+    async function pollReplies() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/live-chat/messages?after_id=" +
+                    lastMessageId,
+                    {
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            (data.messages || [])
+                .forEach(function (item) {
+
+                    appendMessage(
+                        item.message,
+                        "support",
+                        item.id
+                    );
+
+                });
+
+        } catch (error) {
+
+            // Keep login page usable if polling fails.
+
+        }
+
+    }
+
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const message =
+                input.value.trim();
+
+
+            if (!message) {
+                return;
+            }
+
+
+            send.disabled =
+                true;
+
+            status.textContent =
+                "Sending...";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/live-chat/message",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    message:
+                                        message
+                                })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    status.textContent =
+                        data.message ||
+                        "Unable to send your message.";
+
+                    return;
+
+                }
+
+
+                appendMessage(
+                    message,
+                    "user",
+                    data.message_id
+                );
+
+
+                input.value =
+                    "";
+
+                status.textContent =
+                    "Message sent. Support will reply here.";
+
+            } catch (error) {
+
+                status.textContent =
+                    "Unable to send your message right now. Please try again.";
+
+            } finally {
+
+                send.disabled =
+                    false;
+
+            }
+
+        }
+    );
+
+
+    button.addEventListener(
+        "click",
+        function () {
+
+            if (windowEl.hidden) {
+                openChat();
+            } else {
+                closeChat();
+            }
+
+        }
+    );
+
+
+    if (close) {
+
+        close.addEventListener(
+            "click",
+            closeChat
+        );
+
+    }
+
+
+    setInterval(
+        pollReplies,
+        3000
+    );
+
+})();
+
+</script>
 
 
     <script>

@@ -111,6 +111,157 @@
         left: 0 !important;
     }
 }
+
+        .contact-organized .contact-intro h2,
+        .contact-organized .contact-intro p,
+        .contact-organized .contact-card h3,
+        .contact-organized .contact-card p,
+        .contact-organized .contact-card a {
+            color: #f4f7fa !important;
+        }
+
+        .contact-organized .contact-card-label {
+            color: #d9e2ea !important;
+        }
+
+        .contact-organized .contact-card a {
+            color: #f0c968 !important;
+            font-weight: 600 !important;
+        }
+
+        .contact-organized .contact-card {
+            box-shadow: 0 8px 24px rgba(0,0,0,.12) !important;
+        }
+
+        /* Organized Contact section */
+        .contact-section {
+            padding: 90px 24px !important;
+        }
+
+        .contact-organized {
+            width: min(1120px, 100%) !important;
+            margin: 0 auto !important;
+            padding: 48px !important;
+            border-radius: 24px !important;
+            background: #0f2f49 !important;
+            box-sizing: border-box !important;
+            display: grid !important;
+            grid-template-columns: minmax(260px, 0.75fr) minmax(520px, 1.25fr) !important;
+            gap: 48px !important;
+            align-items: center !important;
+        }
+
+        .contact-intro {
+            max-width: 340px !important;
+        }
+
+        .contact-intro h2 {
+            margin: 10px 0 14px !important;
+            font-size: clamp(34px, 4vw, 48px) !important;
+            line-height: 1.05 !important;
+        }
+
+        .contact-intro p {
+            margin: 0 !important;
+            line-height: 1.7 !important;
+            opacity: .92 !important;
+        }
+
+        .contact-details-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 18px !important;
+            margin: 0 !important;
+        }
+
+        .contact-card {
+            min-height: 145px !important;
+            display: flex !important;
+            gap: 16px !important;
+            align-items: flex-start !important;
+            padding: 22px !important;
+            border: 1px solid rgba(190,210,230,.34) !important;
+            border-radius: 16px !important;
+            background: rgba(255,255,255,.10) !important;
+            box-sizing: border-box !important;
+        }
+
+        .contact-card-icon {
+            width: 44px !important;
+            height: 44px !important;
+            flex: 0 0 44px !important;
+            display: grid !important;
+            place-items: center !important;
+            border-radius: 11px !important;
+            background: rgba(184,149,74,.16) !important;
+            color: #f0c968 !important;
+            font-weight: 800 !important;
+            font-size: 13px !important;
+        }
+
+        .contact-card-content {
+            min-width: 0 !important;
+        }
+
+        .contact-card-label {
+            display: block !important;
+            margin-bottom: 7px !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            letter-spacing: .14em !important;
+            opacity: .78 !important;
+        }
+
+        .contact-card h3 {
+            margin: 0 0 8px !important;
+            font-size: 16px !important;
+            line-height: 1.25 !important;
+        }
+
+        .contact-card p,
+        .contact-card a {
+            margin: 0 !important;
+            font-size: 13px !important;
+            line-height: 1.55 !important;
+        }
+
+        .contact-card a {
+            color: inherit !important;
+            text-decoration: none !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        .contact-card a:hover {
+            text-decoration: underline !important;
+        }
+
+        @media (max-width: 850px) {
+            .contact-organized {
+                grid-template-columns: 1fr !important;
+                gap: 30px !important;
+                padding: 34px !important;
+            }
+
+            .contact-intro {
+                max-width: none !important;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .contact-section {
+                padding: 60px 16px !important;
+            }
+
+            .contact-organized {
+                padding: 24px !important;
+                border-radius: 18px !important;
+            }
+
+            .contact-details-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
 </style>
 
 
@@ -357,18 +508,56 @@
         </section>
 
         <section class="contact-section" id="contact">
-            <div class="section-container contact-panel">
-                <div>
-                    <span class="section-kicker">CONTACT</span>
-                    <h2>Need assistance?</h2>
-                    <p>
-                        Use the customer support details configured for your project,
-                        or sign in to access the available customer interface.
-                    </p>
+    <div class="contact-organized">
+        <div class="contact-intro">
+            <span class="section-kicker">CONTACT</span>
+            <h2>Contact Fairmont Bank</h2>
+            <p>
+                Our company and customer support details are provided below.
+                Choose the contact method that is most convenient for you.
+            </p>
+        </div>
+
+        <div class="contact-details-grid">
+            <div class="contact-card">
+                <div class="contact-card-icon">✉</div>
+                <div class="contact-card-content">
+                    <span class="contact-card-label">EMAIL</span>
+                    <h3>Customer Support</h3>
+                    <a href="mailto:support@fairmontbank.com">support@fairmontbank.com</a>
                 </div>
-                <a href="/login" class="contact-button">Access Customer Area</a>
             </div>
-        </section>
+
+            <div class="contact-card">
+                <div class="contact-card-icon">☎</div>
+                <div class="contact-card-content">
+                    <span class="contact-card-label">PHONE</span>
+                    <h3>Phone Support</h3>
+                    <a href="tel:+17317330071">+1 (731) 733-0071</a>
+                </div>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-card-icon">◉</div>
+                <div class="contact-card-content">
+                    <span class="contact-card-label">OFFICE</span>
+                    <h3>Office Address</h3>
+                    <p>Unit 9, Central Way,<br>Park Royal, London</p>
+                </div>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-card-icon">WA</div>
+                <div class="contact-card-content">
+                    <span class="contact-card-label">MESSAGING</span>
+                    <h3>WhatsApp</h3>
+                    <a href="https://wa.me/17317330071?text=Hello%20Fairmont%20Bank%20Support"
+                       target="_blank" rel="noopener noreferrer">Chat with us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
     </main>
 
     <footer class="site-footer">
@@ -430,8 +619,438 @@
                 });
             });
         }
+    </script>
+
+    <div id="google_translate_element"
+     aria-hidden="true"
+     style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
+<script>
+(function () {
+    const languageMap = {
+        EN: 'en',
+        FR: 'fr',
+        ES: 'es',
+        NL: 'nl',
+        DE: 'de',
+        PT: 'pt',
+        IT: 'it',
+        AR: 'ar',
+        HI: 'hi',
+        BN: 'bn',
+        UR: 'ur',
+        ZH: 'zh-CN',
+        JA: 'ja',
+        KO: 'ko',
+        RU: 'ru',
+        TR: 'tr',
+        SW: 'sw',
+        PA: 'pa',
+        GU: 'gu',
+        ML: 'ml'
+    };
+
+    function initFairmontTranslator() {
+        if (!window.google || !google.translate) {
+            setTimeout(initFairmontTranslator, 500);
+            return;
+        }
+
+        if (!document.querySelector('#google_translate_element .goog-te-combo')) {
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: 'en',
+                    includedLanguages: Object.values(languageMap).join(','),
+                    autoDisplay: false
+                },
+                'google_translate_element'
+            );
+        }
+
+        setTimeout(bindFairmontTranslator, 300);
+    }
+
+    function bindFairmontTranslator() {
+        const selector = document.querySelector(
+            '#google_translate_element select.goog-te-combo'
+        );
+
+        const toggle = document.querySelector('.language-toggle');
+        const menu = document.querySelector('.language-menu');
+        const current = document.querySelector('.language-current');
+
+        if (!toggle || !menu) return;
+
+        if (!toggle.dataset.bound) {
+            toggle.dataset.bound = 'true';
+
+            toggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+
+                const open = menu.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!menu.contains(event.target) && !toggle.contains(event.target)) {
+                    menu.classList.remove('open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        if (!menu.dataset.bound) {
+            menu.dataset.bound = 'true';
+
+            menu.querySelectorAll('[data-lang]').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    const code = this.dataset.lang;
+                    const targetLanguage = languageMap[code];
+
+                    if (current) {
+                        current.textContent = code;
+                    }
+
+                    menu.classList.remove('open');
+                    toggle.setAttribute('aria-expanded', 'false');
+
+                    if (!selector || !targetLanguage) {
+                        return;
+                    }
+
+                    selector.value = targetLanguage;
+                    selector.dispatchEvent(new Event('change'));
+                });
+            });
+        }
+
+        if (!selector) {
+            setTimeout(bindFairmontTranslator, 500);
+        }
+    }
+
+    window.googleTranslateElementInit = initFairmontTranslator;
+    window.addEventListener('load', initFairmontTranslator);
+
+    // In case Google Translate loads before the page load handler.
+    setTimeout(initFairmontTranslator, 500);
+})();
+</script>
+
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<!-- Fairmont Bank Public Live Chat -->
+<div id="fairmont-live-chat" aria-live="polite">
+    <button id="fairmont-chat-button" type="button" aria-expanded="false" aria-controls="fairmont-chat-window">
+        <span class="fairmont-chat-icon" aria-hidden="true">●</span>
+        <span class="fairmont-chat-status" aria-hidden="true"></span>
+        <span>Live Chat</span>
+    </button>
+
+    <div id="fairmont-chat-window" role="dialog" aria-label="Fairmont Bank automated support" hidden>
+        <div class="fairmont-chat-header">
+            <div>
+                <strong>Fairmont Bank Support</strong>
+                <small><span class="fairmont-online-dot"></span> Automated Assistant</small>
+            </div>
+            <button id="fairmont-chat-close" type="button" aria-label="Close chat">×</button>
+        </div>
+
+        <div id="fairmont-chat-messages" class="fairmont-chat-messages">
+            <div class="fairmont-message bot">
+                <strong>Support Assistant</strong>
+                <p>Hello. How can I help you today?</p>
+            </div>
+            <div class="fairmont-chat-options">
+                <button type="button" data-chat="account">Account access</button>
+                <button type="button" data-chat="opening">Open an account</button>
+                <button type="button" data-chat="transfers">Transfers</button>
+                <button type="button" data-chat="cards">Cards &amp; payments</button>
+                <button type="button" data-chat="support">Talk to support</button>
+            </div>
+        </div>
+
+        <form id="fairmont-chat-form" class="fairmont-chat-form">
+            <textarea
+                id="fairmont-chat-input"
+                name="message"
+                rows="2"
+                maxlength="2000"
+                placeholder="Type your message..."
+                aria-label="Type your support message"
+                required></textarea>
+            <button type="submit" id="fairmont-chat-send">Send</button>
+        </form>
+        <div id="fairmont-chat-form-status" class="fairmont-chat-form-status" aria-live="polite"></div>
+    </div>
+</div>
+
+<style>
+
+.fairmont-chat-form {
+    display:flex !important;
+    gap:8px !important;
+    padding:10px !important;
+    background:#fff !important;
+    border-top:1px solid #e5e9ee !important;
+}
+.fairmont-chat-form textarea {
+    flex:1 !important;
+    min-width:0 !important;
+    min-height:44px !important;
+    max-height:110px !important;
+    resize:vertical !important;
+    box-sizing:border-box !important;
+    padding:11px 12px !important;
+    border:1px solid #ccd6e2 !important;
+    border-radius:10px !important;
+    background:#fff !important;
+    color:#17283b !important;
+    font:inherit !important;
+    font-size:13px !important;
+    outline:none !important;
+}
+.fairmont-chat-form textarea:focus {
+    border-color:#b8954a !important;
+    box-shadow:0 0 0 2px rgba(184,149,74,.14) !important;
+}
+.fairmont-chat-form button {
+    align-self:stretch !important;
+    min-width:62px !important;
+    border:0 !important;
+    border-radius:10px !important;
+    background:#b8954a !important;
+    color:#07162d !important;
+    font:inherit !important;
+    font-weight:800 !important;
+    cursor:pointer !important;
+}
+.fairmont-chat-form button:disabled {
+    opacity:.6 !important;
+    cursor:wait !important;
+}
+.fairmont-chat-form-status {
+    min-height:0 !important;
+    padding:0 12px 8px !important;
+    background:#fff !important;
+    color:#5b6d82 !important;
+    font-size:11px !important;
+}
+
+/* Public Live Chat: deliberately high z-index and viewport-fixed positioning. */
+#fairmont-live-chat {
+    position: fixed !important;
+    right: 24px !important;
+    top: 110px !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 2147483647 !important;
+    font-family: inherit;
+}
+
+#fairmont-chat-button {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    min-height: 54px !important;
+    padding: 0 20px !important;
+    border: 3px solid #fff !important;
+    border-radius: 30px !important;
+    background: #e0b44f !important;
+    color: #081a2b !important;
+    font: inherit !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,.28), 0 0 0 6px rgba(224,180,79,.16) !important;
+    animation: fairmontChatPulse 2s infinite !important;
+}
+
+.fairmont-chat-icon {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #081a2b !important;
+    color: #fff !important;
+    font-size: 10px !important;
+}
+
+.fairmont-chat-status {
+    position: absolute !important;
+    top: 7px !important;
+    left: 36px !important;
+    width: 9px !important;
+    height: 9px !important;
+    border: 2px solid #e0b44f !important;
+    border-radius: 50% !important;
+    background: #22c55e !important;
+    animation: fairmontOnlineBlink 1.4s infinite !important;
+}
+
+@keyframes fairmontChatPulse {
+    0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,.28), 0 0 0 0 rgba(224,180,79,.48); }
+    50% { box-shadow: 0 8px 25px rgba(0,0,0,.28), 0 0 0 11px rgba(224,180,79,0); }
+}
+
+@keyframes fairmontOnlineBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .35; }
+}
+
+#fairmont-chat-window {
+    position: absolute !important;
+    right: 0 !important;
+    top: 64px !important;
+    bottom: auto !important;
+    width: 350px !important;
+    max-width: calc(100vw - 28px) !important;
+    overflow: hidden !important;
+    border: 1px solid #dbe2e9 !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    color: #172235 !important;
+    box-shadow: 0 20px 55px rgba(0,0,0,.30) !important;
+}
+
+#fairmont-chat-window[hidden] { display: none !important; }
+
+.fairmont-chat-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 17px !important;
+    background: #081a2b !important;
+    color: #fff !important;
+}
+
+.fairmont-chat-header strong { display: block !important; font-size: 14px !important; }
+.fairmont-chat-header small { display: block !important; margin-top: 4px !important; opacity: .75 !important; font-size: 11px !important; }
+.fairmont-online-dot { display:inline-block !important; width:7px !important; height:7px !important; margin-right:5px !important; border-radius:50% !important; background:#22c55e !important; }
+#fairmont-chat-close { border:0 !important; background:transparent !important; color:#fff !important; font-size:25px !important; cursor:pointer !important; }
+
+.fairmont-chat-messages { padding: 15px !important; max-height: 390px !important; overflow-y: auto !important; background:#f7f9fb !important; }
+.fairmont-message { max-width: 88% !important; padding: 11px 13px !important; margin-bottom: 12px !important; border-radius: 12px !important; background:#fff !important; box-shadow:0 2px 8px rgba(0,0,0,.06) !important; font-size:13px !important; line-height:1.45 !important; }
+.fairmont-message strong { font-size:12px !important; }
+.fairmont-message p { margin:5px 0 0 !important; }
+.fairmont-chat-options { display:grid !important; gap:7px !important; }
+.fairmont-chat-options button { width:100% !important; padding:10px 11px !important; border:1px solid #d9e0e7 !important; border-radius:9px !important; background:#fff !important; color:#172235 !important; text-align:left !important; font:inherit !important; font-size:12px !important; cursor:pointer !important; }
+.fairmont-chat-options button:hover { border-color:#e0b44f !important; background:#fffaf0 !important; }
+.fairmont-chat-footer { padding:11px 15px !important; border-top:1px solid #e5e9ee !important; text-align:center !important; }
+.fairmont-chat-footer a { color:#173653 !important; font-size:12px !important; font-weight:700 !important; text-decoration:none !important; }
+
+@media (max-width: 700px) {
+    #fairmont-live-chat { right:14px !important; top:90px !important; bottom:auto !important; transform:none !important; }
+    #fairmont-chat-button { min-height:50px !important; padding:0 16px !important; }
+    #fairmont-chat-window { right:0 !important; top:58px !important; bottom:auto !important; width:calc(100vw - 28px) !important; }
+}
+</style>
+
+<script>
+(function () {
+    const root = document.getElementById('fairmont-live-chat');
+    const button = document.getElementById('fairmont-chat-button');
+    const windowEl = document.getElementById('fairmont-chat-window');
+    const close = document.getElementById('fairmont-chat-close');
+    const messages = document.getElementById('fairmont-chat-messages');
+    if (!root || !button || !windowEl || !messages) return;
+
+    const replies = {
+        account: 'For account access, select Sign In at the top of this page. If you need help with an existing customer account, use the Live Chat window for support.',
+        opening: 'To begin the account-opening process, select Open an Account at the top of the page.',
+        transfers: 'For transfer assistance, sign in to your customer area and use the available transfer tools. For support with a specific issue, use the Live Chat window for support.',
+        cards: 'For cards and payment assistance, sign in to your customer area or use the Live Chat window for further assistance.',
+        support: 'Please use the Live Chat window to continue.'
+    };
+
+    function openChat() {
+        windowEl.hidden = false;
+        button.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeChat() {
+        windowEl.hidden = true;
+        button.setAttribute('aria-expanded', 'false');
+    }
+
+
+    const chatForm = document.getElementById('fairmont-chat-form');
+    const chatInput = document.getElementById('fairmont-chat-input');
+    const chatSend = document.getElementById('fairmont-chat-send');
+    const chatStatus = document.getElementById('fairmont-chat-form-status');
+
+    if (chatForm && chatInput) {
+        chatForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            chatSend.disabled = true;
+            chatStatus.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('/api/live-chat/message', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: message})
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    chatStatus.textContent = data.message || 'Please sign in to send a message.';
+                    return;
+                }
+
+                const user = document.createElement('div');
+                user.className = 'fairmont-message';
+                user.innerHTML = '<strong>You</strong><p>' +
+                    message.replace(/[&<>]/g, '') +
+                    '</p>';
+                messages.appendChild(user);
+
+                chatInput.value = '';
+                chatStatus.textContent = data.message || 'Message sent.';
+                messages.scrollTop = messages.scrollHeight;
+            } catch (error) {
+                chatStatus.textContent = 'Unable to send your message right now. Please try again.';
+            } finally {
+                chatSend.disabled = false;
+            }
+        });
+    }
+
+    button.addEventListener('click', function () {
+        windowEl.hidden ? openChat() : closeChat();
+    });
+    if (close) close.addEventListener('click', closeChat);
+
+    messages.querySelectorAll('[data-chat]').forEach(function (option) {
+        option.addEventListener('click', function () {
+            const key = this.getAttribute('data-chat');
+            const label = this.textContent.trim();
+            const oldOptions = messages.querySelector('.fairmont-chat-options');
+            if (oldOptions) oldOptions.remove();
+
+            const user = document.createElement('div');
+            user.className = 'fairmont-message';
+            user.innerHTML = '<strong>You</strong><p>' + label.replace(/[&<>]/g, '') + '</p>';
+            messages.appendChild(user);
+
+            const bot = document.createElement('div');
+            bot.className = 'fairmont-message bot';
+            bot.innerHTML = '<strong>Support Assistant</strong><p>' + replies[key] + '</p>';
+            messages.appendChild(bot);
+            messages.scrollTop = messages.scrollHeight;
+        });
+    });
+})();
+</script>
+
 </body>
 </html>

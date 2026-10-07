@@ -156,6 +156,15 @@
             .virtual-card-button{width:100%;margin-left:64px}
         }
     </style>
+
+    <link id="fairmont-dashboard-language-assets"
+          rel="stylesheet"
+          href="{{ url_for('static', filename='css/language.css') }}">
+
+    <div id="google_translate_element"
+         aria-hidden="true"
+         style="position:absolute;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;"></div>
+
 </head>
 
 <body>
@@ -219,9 +228,7 @@
             <p class="balance-label">AVAILABLE BALANCE</p>
             <button type="button" class="balance-toggle" onclick="toggleBalance()">Hide</button>
         </div>
-        <h2 id="balance">
-    {{ currency_symbol }}{{ "{:,.2f}".format(display_balance) }}
-</h2>
+        <h2 id="balance">£{{ "{:,.2f}".format(customer.account_balance or 0) }}</h2>
         <p class="customer-reference">Customer ID · {{ customer.customer_id }}</p>
     </section>
 
@@ -231,7 +238,7 @@
             <h2>Virtual ATM Card</h2>
         </div>
 
-        {% if virtual_card and virtual_card.status != "Cancelled" %}
+        {% if virtual_card %}
             <div class="virtual-card">
                 <div class="virtual-card-top">
                     <span class="virtual-card-brand">FAIRMONT BANK</span>
@@ -261,7 +268,7 @@
 
                 <div class="virtual-card-security">
                     <span class="virtual-card-label">SECURITY CODE</span>
-                    <span class="virtual-card-security-code"></span>
+                    <span class="virtual-card-security-code">{{ virtual_card.security_code }}</span>
                 </div>
 
                 <a href="{{ url_for('virtual_card_review') }}" class="virtual-card-review">
@@ -314,10 +321,6 @@
 
             <a href="/pay-bills" class="service-item">
                 <span class="service-icon">£</span><span class="service-name">Pay Bills</span>
-            </a>
-
-            <a href="{{ url_for('customer_invoices') }}" class="service-item">
-                <span class="service-icon">▣</span><span class="service-name">Bills &<br>Invoices</span>
             </a>
 
             <a href="/bank-statements" class="service-item">
@@ -410,7 +413,7 @@ function toggleBalance() {
     const button = document.querySelector(".balance-toggle");
 
     if (balance.dataset.hidden === "true") {
-        balance.textContent = {{ currency_symbol|tojson }} + Number({{ display_balance }}).toLocaleString({{ currency_locale|tojson }}, {
+        balance.textContent = "£" + Number({{ customer.account_balance or 0 }}).toLocaleString("en-GB", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
@@ -497,5 +500,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+    <script id="fairmont-dashboard-language-script"
+            src="{{ url_for('static', filename='js/language.js') }}"></script>
+
 </body>
 </html>

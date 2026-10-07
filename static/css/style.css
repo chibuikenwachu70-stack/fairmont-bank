@@ -2283,5 +2283,41 @@ body:has(.login-page) .login-shell button[type="button"] {
     body:has(.login-page) .login-shell h1 {
         font-size: 34px;
     }
+}/* =========================================
+   FAIRMONT BANK - STICKY LIVE CHAT
+   ========================================= */
+
+.fairmont-live-chat {
+    position: fixed !important;
+    right: 24px !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    z-index: 999999 !important;
+}
+
+/* Always noticeable */
+.fairmont-live-chat .chat-button {
+    animation: fairmontChatPulse 2.2s infinite;
+}
+
+@keyframes fairmontChatPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(224, 180, 79, 0.45);
+    }
+
+    50% {
+        box-shadow: 0 0 0 12px rgba(224, 180, 79, 0);
+    }
+}
+
+/* Mobile positioning */
+@media (max-width: 700px) {
+    .fairmont-live-chat {
+        right: 14px !important;
+        top: auto !important;
+        bottom: 20px !important;
+        transform: none !important;
+    }
 }
 

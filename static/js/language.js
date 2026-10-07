@@ -1,100 +1,172 @@
 (function () {
     "use strict";
 
-    const LANGUAGES = [
-        ["EN", "English"],
-        ["FR", "Français"],
-        ["ES", "Español"],
-        ["NL", "Nederlands"],
-        ["DE", "Deutsch"],
-        ["PT", "Português"],
-        ["IT", "Italiano"],
-        ["AR", "العربية"],
-        ["HI", "हिन्दी (India)"],
-        ["BN", "বাংলা"],
-        ["UR", "اردو"],
-        ["ZH", "中文"],
-        ["JA", "日本語"],
-        ["KO", "한국어"],
-        ["RU", "Русский"],
-        ["TR", "Türkçe"],
-        ["SW", "Kiswahili"],
-        ["PA", "ਪੰਜਾਬੀ"],
-        ["GU", "ગુજરાતી"],
-        ["ML", "മലയാളം"]
-    ];
-
-    const GOOGLE_CODES = {
-        EN: "en", FR: "fr", ES: "es", NL: "nl", DE: "de",
-        PT: "pt", IT: "it", AR: "ar", HI: "hi", BN: "bn",
-        UR: "ur", ZH: "zh-CN", JA: "ja", KO: "ko", RU: "ru",
-        TR: "tr", SW: "sw", PA: "pa", GU: "gu", ML: "ml"
+    const LANGUAGES = {
+        EN: ["English", "en"],
+        FR: ["Français", "fr"],
+        ES: ["Español", "es"],
+        NL: ["Nederlands", "nl"],
+        DE: ["Deutsch", "de"],
+        PT: ["Português", "pt"],
+        IT: ["Italiano", "it"],
+        AR: ["العربية", "ar"],
+        HI: ["हिन्दी", "hi"],
+        BN: ["বাংলা", "bn"],
+        UR: ["اردو", "ur"],
+        ZH: ["中文", "zh-CN"],
+        JA: ["日本語", "ja"],
+        KO: ["한국어", "ko"],
+        RU: ["Русский", "ru"],
+        TR: ["Türkçe", "tr"],
+        SW: ["Kiswahili", "sw"],
+        PA: ["ਪੰਜਾਬੀ", "pa"],
+        GU: ["ગુજરાતી", "gu"],
+        ML: ["മലയാളം", "ml"]
     };
 
-    const STORAGE_KEY = "fairmont_site_language";
+    const STORAGE_KEY = "fairmont_bank_language";
+    const COOKIE_NAME = "fairmont_language";
 
-    function currentLanguage() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        return LANGUAGES.some(item => item[0] === saved) ? saved : "EN";
+    function getCookie(name) {
+        const match = document.cookie.match(
+            new RegExp("(?:^|;\\s*)" + name.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&") + "=([^;]*)")
+        );
+        return match ? decodeURIComponent(match[1]) : "";
     }
 
-    function setGoogleCookie(code) {
-        if (code === "EN") {
-            document.cookie = "googtrans=; Max-Age=0; path=/";
+    function getLanguage() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored && LANGUAGES[stored]) return stored;
+
+        const cookie = getCookie(COOKIE_NAME);
+        if (cookie && LANGUAGES[cookie]) return cookie;
+
+        return "EN";
+    }
+
+    function saveLanguage(code) {
+        if (!LANGUAGES[code]) return;
+
+        localStorage.setItem(STORAGE_KEY, code);
+
+        document.cookie =
+            COOKIE_NAME + "=" + encodeURIComponent(code) +
+            "; path=/; max-age=31536000; SameSite=Lax";
+
+        const googleCode = LANGUAGES[code][1];
+
+        if (googleCode === "en") {
+            document.cookie =
+                "googtrans=; path=/; max-age=0; SameSite=Lax";
+        } else {
+            document.cookie =
+                "googtrans=/en/" + googleCode +
+                "; path=/; max-age=31536000; SameSite=Lax";
+        }
+
+        // Keep the server-side preference in sync when the route exists.
+        fetch("/set-language", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+            },
+            body: "language=" + encodeURIComponent(code)
+        }).catch(function () {});
+    }
+
+    function ensureGoogleTarget() {
+        let target = document.getElementById("google_translate_element");
+
+        if (!target) {
+            target = document.createElement("div");
+            target.id = "google_translate_element";
+            target.setAttribute("aria-hidden", "true");
+            target.style.cssText =
+                "position:absolute!important;left:-99999px!important;" +
+                "top:-99999px!important;width:1px!important;height:1px!important;" +
+                "overflow:hidden!important;";
+            document.body.appendChild(target);
+        }
+
+        return target;
+    }
+
+    function initializeGoogleTranslate() {
+        const target = ensureGoogleTarget();
+
+        if (!window.google || !google.translate || !target) return;
+
+        if (!target.querySelector(".goog-te-combo")) {
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: "en",
+                    includedLanguages: Object.keys(LANGUAGES)
+                        .map(function (key) { return LANGUAGES[key][1]; })
+                        .join(","),
+                    autoDisplay: false
+                },
+                "google_translate_element"
+            );
+        }
+
+        // Reapply the saved choice to the Google selector after it is created.
+        const code = getLanguage();
+        const googleCode = LANGUAGES[code][1];
+        const combo = target.querySelector(".goog-te-combo");
+
+        if (combo && combo.value !== googleCode) {
+            combo.value = googleCode;
+            combo.dispatchEvent(new Event("change"));
+        }
+    }
+
+    function loadGoogleTranslate() {
+        if (window.google && window.google.translate) {
+            initializeGoogleTranslate();
             return;
         }
 
-        const googleCode = GOOGLE_CODES[code];
-        if (!googleCode) return;
+        window.googleTranslateElementInit = initializeGoogleTranslate;
 
-        const value = "/en/" + googleCode;
-        document.cookie = "googtrans=" + value + "; path=/; SameSite=Lax";
-    }
-
-    function setServerLanguage(code) {
-        const body = new URLSearchParams();
-        body.set("language", code);
-
-        return fetch("/set-language", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            body: body.toString(),
-            credentials: "same-origin"
-        }).catch(function () {
-            // The browser-side preference still works if the request fails.
-        });
-    }
-
-    function buildSelector() {
-        let selector = document.querySelector(".language-selector");
-
-        if (selector) {
-            return selector;
+        if (!document.querySelector("script[data-fairmont-google-translate]")) {
+            const script = document.createElement("script");
+            script.src =
+                "https://translate.google.com/translate_a/element.js" +
+                "?cb=googleTranslateElementInit";
+            script.async = true;
+            script.dataset.fairmontGoogleTranslate = "true";
+            document.head.appendChild(script);
         }
+    }
+
+    function createSelector() {
+        let selector =
+            document.querySelector(".fairmont-global-language") ||
+            document.querySelector(".language-selector") ||
+            document.querySelector(".fairmont-login-language");
+
+        if (selector) return selector;
 
         selector = document.createElement("div");
-        selector.className = "language-selector language-selector-global";
-        selector.innerHTML = `
-            <button class="language-toggle" type="button"
-                    aria-expanded="false" aria-haspopup="listbox"
-                    aria-label="Select language">
-                <span class="language-current">EN</span>
-                <span class="language-arrow">⌄</span>
-            </button>
-            <div class="language-menu" role="listbox"></div>
-        `;
+        selector.className = "fairmont-global-language";
+        selector.innerHTML =
+            '<button type="button" class="fairmont-global-language-toggle" ' +
+            'aria-expanded="false" aria-haspopup="listbox">' +
+            '<span class="fairmont-global-language-current">EN</span>' +
+            '<span aria-hidden="true">⌄</span>' +
+            '</button>' +
+            '<div class="fairmont-global-language-menu" role="listbox"></div>';
 
-        const menu = selector.querySelector(".language-menu");
+        const menu =
+            selector.querySelector(".fairmont-global-language-menu");
 
-        LANGUAGES.forEach(function (item) {
+        Object.keys(LANGUAGES).forEach(function (code) {
             const button = document.createElement("button");
             button.type = "button";
-            button.dataset.lang = item[0];
-            button.textContent = item[1];
+            button.dataset.lang = code;
             button.setAttribute("role", "option");
+            button.textContent = LANGUAGES[code][0];
             menu.appendChild(button);
         });
 
@@ -103,41 +175,55 @@
     }
 
     function bindSelector(selector) {
-        if (selector.dataset.languageBound === "true") return;
-        selector.dataset.languageBound = "true";
+        if (!selector || selector.dataset.fairmontLanguageBound === "true") {
+            return;
+        }
 
-        const toggle = selector.querySelector(".language-toggle");
-        const menu = selector.querySelector(".language-menu");
-        const current = selector.querySelector(".language-current");
+        selector.dataset.fairmontLanguageBound = "true";
+
+        const toggle =
+            selector.querySelector(
+                ".fairmont-global-language-toggle, .language-toggle, #fairmont-login-language-toggle"
+            );
+
+        const menu =
+            selector.querySelector(
+                ".fairmont-global-language-menu, .language-menu, #fairmont-login-language-menu"
+            );
+
+        const current =
+            selector.querySelector(
+                ".fairmont-global-language-current, .language-current, #fairmont-login-language-current"
+            );
 
         if (!toggle || !menu || !current) return;
 
-        current.textContent = currentLanguage();
+        const saved = getLanguage();
+        current.textContent = saved;
 
         toggle.addEventListener("click", function (event) {
+            event.preventDefault();
             event.stopPropagation();
+
             const open = menu.classList.toggle("open");
             toggle.setAttribute("aria-expanded", open ? "true" : "false");
         });
 
-        menu.querySelectorAll("button[data-lang]").forEach(function (button) {
-            button.addEventListener("click", function (event) {
-                event.stopPropagation();
+        menu.querySelectorAll("[data-lang]").forEach(function (item) {
+            item.addEventListener("click", function () {
+                const code = item.dataset.lang;
+                if (!LANGUAGES[code]) return;
 
-                const code = button.dataset.lang;
-                localStorage.setItem(STORAGE_KEY, code);
                 current.textContent = code;
                 menu.classList.remove("open");
                 toggle.setAttribute("aria-expanded", "false");
 
-                setGoogleCookie(code);
+                saveLanguage(code);
 
-                setServerLanguage(code).finally(function () {
-                    // Reload so the Google translator starts the new page
-                    // in the selected language and keeps that choice on
-                    // every customer page.
-                    window.location.reload();
-                });
+                // A full reload is intentional: the Google translation cookie
+                // is then applied to the entire new page, including dashboard,
+                // transfers, payments, profile, invoices, etc.
+                window.location.reload();
             });
         });
 
@@ -149,59 +235,22 @@
         });
     }
 
-    window.googleTranslateElementInit = function () {
-        if (!window.google || !google.translate) return;
+    function start() {
+        ensureGoogleTarget();
 
-        new google.translate.TranslateElement({
-            pageLanguage: "en",
-            autoDisplay: false,
-            includedLanguages: "fr,es,nl,de,pt,it,ar,hi,bn,ur,zh-CN,ja,ko,ru,tr,sw,pa,gu,ml",
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-        }, "google_translate_element");
-
-        const code = currentLanguage();
-        if (code !== "EN") {
-            const googleCode = GOOGLE_CODES[code];
-
-            // Give the Google widget a moment to create its select, then
-            // explicitly select the stored language as a fallback.
-            let attempts = 0;
-            const choose = function () {
-                const select = document.querySelector(".goog-te-combo");
-                if (select && googleCode) {
-                    select.value = googleCode;
-                    select.dispatchEvent(new Event("change", { bubbles: true }));
-                    return;
-                }
-                if (attempts++ < 25) setTimeout(choose, 200);
-            };
-            choose();
-        }
-    };
-
-    function loadGoogleTranslate() {
-        if (document.getElementById("fairmont-google-translate-script")) return;
-
-        const script = document.createElement("script");
-        script.id = "fairmont-google-translate-script";
-        script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-        script.async = true;
-        document.head.appendChild(script);
-    }
-
-    function initialize() {
-        const selector = buildSelector();
+        const selector = createSelector();
         bindSelector(selector);
-
-        const code = currentLanguage();
-        setGoogleCookie(code);
-
         loadGoogleTranslate();
+
+        // Google Translate loads asynchronously, so retry initialization.
+        setTimeout(initializeGoogleTranslate, 700);
+        setTimeout(initializeGoogleTranslate, 1800);
+        setTimeout(initializeGoogleTranslate, 3500);
     }
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initialize);
+        document.addEventListener("DOMContentLoaded", start);
     } else {
-        initialize();
+        start();
     }
 })();

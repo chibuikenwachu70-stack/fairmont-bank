@@ -1,4 +1,4 @@
-from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash
+from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from flask_login import UserMixin
 from flask_login import login_user
@@ -11,7 +11,6 @@ import string
 import os
 from datetime import datetime, timezone, timedelta
 import re
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 
 app = Flask(__name__)
@@ -123,6 +122,13 @@ class LiveChatConversation(db.Model):
         db.Integer,
         db.ForeignKey("customer.id"),
         nullable=False,
+        index=True
+    )
+
+    # Browser session identifier used for visitors who are not signed in.
+    guest_session_id = db.Column(
+        db.String(120),
+        nullable=True,
         index=True
     )
 
@@ -364,6 +370,80 @@ class Customer(UserMixin, db.Model):
         default=False
     )
 
+
+
+# =========================================================
+# FAIRMONT BANK CUSTOMER INVOICE / BILLING MODEL
+# =========================================================
+
+class BankInvoice(db.Model):
+    __tablename__ = "bank_invoices"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    invoice_number = db.Column(
+        db.String(40), unique=True, nullable=False, index=True
+    )
+
+    customer_id = db.Column(
+        db.String(20), nullable=False, index=True
+    )
+
+    billing_type = db.Column(
+        db.String(100), nullable=False
+    )
+
+    description = db.Column(
+        db.String(500), nullable=False
+    )
+
+    amount = db.Column(db.Float, nullable=False, default=0.0)
+    tcc_tax = db.Column(db.Float, nullable=False, default=0.0)
+    other_fee = db.Column(db.Float, nullable=False, default=0.0)
+    discount = db.Column(db.Float, nullable=False, default=0.0)
+    total = db.Column(db.Float, nullable=False, default=0.0)
+
+    currency = db.Column(
+        db.String(10), nullable=False, default="GBP"
+    )
+
+    issue_date = db.Column(
+        db.Date, nullable=False, default=lambda: datetime.utcnow().date()
+    )
+
+    due_date = db.Column(
+        db.Date, nullable=False
+    )
+
+    status = db.Column(
+        db.String(30), nullable=False, default="Pending"
+    )
+
+    payment_method = db.Column(
+        db.String(80), nullable=True
+    )
+
+    payment_reference = db.Column(
+        db.String(100), nullable=True
+    )
+
+    billing_note = db.Column(
+        db.Text, nullable=True
+    )
+
+    created_by = db.Column(
+        db.String(80), nullable=True
+    )
+
+    created_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow
+    )
+
+    paid_at = db.Column(
+        db.DateTime, nullable=True
+    )
+
+
 class CustomerLoginOTP(db.Model):
 
     __tablename__ = "customer_login_otp"
@@ -526,34 +606,6 @@ class BankMessage(db.Model):
         nullable=False,
         default=datetime.utcnow
     )
-
-
-class BankInvoice(db.Model):
-    """Customer billing/invoice record created by authorized administrators."""
-    __tablename__ = "bank_invoices"
-
-    id = db.Column(db.Integer, primary_key=True)
-    invoice_number = db.Column(db.String(40), unique=True, nullable=False, index=True)
-    customer_id = db.Column(db.String(20), nullable=False, index=True)
-    billing_type = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(500), nullable=False)
-    amount = db.Column(db.Numeric(18, 2), nullable=False, default=0)
-    tcc_tax = db.Column(db.Numeric(18, 2), nullable=False, default=0)
-    other_fee = db.Column(db.Numeric(18, 2), nullable=False, default=0)
-    discount = db.Column(db.Numeric(18, 2), nullable=False, default=0)
-    total = db.Column(db.Numeric(18, 2), nullable=False, default=0)
-    currency = db.Column(db.String(10), nullable=False, default="GBP")
-    issue_date = db.Column(db.Date, nullable=False, default=lambda: datetime.utcnow().date())
-    due_date = db.Column(db.Date, nullable=False)
-    status = db.Column(db.String(20), nullable=False, default="Pending", index=True)
-    payment_reference = db.Column(db.String(80), nullable=True)
-    billing_note = db.Column(db.String(1000), nullable=True)
-    created_by = db.Column(db.Integer, nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    paid_at = db.Column(db.DateTime, nullable=True)
-    cancelled_at = db.Column(db.DateTime, nullable=True)
-
-
 
 
 class PaymentApproval(db.Model):
@@ -1119,48 +1171,6 @@ def generate_transaction_reference():
 
 
 # --------------------------------------------------
-# Global customer language assets
-# --------------------------------------------------
-
-@app.after_request
-def inject_customer_language_assets(response):
-    # Load the shared language selector/translator on every customer HTML page.
-    try:
-        content_type = response.headers.get("Content-Type", "")
-        path = request.path or ""
-        is_admin = path == "/admin" or path.startswith("/admin/")
-
-        if (
-            "text/html" in content_type
-            and not is_admin
-            and response.status_code < 400
-        ):
-            html = response.get_data(as_text=True)
-
-            if "/static/js/language.js" not in html:
-                head_assets = (
-                    '\n<link rel="stylesheet" href="/static/css/language.css">'
-                    '\n<div id="google_translate_element" aria-hidden="true"></div>\n'
-                )
-                if "</head>" in html:
-                    html = html.replace("</head>", head_assets + "</head>", 1)
-
-                if "</body>" in html:
-                    html = html.replace(
-                        "</body>",
-                        '<script src="/static/js/language.js"></script>\n</body>',
-                        1
-                    )
-
-                response.set_data(html)
-                response.headers.pop("Content-Length", None)
-    except Exception:
-        pass
-
-    return response
-
-
-# --------------------------------------------------
 # Dashboard template values
 # --------------------------------------------------
 
@@ -1218,64 +1228,6 @@ def home():
     return render_template(
         "index.html"
     )
-
-
-# =========================================================
-# SITE LANGUAGE
-# =========================================================
-
-SUPPORTED_SITE_LANGUAGES = {
-    "EN": "English",
-    "FR": "Français",
-    "ES": "Español",
-    "NL": "Nederlands",
-    "DE": "Deutsch",
-    "PT": "Português",
-    "IT": "Italiano",
-    "AR": "العربية",
-    "HI": "हिन्दी (India)",
-    "BN": "বাংলা",
-    "UR": "اردو",
-    "ZH": "中文",
-    "JA": "日本語",
-    "KO": "한국어",
-    "RU": "Русский",
-    "TR": "Türkçe",
-    "SW": "Kiswahili",
-    "PA": "ਪੰਜਾਬੀ",
-    "GU": "ગુજરાતી",
-    "ML": "മലയാളം"
-}
-
-SITE_LANGUAGE_GOOGLE_CODES = {
-    "EN": "en", "FR": "fr", "ES": "es", "NL": "nl", "DE": "de",
-    "PT": "pt", "IT": "it", "AR": "ar", "HI": "hi", "BN": "bn",
-    "UR": "ur", "ZH": "zh-CN", "JA": "ja", "KO": "ko", "RU": "ru",
-    "TR": "tr", "SW": "sw", "PA": "pa", "GU": "gu", "ML": "ml"
-}
-
-
-@app.route("/set-language", methods=["POST"])
-def set_language():
-    # Persist the selected site language in the session/account.
-    code = request.form.get("language", "").strip().upper()
-
-    if code not in SUPPORTED_SITE_LANGUAGES:
-        return {"ok": False, "error": "Unsupported language"}, 400
-
-    language_name = SUPPORTED_SITE_LANGUAGES[code]
-    session["site_language"] = code
-    session["site_language_name"] = language_name
-
-    if current_user.is_authenticated:
-        try:
-            current_user.preferred_language = language_name
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            return {"ok": False, "error": "Could not save language preference"}, 500
-
-    return {"ok": True, "code": code, "language": language_name}
 
 
 # =========================================================
@@ -1369,11 +1321,6 @@ def login():
                 customer=customer,
                 error=None
             )
-
-        selected_language = session.get("site_language")
-        if selected_language in SUPPORTED_SITE_LANGUAGES:
-            customer.preferred_language = SUPPORTED_SITE_LANGUAGES[selected_language]
-            db.session.commit()
 
         login_user(customer)
 
@@ -1535,10 +1482,6 @@ def verify_login_otp():
         )
 
     otp_record.used = True
-
-    selected_language = session.get("site_language")
-    if selected_language in SUPPORTED_SITE_LANGUAGES:
-        customer.preferred_language = SUPPORTED_SITE_LANGUAGES[selected_language]
 
     login_user(customer)
 
@@ -2410,6 +2353,39 @@ def logout():
     return render_template(
         "login.html"
     )
+
+
+# =========================================================
+# LIVE CHAT GUEST SESSION DATABASE MIGRATION
+# =========================================================
+
+def ensure_live_chat_guest_column():
+    """Add guest_session_id to older live-chat tables if needed."""
+    try:
+        inspector = db.inspect(db.engine)
+
+        if "live_chat_conversations" not in inspector.get_table_names():
+            return
+
+        columns = {
+            column["name"]
+            for column in inspector.get_columns(
+                "live_chat_conversations"
+            )
+        }
+
+        if "guest_session_id" not in columns:
+            with db.engine.begin() as connection:
+                connection.exec_driver_sql(
+                    "ALTER TABLE live_chat_conversations "
+                    "ADD COLUMN guest_session_id VARCHAR(120)"
+                )
+
+    except Exception as exc:
+        print(
+            "LIVE CHAT GUEST SESSION MIGRATION: skipped:",
+            exc
+        )
 
 
 # =========================================================
@@ -3724,21 +3700,24 @@ def international_transfer():
         original_transaction_reference=transaction_reference
     )
 
-    # Apply the customer's existing TCC payment restriction.
-    # TCC OFF -> Pending Approval.
-    # TCC ON  -> TCC Verification Required.
+    # Enforce the customer's existing TCC restriction before the
+    # international transfer can reach the normal confirmation page.
     apply_tcc_requirement(
         customer,
         approval
     )
+
+    # Keep the transfer record synchronized with the approval state.
+    if approval.status == "TCC Verification Required":
+        transfer.status = "TCC Verification Required"
 
     try:
         db.session.add(transfer)
         db.session.add(approval)
         db.session.commit()
 
-        # Do not show the normal confirmation page until
-        # TCC verification has been completed.
+        # When TCC is enabled, do not show the normal submitted page.
+        # Send the customer to the existing TCC verification workflow.
         if approval.status == "TCC Verification Required":
             return redirect(
                 url_for(
@@ -3746,6 +3725,7 @@ def international_transfer():
                     approval_id=approval.id
                 )
             )
+
     except IntegrityError:
         db.session.rollback()
         flash(
@@ -3764,240 +3744,6 @@ def international_transfer():
         transfer_reference=transaction_reference,
         approval=approval
     )
-
-
-# ============================================================
-# BILLS & INVOICES
-# ============================================================
-
-INVOICE_BILLING_TYPES = (
-    "TCC Tax / Government Tax Assessment",
-    "TCC Processing Fee",
-    "Account Maintenance Fee",
-    "Account Service Fee",
-    "International Transfer Fee",
-    "Wire Transfer Fee",
-    "Currency Conversion Fee",
-    "Compliance / Verification Fee",
-    "Document Processing Fee",
-    "Banking Service Charge",
-    "Other Customer Billing",
-)
-
-
-def generate_invoice_number():
-    while True:
-        number = f"FB-INV-{datetime.utcnow():%Y%m%d}-{secrets.token_hex(3).upper()}"
-        if not BankInvoice.query.filter_by(invoice_number=number).first():
-            return number
-
-
-def parse_money(value, label):
-    try:
-        amount = Decimal(str(value or "0")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    except (InvalidOperation, ValueError, TypeError):
-        raise ValueError(f"{label} must be a valid amount.")
-    if amount < 0:
-        raise ValueError(f"{label} cannot be negative.")
-    return amount
-
-
-def parse_invoice_due_date(value):
-    try:
-        return datetime.strptime(value, "%Y-%m-%d").date()
-    except (TypeError, ValueError):
-        raise ValueError("Please provide a valid due date.")
-
-
-@app.route("/invoices")
-@login_required
-def customer_invoices():
-    customer = current_user
-    invoices = (
-        BankInvoice.query
-        .filter_by(customer_id=customer.customer_id)
-        .order_by(BankInvoice.created_at.desc())
-        .all()
-    )
-    today = datetime.utcnow().date()
-    for invoice in invoices:
-        if invoice.status == "Pending" and invoice.due_date < today:
-            invoice.status = "Overdue"
-    if any(i.status == "Overdue" for i in invoices):
-        db.session.commit()
-    return render_template(
-        "invoices.html",
-        customer=customer,
-        invoices=invoices,
-        currency_symbol=app.config.get("CURRENCY_SYMBOL", "£")
-    )
-
-
-@app.route("/invoices/<int:invoice_id>")
-@login_required
-def customer_invoice_detail(invoice_id):
-    invoice = db.session.get(BankInvoice, invoice_id)
-    if invoice is None or invoice.customer_id != current_user.customer_id:
-        flash("The invoice could not be found.", "error")
-        return redirect(url_for("customer_invoices"))
-    if invoice.status == "Pending" and invoice.due_date < datetime.utcnow().date():
-        invoice.status = "Overdue"
-        db.session.commit()
-    return render_template(
-        "invoice_detail.html",
-        customer=current_user,
-        invoice=invoice,
-        currency_symbol=app.config.get("CURRENCY_SYMBOL", "£")
-    )
-
-
-@app.route("/admin/invoices")
-def admin_invoices():
-    admin_id = session.get("admin_id")
-    if not admin_id:
-        return redirect(url_for("admin_login"))
-    admin = db.session.get(AdminUser, admin_id)
-    if admin is None or not admin.is_active:
-        session.pop("admin_id", None)
-        return redirect(url_for("admin_login"))
-    invoices = BankInvoice.query.order_by(BankInvoice.created_at.desc()).all()
-    customers = {c.customer_id: c for c in Customer.query.all()}
-    return render_template("admin_invoices.html", admin=admin, invoices=invoices, customers=customers)
-
-
-@app.route("/admin/invoices/create", methods=["GET", "POST"])
-def admin_create_invoice():
-    admin_id = session.get("admin_id")
-    if not admin_id:
-        return redirect(url_for("admin_login"))
-    admin = db.session.get(AdminUser, admin_id)
-    if admin is None or not admin.is_active:
-        session.pop("admin_id", None)
-        return redirect(url_for("admin_login"))
-
-    customers = Customer.query.order_by(Customer.full_name.asc()).all()
-    errors = []
-    form = request.form
-    if request.method == "POST":
-        customer_id = form.get("customer_id", "").strip()
-        billing_type = form.get("billing_type", "").strip()
-        description = form.get("description", "").strip()
-        due_date_text = form.get("due_date", "").strip()
-        billing_note = form.get("billing_note", "").strip()
-        customer = Customer.query.filter_by(customer_id=customer_id).first()
-
-        if customer is None:
-            errors.append("Please select a valid customer.")
-        if billing_type not in INVOICE_BILLING_TYPES:
-            errors.append("Please select a valid billing type.")
-        if not description:
-            errors.append("Please enter an invoice description.")
-
-        try:
-            amount = parse_money(form.get("amount"), "Amount")
-            tcc_tax = parse_money(form.get("tcc_tax"), "TCC tax")
-            other_fee = parse_money(form.get("other_fee"), "Other fee")
-            discount = parse_money(form.get("discount"), "Discount")
-            due_date = parse_invoice_due_date(due_date_text)
-            total = (amount + tcc_tax + other_fee - discount).quantize(Decimal("0.01"))
-            if total < 0:
-                errors.append("Discount cannot be greater than the invoice charges.")
-        except ValueError as exc:
-            errors.append(str(exc))
-            amount = tcc_tax = other_fee = discount = total = Decimal("0.00")
-            due_date = datetime.utcnow().date()
-
-        if not errors:
-            invoice = BankInvoice(
-                invoice_number=generate_invoice_number(),
-                customer_id=customer.customer_id,
-                billing_type=billing_type,
-                description=description,
-                amount=amount,
-                tcc_tax=tcc_tax,
-                other_fee=other_fee,
-                discount=discount,
-                total=total,
-                currency=app.config.get("CURRENCY_CODE", "GBP"),
-                due_date=due_date,
-                status="Pending",
-                billing_note=billing_note or None,
-                created_by=admin.id,
-            )
-            db.session.add(invoice)
-            db.session.commit()
-            flash(f"Invoice {invoice.invoice_number} was created successfully.", "success")
-            return redirect(url_for("admin_invoice_detail", invoice_id=invoice.id))
-
-    return render_template(
-        "admin_invoice_create.html",
-        admin=admin,
-        customers=customers,
-        billing_types=INVOICE_BILLING_TYPES,
-        errors=errors,
-        form=form,
-        today=datetime.utcnow().date().isoformat()
-    )
-
-
-@app.route("/admin/invoices/<int:invoice_id>")
-def admin_invoice_detail(invoice_id):
-    admin_id = session.get("admin_id")
-    if not admin_id:
-        return redirect(url_for("admin_login"))
-    admin = db.session.get(AdminUser, admin_id)
-    if admin is None or not admin.is_active:
-        session.pop("admin_id", None)
-        return redirect(url_for("admin_login"))
-    invoice = db.session.get(BankInvoice, invoice_id)
-    if invoice is None:
-        flash("The invoice could not be found.", "error")
-        return redirect(url_for("admin_invoices"))
-    customer = Customer.query.filter_by(customer_id=invoice.customer_id).first()
-    return render_template("admin_invoice_detail.html", admin=admin, invoice=invoice, customer=customer)
-
-
-@app.route("/admin/invoices/<int:invoice_id>/mark-paid", methods=["POST"])
-def admin_mark_invoice_paid(invoice_id):
-    admin_id = session.get("admin_id")
-    if not admin_id:
-        return redirect(url_for("admin_login"))
-    admin = db.session.get(AdminUser, admin_id)
-    if admin is None or not admin.is_active:
-        session.pop("admin_id", None)
-        return redirect(url_for("admin_login"))
-    invoice = db.session.get(BankInvoice, invoice_id)
-    if invoice is None:
-        flash("The invoice could not be found.", "error")
-        return redirect(url_for("admin_invoices"))
-    if invoice.status != "Paid":
-        invoice.status = "Paid"
-        invoice.payment_reference = request.form.get("payment_reference", "").strip() or generate_transaction_reference()
-        invoice.paid_at = datetime.utcnow()
-        db.session.commit()
-        flash(f"Invoice {invoice.invoice_number} marked as paid.", "success")
-    return redirect(url_for("admin_invoice_detail", invoice_id=invoice.id))
-
-
-@app.route("/admin/invoices/<int:invoice_id>/cancel", methods=["POST"])
-def admin_cancel_invoice(invoice_id):
-    admin_id = session.get("admin_id")
-    if not admin_id:
-        return redirect(url_for("admin_login"))
-    admin = db.session.get(AdminUser, admin_id)
-    if admin is None or not admin.is_active:
-        session.pop("admin_id", None)
-        return redirect(url_for("admin_login"))
-    invoice = db.session.get(BankInvoice, invoice_id)
-    if invoice is None:
-        flash("The invoice could not be found.", "error")
-        return redirect(url_for("admin_invoices"))
-    if invoice.status != "Paid":
-        invoice.status = "Cancelled"
-        invoice.cancelled_at = datetime.utcnow()
-        db.session.commit()
-        flash(f"Invoice {invoice.invoice_number} was cancelled.", "success")
-    return redirect(url_for("admin_invoice_detail", invoice_id=invoice.id))
 
 
 # ============================================================
@@ -5322,7 +5068,9 @@ def account_preferences():
             "Standard"
         ).strip()
 
-        allowed_languages = set(SUPPORTED_SITE_LANGUAGES.values())
+        allowed_languages = {
+            "English"
+        }
 
         allowed_currencies = {
             "GBP",
@@ -5527,6 +5275,120 @@ def ensure_login_otp_column():
 # FAIRmont BANK LIVE CHAT
 # Customer Support Chat
 # ============================================================
+
+@app.route("/api/live-chat/message", methods=["POST"])
+def api_live_chat_message():
+    """
+    Public Live Chat API used by the floating homepage widget.
+
+    Signed-in customers are attached to their own customer account.
+    Visitors who are not signed in are placed into a dedicated support
+    visitor record and identified by a browser session token.
+    """
+
+    data = request.get_json(silent=True) or {}
+    message_text = str(data.get("message", "")).strip()
+
+    if not message_text:
+        return jsonify({
+            "ok": False,
+            "message": "Please enter a message."
+        }), 400
+
+    if len(message_text) > 2000:
+        message_text = message_text[:2000]
+
+    guest_session_id = None
+
+    if current_user.is_authenticated:
+        customer_id = current_user.id
+
+    else:
+        # Keep the visitor's support conversation tied to this browser.
+        guest_session_id = session.get("live_chat_guest_token")
+
+        if not guest_session_id:
+            guest_session_id = secrets.token_urlsafe(32)
+            session["live_chat_guest_token"] = guest_session_id
+            session.modified = True
+
+        # Reuse one non-login support visitor record so the existing
+        # admin Live Chat page can display the conversation normally.
+        guest_customer = Customer.query.filter_by(
+            customer_id="GUESTCHAT"
+        ).first()
+
+        if guest_customer is None:
+            guest_customer = Customer(
+                customer_id="GUESTCHAT",
+                account_number=None,
+                full_name="Website Visitor",
+                email="guest-chat@local.invalid",
+                phone="GUEST-CHAT",
+                account_type="Support Visitor",
+                country="Website",
+                password_hash=generate_password_hash(
+                    secrets.token_urlsafe(32)
+                ),
+                account_status="Guest",
+                account_balance=0.0
+            )
+            db.session.add(guest_customer)
+            db.session.flush()
+
+        customer_id = guest_customer.id
+
+    query = LiveChatConversation.query.filter_by(
+        customer_id=customer_id,
+        status="Open"
+    )
+
+    if guest_session_id:
+        query = query.filter_by(
+            guest_session_id=guest_session_id
+        )
+
+    conversation = (
+        query
+        .order_by(LiveChatConversation.updated_at.desc())
+        .first()
+    )
+
+    if conversation is None:
+        conversation = LiveChatConversation(
+            customer_id=customer_id,
+            guest_session_id=guest_session_id,
+            status="Open",
+            subject="Website Live Chat"
+        )
+        db.session.add(conversation)
+        db.session.flush()
+
+    customer_message = LiveChatMessage(
+        conversation_id=conversation.id,
+        sender_type="customer",
+        sender_id=(
+            current_user.id
+            if current_user.is_authenticated
+            else None
+        ),
+        message=message_text,
+        is_read=False,
+        created_at=datetime.utcnow()
+    )
+
+    conversation.updated_at = datetime.utcnow()
+    db.session.add(customer_message)
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "message": (
+            "Message sent successfully. "
+            "Your message has been delivered to Fairmont Bank Support."
+        )
+    })
+
 
 @app.route("/live-chat", methods=["GET", "POST"])
 def live_chat():
@@ -5846,6 +5708,338 @@ def admin_mark_login_otp_used(otp_id):
 
     return redirect(
         url_for("admin_login_otp_requests")
+    )
+
+
+
+
+# =========================================================
+# BILLS & INVOICES
+# =========================================================
+
+BILLING_TYPES = [
+    "TCC Tax / Government Tax Assessment",
+    "TCC Processing Fee",
+    "Account Maintenance Fee",
+    "Account Service Fee",
+    "International Transfer Fee",
+    "Wire Transfer Fee",
+    "Currency Conversion Fee",
+    "Compliance / Verification Fee",
+    "Document Processing Fee",
+    "Banking Service Charge",
+    "Other Customer Billing",
+]
+
+
+def _admin_invoice_guard():
+    """Return a redirect response when an administrator is not signed in."""
+    admin_id = session.get("admin_id")
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+
+    admin = db.session.get(AdminUser, admin_id)
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    return None
+
+
+def _refresh_invoice_status(invoice):
+    """Update a pending invoice to Overdue when its due date has passed."""
+    if (
+        invoice.status == "Pending"
+        and invoice.due_date is not None
+        and invoice.due_date < datetime.utcnow().date()
+    ):
+        invoice.status = "Overdue"
+        return True
+    return False
+
+
+def generate_bank_invoice_number():
+    """Generate a unique customer billing invoice number."""
+    while True:
+        number = (
+            f"FB-INV-{datetime.utcnow().strftime('%Y%m%d')}-"
+            f"{secrets.token_hex(3).upper()}"
+        )
+        if not BankInvoice.query.filter_by(invoice_number=number).first():
+            return number
+
+
+@app.route("/admin/invoices")
+def admin_invoices():
+    guard = _admin_invoice_guard()
+    if guard:
+        return guard
+
+    invoices = BankInvoice.query.order_by(
+        BankInvoice.created_at.desc(), BankInvoice.id.desc()
+    ).all()
+
+    changed = False
+    for invoice in invoices:
+        if _refresh_invoice_status(invoice):
+            changed = True
+    if changed:
+        db.session.commit()
+
+    customers = {
+        customer.customer_id: customer
+        for customer in Customer.query.all()
+    }
+
+    return render_template(
+        "admin_invoices.html",
+        invoices=invoices,
+        customers=customers,
+    )
+
+
+@app.route("/admin/invoices/create", methods=["GET", "POST"])
+def admin_create_invoice():
+    guard = _admin_invoice_guard()
+    if guard:
+        return guard
+
+    customers = Customer.query.order_by(Customer.full_name.asc()).all()
+    form = request.form if request.method == "POST" else {}
+    errors = []
+    today = datetime.utcnow().date().isoformat()
+
+    if request.method == "POST":
+        customer_id = request.form.get("customer_id", "").strip()
+        billing_type = request.form.get("billing_type", "").strip()
+        description = request.form.get("description", "").strip()
+
+        customer = Customer.query.filter_by(customer_id=customer_id).first()
+        if customer is None:
+            errors.append("Please select a valid customer.")
+        if not billing_type:
+            errors.append("Please select a billing type.")
+        if not description:
+            errors.append("Please enter a description.")
+
+        def money_field(name, label):
+            raw = request.form.get(name, "0").strip()
+            if raw == "":
+                return 0.0
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                errors.append(f"{label} must be a valid number.")
+                return 0.0
+            if value < 0:
+                errors.append(f"{label} cannot be negative.")
+                return 0.0
+            return round(value, 2)
+
+        amount = money_field("amount", "Base amount")
+        tcc_tax = money_field("tcc_tax", "TCC tax")
+        other_fee = money_field("other_fee", "Other fee")
+        discount = money_field("discount", "Discount")
+
+        due_date = None
+        due_date_raw = request.form.get("due_date", "").strip()
+        if due_date_raw:
+            try:
+                due_date = datetime.strptime(due_date_raw, "%Y-%m-%d").date()
+            except ValueError:
+                errors.append("Please enter a valid due date.")
+        else:
+            errors.append("Please enter a due date.")
+
+        if discount > amount + tcc_tax + other_fee:
+            errors.append("Discount cannot be greater than the invoice charges.")
+
+        if not errors:
+            total = round(amount + tcc_tax + other_fee - discount, 2)
+            invoice = BankInvoice(
+                invoice_number=generate_bank_invoice_number(),
+                customer_id=customer.customer_id,
+                billing_type=billing_type,
+                description=description,
+                amount=amount,
+                tcc_tax=tcc_tax,
+                other_fee=other_fee,
+                discount=discount,
+                total=total,
+                currency=(
+                    request.form.get("currency", "GBP").strip().upper()
+                    or "GBP"
+                ),
+                issue_date=datetime.utcnow().date(),
+                due_date=due_date,
+                status="Pending",
+                billing_note=request.form.get("billing_note", "").strip() or None,
+                created_by=session.get("admin_username"),
+            )
+
+            db.session.add(invoice)
+            db.session.commit()
+
+            flash(
+                f"Invoice {invoice.invoice_number} created successfully.",
+                "success",
+            )
+            return redirect(
+                url_for("admin_invoice_detail", invoice_id=invoice.id)
+            )
+
+    return render_template(
+        "admin_invoice_create.html",
+        customers=customers,
+        billing_types=BILLING_TYPES,
+        form=form,
+        errors=errors,
+        today=today,
+    )
+
+
+@app.route("/admin/invoices/<int:invoice_id>")
+def admin_invoice_detail(invoice_id):
+    guard = _admin_invoice_guard()
+    if guard:
+        return guard
+
+    invoice = db.session.get(BankInvoice, invoice_id)
+    if invoice is None:
+        return "Invoice not found", 404
+
+    if _refresh_invoice_status(invoice):
+        db.session.commit()
+
+    # The admin invoice detail template displays the customer name and ID.
+    # Load the customer linked to this invoice before rendering.
+    customer = Customer.query.filter_by(
+        customer_id=invoice.customer_id
+    ).first()
+
+    if customer is None:
+        return "Customer associated with this invoice was not found", 404
+
+    return render_template(
+        "admin_invoice_detail.html",
+        invoice=invoice,
+        customer=customer,
+    )
+
+
+@app.route("/admin/invoices/<int:invoice_id>/mark-paid", methods=["POST"])
+def admin_mark_invoice_paid(invoice_id):
+    guard = _admin_invoice_guard()
+    if guard:
+        return guard
+
+    invoice = db.session.get(BankInvoice, invoice_id)
+    if invoice is None:
+        return "Invoice not found", 404
+
+    if invoice.status == "Cancelled":
+        flash("A cancelled invoice cannot be marked as paid.", "error")
+        return redirect(url_for("admin_invoice_detail", invoice_id=invoice.id))
+
+    invoice.status = "Paid"
+    payment_reference = request.form.get("payment_reference", "").strip()
+    invoice.payment_reference = payment_reference or invoice.payment_reference
+    invoice.paid_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash(f"Invoice {invoice.invoice_number} marked as paid.", "success")
+    return redirect(url_for("admin_invoice_detail", invoice_id=invoice.id))
+
+
+@app.route("/admin/invoices/<int:invoice_id>/cancel", methods=["POST"])
+def admin_cancel_invoice(invoice_id):
+    guard = _admin_invoice_guard()
+    if guard:
+        return guard
+
+    invoice = db.session.get(BankInvoice, invoice_id)
+    if invoice is None:
+        return "Invoice not found", 404
+
+    if invoice.status == "Paid":
+        flash("A paid invoice cannot be cancelled.", "error")
+        return redirect(url_for("admin_invoice_detail", invoice_id=invoice.id))
+
+    invoice.status = "Cancelled"
+    db.session.commit()
+
+    flash(f"Invoice {invoice.invoice_number} cancelled.", "success")
+    return redirect(url_for("admin_invoice_detail", invoice_id=invoice.id))
+
+
+@app.route("/admin/invoices/<int:invoice_id>/print")
+def admin_print_invoice(invoice_id):
+    guard = _admin_invoice_guard()
+    if guard:
+        return guard
+
+    invoice = db.session.get(BankInvoice, invoice_id)
+    if invoice is None:
+        return "Invoice not found", 404
+
+    return render_template("admin_invoice_detail.html", invoice=invoice)
+
+
+@app.route("/invoices")
+def customer_invoices():
+    customer_id = session.get("customer_id")
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(customer_id=customer_id).first()
+    if customer is None:
+        session.pop("customer_id", None)
+        return redirect(url_for("login"))
+
+    invoices = BankInvoice.query.filter_by(
+        customer_id=customer.customer_id
+    ).order_by(
+        BankInvoice.issue_date.desc(), BankInvoice.id.desc()
+    ).all()
+
+    changed = False
+    for invoice in invoices:
+        if _refresh_invoice_status(invoice):
+            changed = True
+    if changed:
+        db.session.commit()
+
+    return render_template("invoices.html", invoices=invoices)
+
+
+@app.route("/invoices/<int:invoice_id>")
+def customer_invoice_detail(invoice_id):
+    customer_id = session.get("customer_id")
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(customer_id=customer_id).first()
+    if customer is None:
+        session.pop("customer_id", None)
+        return redirect(url_for("login"))
+
+    invoice = BankInvoice.query.filter_by(
+        id=invoice_id,
+        customer_id=customer.customer_id,
+    ).first()
+
+    if invoice is None:
+        return "Invoice not found", 404
+
+    if _refresh_invoice_status(invoice):
+        db.session.commit()
+
+    return render_template(
+        "invoice_detail.html",
+        invoice=invoice,
+        customer=customer,
     )
 
 
@@ -8246,11 +8440,48 @@ if "admin_incoming_payment" not in app.view_functions:
     )
 
 
+def ensure_bank_invoice_schema():
+    """Safely add invoice columns that may be missing from an older SQLite table.
+
+    SQLite/SQLAlchemy create_all() does not alter an existing table, so this
+    small idempotent migration preserves existing invoice records.
+    """
+    from sqlalchemy import inspect, text
+
+    db.create_all()
+    inspector = inspect(db.engine)
+    tables = inspector.get_table_names()
+
+    if "bank_invoices" not in tables:
+        return
+
+    existing = {col["name"] for col in inspector.get_columns("bank_invoices")}
+
+    optional_columns = {
+        "payment_method": "VARCHAR(80)",
+        "payment_reference": "VARCHAR(100)",
+        "billing_note": "TEXT",
+        "created_by": "VARCHAR(80)",
+        "paid_at": "DATETIME",
+    }
+
+    with db.engine.begin() as conn:
+        for column_name, sql_type in optional_columns.items():
+            if column_name not in existing:
+                conn.execute(
+                    text(
+                        f'ALTER TABLE bank_invoices ADD COLUMN "{column_name}" {sql_type}'
+                    )
+                )
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        ensure_bank_invoice_schema()
         ensure_account_preference_columns()
         ensure_virtual_card_security_code_column()
+        ensure_live_chat_guest_column()
         repair_payment_approvals_sequence()
 
 
