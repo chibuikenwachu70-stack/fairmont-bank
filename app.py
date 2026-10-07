@@ -8441,10 +8441,11 @@ if "admin_incoming_payment" not in app.view_functions:
 
 
 def ensure_bank_invoice_schema():
-    """Safely add invoice columns that may be missing from an older SQLite table.
+    """Create the invoice table and add missing invoice columns safely.
 
-    SQLite/SQLAlchemy create_all() does not alter an existing table, so this
-    small idempotent migration preserves existing invoice records.
+    This runs against the configured production database as well as local
+    SQLite. SQLAlchemy create_all() creates bank_invoices when it does not
+    exist; the column checks preserve existing records on older databases.
     """
     from sqlalchemy import inspect, text
 
@@ -8473,6 +8474,19 @@ def ensure_bank_invoice_schema():
                         f'ALTER TABLE bank_invoices ADD COLUMN "{column_name}" {sql_type}'
                     )
                 )
+
+
+
+# PRODUCTION DATABASE STARTUP INITIALIZATION
+# Render/Gunicorn imports this module instead of executing the __main__ block.
+# Therefore the production PostgreSQL database must be initialized here.
+with app.app_context():
+    db.create_all()
+    ensure_bank_invoice_schema()
+    ensure_account_preference_columns()
+    ensure_virtual_card_security_code_column()
+    ensure_live_chat_guest_column()
+    repair_payment_approvals_sequence()
 
 
 if __name__ == "__main__":
