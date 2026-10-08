@@ -1222,6 +1222,68 @@ def inject_dashboard_values():
     }
 
 
+# ============================================================
+# FROZEN CUSTOMER ACCOUNT PAYMENT GUARD
+# ============================================================
+
+FROZEN_ACCOUNT_PAYMENT_PATHS = {
+    "/send-money",
+    "/send-fairmont-money",
+    "/international-transfer",
+    "/pay-bills",
+    "/electric-bills",
+    "/airtime",
+    "/data-bundles",
+    "/tv-subscriptions",
+    "/lifestyle",
+    "/flights-travel",
+    "/withdraw/paypal",
+    "/withdraw/card",
+    "/withdraw/bank",
+    "/withdraw/wise",
+    "/withdraw/cashapp",
+    "/withdraw/venmo",
+    "/payment/tcc-verification",
+}
+
+
+@app.before_request
+def enforce_frozen_customer_payment_block():
+    """Prevent frozen customer accounts from submitting payment actions."""
+
+    if request.path.startswith("/admin"):
+        return None
+
+    customer_id = session.get("customer_id")
+
+    if not customer_id:
+        return None
+
+    path = request.path.rstrip("/") or "/"
+
+    is_payment_path = (
+        path in FROZEN_ACCOUNT_PAYMENT_PATHS
+        or path.startswith("/withdraw/")
+        or path.startswith("/payment/tcc-verification/")
+    )
+
+    if not is_payment_path:
+        return None
+
+    customer = Customer.query.filter_by(
+        customer_id=customer_id
+    ).first()
+
+    if customer is None:
+        return None
+
+    if str(customer.account_status or "").strip().lower() == "locked":
+        session["account_frozen_popup"] = True
+        return redirect(url_for("dashboard"))
+
+    return None
+
+
 @app.route("/")
 def home():
 
@@ -1260,7 +1322,10 @@ def login():
                 error="Invalid Customer ID or password."
             )
 
-        if customer.account_status != "Active":
+        # A locked/frozen customer may still sign in and view the
+        # account. Financial actions are blocked separately by the
+        # frozen-account payment guard.
+        if customer.account_status not in ("Active", "Locked"):
 
             return render_template(
                 "login.html",
@@ -3550,22 +3615,18 @@ def send_money():
         sender_country=customer.country,
     )
 
-    apply_tcc_requirement(
-        customer,
-        approval
-    )
+    # UK bank payments do not require a TCC code.
+    # They remain pending for the normal payment-approval workflow.
+    approval.status = "Pending Approval"
+    approval.tcc_status = "Not Required"
+    approval.tcc_code = None
+    approval.tcc_generated_at = None
+    approval.tcc_expires_at = None
+    approval.tcc_verified_at = None
+    approval.tcc_attempts = 0
 
     db.session.add(approval)
     db.session.commit()
-
-    if approval.status == "TCC Verification Required":
-
-        return redirect(
-            url_for(
-                "payment_tcc_verification",
-                approval_id=approval.id
-            )
-        )
 
     return render_template(
         "payment_pending_confirmation.html",
@@ -8441,11 +8502,10 @@ if "admin_incoming_payment" not in app.view_functions:
 
 
 def ensure_bank_invoice_schema():
-    """Create the invoice table and add missing invoice columns safely.
+    """Safely add invoice columns that may be missing from an older SQLite table.
 
-    This runs against the configured production database as well as local
-    SQLite. SQLAlchemy create_all() creates bank_invoices when it does not
-    exist; the column checks preserve existing records on older databases.
+    SQLite/SQLAlchemy create_all() does not alter an existing table, so this
+    small idempotent migration preserves existing invoice records.
     """
     from sqlalchemy import inspect, text
 
@@ -8474,19 +8534,6 @@ def ensure_bank_invoice_schema():
                         f'ALTER TABLE bank_invoices ADD COLUMN "{column_name}" {sql_type}'
                     )
                 )
-
-
-
-# PRODUCTION DATABASE STARTUP INITIALIZATION
-# Render/Gunicorn imports this module instead of executing the __main__ block.
-# Therefore the production PostgreSQL database must be initialized here.
-with app.app_context():
-    db.create_all()
-    ensure_bank_invoice_schema()
-    ensure_account_preference_columns()
-    ensure_virtual_card_security_code_column()
-    ensure_live_chat_guest_column()
-    repair_payment_approvals_sequence()
 
 
 if __name__ == "__main__":

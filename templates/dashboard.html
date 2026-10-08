@@ -157,17 +157,33 @@
         }
     </style>
 
-    <link id="fairmont-dashboard-language-assets"
-          rel="stylesheet"
-          href="{{ url_for('static', filename='css/language.css') }}">
-
-    <div id="google_translate_element"
-         aria-hidden="true"
-         style="position:absolute;left:-99999px;top:-99999px;width:1px;height:1px;overflow:hidden;"></div>
-
+<style id="account-frozen-popup-style">
+.account-frozen-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
+.account-frozen-modal{position:relative;width:min(560px,100%);max-height:90vh;overflow-y:auto;padding:32px;border-radius:18px;background:#fff;color:#172033;box-shadow:0 25px 80px rgba(0,0,0,.35)}
+.account-frozen-modal h2{margin:12px 0 16px;font-size:25px}.account-frozen-modal p{line-height:1.65;margin:0 0 16px}.account-frozen-close{position:absolute;top:12px;right:15px;border:0;background:transparent;font-size:30px;cursor:pointer;color:#687386}.frozen-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:#f3e1b8;color:#795b19;font-size:25px;font-weight:800}.frozen-contact{display:grid;gap:12px;margin:22px 0}.frozen-contact div{padding:13px 15px;border:1px solid #e2e6ec;border-radius:10px}.frozen-contact strong{display:block;margin-bottom:4px}.frozen-contact a{color:#2454a6;text-decoration:none}.frozen-support-button{width:100%;padding:13px 18px;border:0;border-radius:10px;background:#172d52;color:#fff;font-weight:700;cursor:pointer}@media(max-width:600px){.account-frozen-modal{padding:25px 20px}}
+</style>
 </head>
 
 <body>
+{% if session.pop('account_frozen_popup', False) %}
+<div id="accountFrozenModal" class="account-frozen-overlay" role="dialog" aria-modal="true" aria-labelledby="accountFrozenTitle">
+  <div class="account-frozen-modal">
+    <button class="account-frozen-close" type="button" onclick="closeFrozenModal()" aria-label="Close">&times;</button>
+    <div class="frozen-icon" aria-hidden="true">!</div>
+    <h2 id="accountFrozenTitle">Account Frozen</h2>
+    <p><strong>Your account has been frozen due to a security and compliance review.</strong> As a result, payments, transfers, withdrawals, and bill payments are temporarily unavailable.</p>
+    <p>Please contact <strong>Fairmont Bank Customer Support</strong> for assistance and information about the steps required to restore access to your account.</p>
+    <div class="frozen-contact">
+      <div><strong>Customer Support</strong><a href="mailto:support@fairmontbank.com">support@fairmontbank.com</a></div>
+      <div><strong>Phone</strong><a href="tel:+17317330071">+1 (731) 733-0071</a></div>
+      <div><strong>WhatsApp</strong><a href="https://wa.me/17317330071?text=Hello%20Fairmont%20Bank%20Support" target="_blank" rel="noopener noreferrer">Chat with Fairmont Bank Support</a></div>
+    </div>
+    <button class="frozen-support-button" type="button" onclick="window.open('https://wa.me/17317330071?text=Hello%20Fairmont%20Bank%20Support','_blank')">Contact Support</button>
+  </div>
+</div>
+<script>function closeFrozenModal(){const m=document.getElementById('accountFrozenModal');if(m)m.remove();}</script>
+{% endif %}
+
 <main class="dashboard-page">
 <div class="dashboard-shell">
 
@@ -192,8 +208,8 @@
                         <path d="M10 21h4"></path>
                     </svg>
                 </span>
-                {% if notification_unread_count > 0 %}
-                    <span class="dashboard-notification-badge">{{ notification_unread_count }}</span>
+                {% if notification_unread_count|default(0) > 0 %}
+                    <span class="dashboard-notification-badge">{{ notification_unread_count|default(0) }}</span>
                 {% endif %}
             </a>
         </div>
@@ -500,9 +516,5 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
-
-    <script id="fairmont-dashboard-language-script"
-            src="{{ url_for('static', filename='js/language.js') }}"></script>
-
 </body>
 </html>
