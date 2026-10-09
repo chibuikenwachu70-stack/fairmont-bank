@@ -9843,6 +9843,29 @@ def ensure_bank_invoice_schema():
                 )
 
 
+# Initialize missing database tables after every SQLAlchemy model has been
+# declared. Render starts this application with Gunicorn, which imports app.py
+# without executing the __main__ block. create_all() creates missing tables
+# and does not delete existing tables or records. It does not alter existing
+# table definitions; use explicit migrations for column changes.
+try:
+    with app.app_context():
+        db.create_all()
+        from sqlalchemy import inspect
+        _database_tables = set(inspect(db.engine).get_table_names())
+        if "transactions" not in _database_tables:
+            raise RuntimeError(
+                "Database initialization finished but the transactions table is missing. "
+                "Check DATABASE_URL and database permissions."
+            )
+        app.logger.info(
+            "Database initialization complete; transactions table is available."
+        )
+except Exception:
+    app.logger.exception("Database initialization failed during application startup.")
+    raise
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
