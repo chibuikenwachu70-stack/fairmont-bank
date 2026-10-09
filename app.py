@@ -9843,6 +9843,47 @@ def ensure_bank_invoice_schema():
                 )
 
 
+def ensure_payment_approvals_schema():
+    """Add newer payment_approvals columns to existing PostgreSQL databases."""
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(db.engine)
+    if "payment_approvals" not in inspector.get_table_names():
+        # db.create_all() below creates the complete table when it is absent.
+        return
+
+    existing_columns = {
+        column["name"]
+        for column in inspector.get_columns("payment_approvals")
+    }
+
+    # Use explicit PostgreSQL/SQLite-compatible column types. Defaults are
+    # included where required so existing rows remain valid after migration.
+    missing_columns = {
+        "recipient_customer_id": "VARCHAR(20)",
+        "recipient_name": "VARCHAR(150)",
+        "recipient_email": "VARCHAR(254) NOT NULL DEFAULT ''",
+        "recipient_account_number": "VARCHAR(50)",
+        "original_transaction_reference": "VARCHAR(40)",
+        "tcc_status": "VARCHAR(30) NOT NULL DEFAULT 'Not Required'",
+        "tcc_code": "VARCHAR(6)",
+        "tcc_generated_at": "TIMESTAMP",
+        "tcc_expires_at": "TIMESTAMP",
+        "tcc_verified_at": "TIMESTAMP",
+        "tcc_attempts": "INTEGER NOT NULL DEFAULT 0",
+    }
+
+    with db.engine.begin() as connection:
+        for column_name, sql_definition in missing_columns.items():
+            if column_name not in existing_columns:
+                connection.execute(text(
+                    f'ALTER TABLE payment_approvals ADD COLUMN "{column_name}" {sql_definition}'
+                ))
+                app.logger.info(
+                    "Database migration added payment_approvals.%s", column_name
+                )
+
+
 # Initialize missing database tables after every SQLAlchemy model has been
 # declared. Render starts this application with Gunicorn, which imports app.py
 # without executing the __main__ block. create_all() creates missing tables
@@ -9851,6 +9892,7 @@ def ensure_bank_invoice_schema():
 try:
     with app.app_context():
         db.create_all()
+        ensure_payment_approvals_schema()
         from sqlalchemy import inspect
         _database_tables = set(inspect(db.engine).get_table_names())
         if "transactions" not in _database_tables:
