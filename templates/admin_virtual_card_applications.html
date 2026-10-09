@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Virtual Card Applications | Admin</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 28px;
+            background: #081426;
+            color: #f4f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: #a9bfd8;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .link-button {
+            display: inline-block;
+            padding: 11px 16px;
+            border-radius: 8px;
+            background: #203953;
+            border: 1px solid #45698f;
+            color: #eaf3ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .link-button:hover {
+            background: #294968;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            padding: 20px;
+            background: #122844;
+            border: 1px solid #29435f;
+            border-radius: 12px;
+        }
+
+        .summary-label {
+            color: #a9bfd8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-number {
+            margin-top: 10px;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .panel {
+            overflow: hidden;
+            background: #122844;
+            border: 1px solid #29435f;
+            border-radius: 14px;
+        }
+
+        .panel-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid #29435f;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .flash-message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .flash-success {
+            background: #143d2b;
+            border: 1px solid #2d8052;
+            color: #d7ffe7;
+        }
+
+        .flash-error {
+            background: #4a2025;
+            border: 1px solid #a83c48;
+            color: #ffe1e4;
+        }
+
+        .flash-info {
+            background: #203953;
+            border: 1px solid #45698f;
+            color: #e1efff;
+        }
+
+        .flash-warning {
+            background: #49391b;
+            border: 1px solid #9a7831;
+            color: #fff0c7;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th,
+        td {
+            padding: 17px 16px;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid #29435f;
+            font-size: 13px;
+        }
+
+        th {
+            background: #102239;
+            color: #b9cce2;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #162f4b;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .customer-id {
+            font-weight: bold;
+            color: #ffffff;
+            overflow-wrap: anywhere;
+        }
+
+        .muted {
+            display: block;
+            margin-top: 6px;
+            color: #9fb4cc;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            color: #ffe4a3;
+            background: #4a3919;
+            border: 1px solid #80652b;
+        }
+
+        .status-approved {
+            color: #b8ffd2;
+            background: #153d2b;
+            border: 1px solid #2b7850;
+        }
+
+        .status-rejected {
+            color: #ffd0d5;
+            background: #4a2025;
+            border: 1px solid #923b45;
+        }
+
+        .status-other {
+            color: #d9e8fa;
+            background: #263c55;
+            border: 1px solid #45698f;
+        }
+
+        .actions {
+            min-width: 250px;
+        }
+
+        .action-form {
+            margin-bottom: 12px;
+        }
+
+        .action-form:last-child {
+            margin-bottom: 0;
+        }
+
+        .reason-input {
+            display: block;
+            width: 100%;
+            min-height: 68px;
+            margin-bottom: 8px;
+            padding: 10px;
+            resize: vertical;
+            border: 1px solid #45617e;
+            border-radius: 7px;
+            background: #091a2d;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 12px;
+        }
+
+        .reason-input:focus {
+            outline: 2px solid #2878e5;
+            outline-offset: 1px;
+        }
+
+        .reason-input::placeholder {
+            color: #8da5bf;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .approve-button {
+            background: #16834d;
+            color: #ffffff;
+        }
+
+        .approve-button:hover {
+            background: #11683d;
+        }
+
+        .reject-button {
+            background: #a92f3d;
+            color: #ffffff;
+        }
+
+        .reject-button:hover {
+            background: #852431;
+        }
+
+        .reviewed-note {
+            color: #b5c7dc;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .empty-state {
+            padding: 55px 20px;
+            text-align: center;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 12px;
+            font-size: 19px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            color: #a9bfd8;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            color: #8fa6bf;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 23px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-number {
+                font-size: 25px;
+            }
+
+            .panel-header {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+
+        <!-- PAGE HEADER -->
+        <header class="header">
+            <div>
+                <h1>Virtual Card Applications</h1>
+                <p class="subtitle">
+                    Review customer applications and manage virtual card issuance.
+                </p>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="link-button"
+                    href="{{ url_for('admin_dashboard') }}"
+                >
+                    Back to Admin Dashboard
+                </a>
+
+                <a
+                    class="link-button"
+                    href="{{ url_for('admin_logout') }}"
+                >
+                    Admin Logout
+                </a>
+            </div>
+        </header>
+
+        <!-- FLASH MESSAGES -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+
+                    {% if category == "success" %}
+                        <div class="flash-message flash-success" role="status">
+                            {{ message }}
+                        </div>
+                    {% elif category == "error" %}
+                        <div class="flash-message flash-error" role="alert">
+                            {{ message }}
+                        </div>
+                    {% elif category == "warning" %}
+                        <div class="flash-message flash-warning" role="status">
+                            {{ message }}
+                        </div>
+                    {% else %}
+                        <div class="flash-message flash-info" role="status">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- SUMMARY -->
+        {% set pending_count = applications
+            | selectattr("status", "equalto", "Pending")
+            | list
+            | length
+        %}
+
+        {% set approved_count = applications
+            | selectattr("status", "equalto", "Approved")
+            | list
+            | length
+        %}
+
+        {% set rejected_count = applications
+            | selectattr("status", "equalto", "Rejected")
+            | list
+            | length
+        %}
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+                <div class="summary-label">Total Applications</div>
+                <div class="summary-number">{{ applications | length }}</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Awaiting Review</div>
+                <div class="summary-number">{{ pending_count }}</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Approved Applications</div>
+                <div class="summary-number">{{ approved_count }}</div>
+            </div>
+
+        </section>
+
+        <!-- APPLICATIONS TABLE -->
+        <section class="panel">
+
+            <div class="panel-header">
+                <h2>Application Records</h2>
+            </div>
+
+            {% if applications %}
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Application</th>
+                                <th>Customer ID</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Review Details</th>
+                                <th>Administrator Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for application in applications %}
+
+                                <tr>
+                                    <!-- APPLICATION ID -->
+                                    <td>
+                                        <strong>#{{ application.id }}</strong>
+                                    </td>
+
+                                    <!-- CUSTOMER -->
+                                    <td>
+                                        <span class="customer-id">
+                                            {{ application.customer_id }}
+                                        </span>
+                                    </td>
+
+                                    <!-- SUBMISSION DATE -->
+                                    <td>
+                                        {% if application.submitted_at %}
+                                            {{ application.submitted_at.strftime("%d %b %Y") }}
+                                            <span class="muted">
+                                                {{ application.submitted_at.strftime("%H:%M UTC") }}
+                                            </span>
+                                        {% else %}
+                                            <span class="muted">
+                                                Date unavailable
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- APPLICATION STATUS -->
+                                    <td>
+                                        {% if application.status == "Pending" %}
+                                            <span class="status status-pending">
+                                                Pending
+                                            </span>
+                                        {% elif application.status == "Approved" %}
+                                            <span class="status status-approved">
+                                                Approved
+                                            </span>
+                                        {% elif application.status == "Rejected" %}
+                                            <span class="status status-rejected">
+                                                Rejected
+                                            </span>
+                                        {% else %}
+                                            <span class="status status-other">
+                                                {{ application.status }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- REVIEW DETAILS -->
+                                    <td>
+                                        {% if application.reviewed_by %}
+                                            <strong>Reviewed by</strong>
+                                            <span class="muted">
+                                                {{ application.reviewed_by }}
+                                            </span>
+                                        {% endif %}
+
+                                        {% if application.reviewed_at %}
+                                            <strong>Review date</strong>
+                                            <span class="muted">
+                                                {{ application.reviewed_at.strftime("%d %b %Y, %H:%M UTC") }}
+                                            </span>
+                                        {% endif %}
+
+                                        {% if application.rejection_reason %}
+                                            <strong>Reason</strong>
+                                            <span class="muted">
+                                                {{ application.rejection_reason }}
+                                            </span>
+                                        {% endif %}
+
+                                        {% if not application.reviewed_by
+                                              and not application.reviewed_at
+                                              and not application.rejection_reason %}
+                                            <span class="muted">
+                                                No review recorded yet.
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- ACTIONS -->
+                                    <td class="actions">
+
+                                        {% if application.status == "Pending" %}
+
+                                            <!-- APPROVE -->
+                                            <form
+                                                class="action-form"
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'admin_review_virtual_card_application',
+                                                    application_id=application.id
+                                                ) }}"
+                                                onsubmit="return confirm('Approve this virtual card application?');"
+                                            >
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="approve"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-button approve-button"
+                                                >
+                                                    Approve Application
+                                                </button>
+                                            </form>
+
+                                            <!-- REJECT -->
+                                            <form
+                                                class="action-form"
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'admin_review_virtual_card_application',
+                                                    application_id=application.id
+                                                ) }}"
+                                                onsubmit="return confirm('Reject this virtual card application?');"
+                                            >
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="reject"
+                                                >
+
+                                                <textarea
+                                                    name="rejection_reason"
+                                                    class="reason-input"
+                                                    maxlength="255"
+                                                    placeholder="Reason for rejection (optional)"
+                                                ></textarea>
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-button reject-button"
+                                                >
+                                                    Reject Application
+                                                </button>
+                                            </form>
+
+                                        {% else %}
+
+                                            <div class="reviewed-note">
+                                                This application has already
+                                                been reviewed.
+
+                                                {% if application.status == "Approved" %}
+                                                    <br><br>
+                                                    The application is approved.
+                                                {% elif application.status == "Rejected" %}
+                                                    <br><br>
+                                                    The application was rejected.
+                                                {% endif %}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+                    <h3>No Virtual Card Applications</h3>
+                    <p>
+                        There are currently no virtual card applications
+                        to display. Applications will appear here when
+                        customers submit requests.
+                    </p>
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <p class="footer-note">
+            Administrator access is required to review applications.
+            Approving an application authorizes the application to issue
+            or replace a simulated virtual card within this website.
+            This page does not connect to a real card network.
+        </p>
+
+    </main>
+</body>
+</html>

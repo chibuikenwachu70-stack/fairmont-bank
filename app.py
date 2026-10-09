@@ -1,4 +1,4 @@
-from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash, jsonify, Response
 from flask_login import login_required, current_user
 from flask_login import UserMixin
 from flask_login import login_user
@@ -8,12 +8,529 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 import string
+import csv
+import io
 import os
 from datetime import datetime, timezone, timedelta
 import re
+import smtplib
+from email.message import EmailMessage
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 
 app = Flask(__name__)
+
+
+def send_bank_email(recipient_email, subject, body, html_body=None):
+    """Send a text email, optionally with a professionally formatted HTML alternative."""
+    recipient_email = (recipient_email or "").strip()
+    if not recipient_email or "@" not in recipient_email:
+        return False
+
+    server_name = os.getenv("MAIL_SERVER", "smtp-relay.brevo.com")
+    try:
+        server_port = int(os.getenv("MAIL_PORT", "587"))
+    except (TypeError, ValueError):
+        print("EMAIL NOT SENT: MAIL_PORT must be a number.")
+        return False
+
+    username = os.getenv("MAIL_USERNAME", "").strip()
+    password = os.getenv("MAIL_PASSWORD", "")
+    sender = os.getenv("MAIL_DEFAULT_SENDER", "support@fairmontbank.com").strip()
+    use_tls = os.getenv("MAIL_USE_TLS", "true").strip().lower() in {"1", "true", "yes", "on"}
+    if not username or not password or not sender:
+        print("EMAIL NOT SENT: configure SMTP settings in .env.")
+        return False
+
+    message = EmailMessage()
+    message["Subject"] = str(subject).strip()
+    message["From"] = sender
+    message["To"] = recipient_email
+    message.set_content(str(body).strip())
+
+    if html_body:
+        # The HTML template includes the same short notice in its footer.
+        message.add_alternative(str(html_body), subtype="html")
+
+    try:
+        with smtplib.SMTP(server_name, server_port, timeout=20) as smtp:
+            smtp.ehlo()
+            if use_tls:
+                smtp.starttls()
+                smtp.ehlo()
+            smtp.login(username, password)
+            smtp.send_message(message)
+        print(f"EMAIL ACCEPTED for {recipient_email}")
+        return True
+    except Exception as exc:
+        print(f"EMAIL FAILED for {recipient_email}: {type(exc).__name__}: {exc}")
+        return False
+
+
+def send_branded_customer_email(
+    customer,
+    subject,
+    eyebrow,
+    heading,
+    message_text,
+    details=None,
+):
+    """Send a branded HTML and plain-text customer email with a bank disclosure."""
+    if customer is None or not getattr(customer, "email", None):
+        return False
+
+    details = details or []
+    text_lines = [
+        "FAIRMONT BANK — ACCOUNT SERVICES",
+        "",
+        str(heading),
+        "",
+        f"Dear {customer.full_name},",
+        "",
+        str(message_text),
+        "",
+    ]
+    for label, value in details:
+        text_lines.append(f"{label}: {value}")
+    text_lines.extend([
+        "",
+        "For assistance, contact support@fairmontbank.com.",
+        "",
+        "Kind regards,",
+        "Fairmont Bank",
+        "Account Services",
+    ])
+
+    html_body = render_template_string(
+        """
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>{{ heading }}</title>
+        </head>
+        <body style="margin:0;padding:0;background:#f2f5f9;font-family:Arial,Helvetica,sans-serif;color:#253247;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f2f5f9;padding:28px 10px;">
+            <tr><td align="center">
+              <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%;max-width:600px;background:#ffffff;border:1px solid #e1e7ef;border-radius:12px;overflow:hidden;">
+                <tr><td style="background:#102747;padding:26px 28px;text-align:center;">
+                  {% if logo_url %}<img src="{{ logo_url }}" alt="Fairmont Bank" width="170" style="display:block;max-width:170px;width:100%;height:auto;margin:0 auto 12px;border:0;">{% else %}<div style="font-size:24px;font-weight:700;letter-spacing:2px;color:#ffffff;">FAIRMONT BANK</div>{% endif %}
+                  <div style="font-size:11px;letter-spacing:2px;color:#d9bd78;margin-top:8px;">ACCOUNT SERVICES</div>
+                  <div style="height:3px;width:58px;background:#c5a45d;margin:18px auto 0;"></div>
+                </td></tr>
+                <tr><td style="padding:30px 28px 12px;">
+                  <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9a772f;">{{ eyebrow|upper }}</div>
+                  <h1 style="font-size:25px;line-height:1.3;color:#102747;margin:10px 0 18px;">{{ heading }}</h1>
+                  <p style="font-size:15px;line-height:1.8;margin:0 0 14px;">Dear {{ customer.full_name }},</p>
+                  <p style="font-size:14px;line-height:1.8;color:#536174;margin:0 0 22px;white-space:pre-line;">{{ message_text }}</p>
+                </td></tr>
+                {% if details %}
+                <tr><td style="padding:0 28px 24px;">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e1e7ef;border-radius:8px;">
+                    <tr><td colspan="2" style="padding:13px 16px;background:#f6f8fb;color:#102747;font-size:12px;font-weight:700;letter-spacing:1px;">DETAILS</td></tr>
+                    {% for label, value in details %}
+                    <tr>
+                      <td style="padding:12px 16px;border-top:1px solid #edf0f4;color:#68768a;font-size:13px;">{{ label }}</td>
+                      <td style="padding:12px 16px;border-top:1px solid #edf0f4;color:#102747;font-size:13px;font-weight:700;text-align:right;word-break:break-word;">{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                </td></tr>
+                {% endif %}
+                <tr><td style="padding:0 28px 28px;">
+                  <p style="font-size:13px;line-height:1.8;color:#536174;margin:0;">If you need assistance, contact <a href="mailto:support@fairmontbank.com" style="color:#9a772f;text-decoration:none;font-weight:700;">support@fairmontbank.com</a>.</p>
+                  <p style="font-size:13px;line-height:1.8;color:#536174;margin:18px 0 0;">Kind regards,<br><strong style="color:#102747;">Fairmont Bank</strong><br>Account Services</p>
+                </td></tr>
+                <tr><td style="background:#f6f8fb;border-top:1px solid #e1e7ef;padding:18px 24px;text-align:center;">
+                  <p style="font-size:11px;line-height:1.7;color:#7b8797;margin:0;">This email is generated by a banking software.
+                  <p style="font-size:11px;color:#9aa4b2;margin:10px 0 0;">&copy; Fairmont Bank. All rights reserved.</p>
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+        </body>
+        </html>
+        """,
+        customer=customer,
+        eyebrow=eyebrow,
+        heading=heading,
+        message_text=message_text,
+        details=details,
+        logo_url=os.getenv("BANK_LOGO_URL", "").strip(),
+    )
+    return send_bank_email(
+        customer.email,
+        subject,
+        "\n".join(text_lines),
+        html_body=html_body,
+    )
+def send_branded_recipient_email(
+    recipient_email,
+    recipient_name,
+    subject,
+    eyebrow,
+    heading,
+    message_text,
+    details=None,
+):
+    """Send a branded HTML email to an external transfer recipient."""
+
+    if not recipient_email:
+        return False
+
+    details = details or []
+
+    text_lines = [
+        "FAIRMONT BANK - ACCOUNT SERVICES",
+        "",
+        heading,
+        "",
+        f"Dear {recipient_name or 'Recipient'},",
+        "",
+        message_text,
+        "",
+    ]
+
+    for label, value in details:
+        text_lines.append(f"{label}: {value}")
+
+    text_lines.extend([
+        "",
+        "This notification reflects the status recorded in the application.",
+        "It does not independently confirm that external funds were credited.",
+        "",
+        "Kind regards,",
+        "Fairmont Bank",
+        "Account Services",
+    ])
+
+    html_body = render_template_string(
+        """
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>{{ heading }}</title>
+        </head>
+
+        <body style="margin:0;padding:0;background:#f2f5f9;
+                     font-family:Arial,Helvetica,sans-serif;color:#253247;">
+
+          <table role="presentation" width="100%" cellspacing="0"
+                 cellpadding="0" style="background:#f2f5f9;padding:28px 10px;">
+            <tr>
+              <td align="center">
+
+                <table role="presentation" width="600" cellspacing="0"
+                       cellpadding="0"
+                       style="width:100%;max-width:600px;background:#ffffff;
+                              border:1px solid #e1e7ef;border-radius:12px;
+                              overflow:hidden;">
+
+                  <tr>
+                    <td style="background:#102747;padding:26px 28px;text-align:center;">
+                      {% if logo_url %}
+                      <img src="{{ logo_url }}" alt="Fairmont Bank" width="170"
+                           style="display:block;max-width:170px;width:100%;height:auto;margin:0 auto 12px;border:0;">
+                      {% else %}
+                      <div style="font-size:24px;font-weight:700;letter-spacing:2px;color:#ffffff;">FAIRMONT BANK</div>
+                      {% endif %}
+                      <div style="font-size:11px;letter-spacing:2px;
+                                  color:#d9bd78;margin-top:8px;">
+                        ACCOUNT SERVICES
+                      </div>
+                      <div style="height:3px;width:58px;background:#c5a45d;
+                                  margin:18px auto 0;"></div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding:30px 28px 12px;">
+                      <div style="font-size:11px;font-weight:700;
+                                  letter-spacing:1.5px;color:#9a772f;">
+                        {{ eyebrow|upper }}
+                      </div>
+
+                      <h1 style="font-size:25px;line-height:1.3;
+                                 color:#102747;margin:10px 0 18px;">
+                        {{ heading }}
+                      </h1>
+
+                      <p style="font-size:15px;line-height:1.8;margin:0 0 14px;">
+                        Dear {{ recipient_name or "Recipient" }},
+                      </p>
+
+                      <p style="font-size:14px;line-height:1.8;color:#536174;
+                                margin:0 0 22px;white-space:pre-line;">
+                        {{ message_text }}
+                      </p>
+                    </td>
+                  </tr>
+
+                  {% if details %}
+                  <tr>
+                    <td style="padding:0 28px 24px;">
+                      <table role="presentation" width="100%" cellspacing="0"
+                             cellpadding="0"
+                             style="border:1px solid #e1e7ef;border-radius:8px;">
+
+                        <tr>
+                          <td colspan="2"
+                              style="padding:13px 16px;background:#f6f8fb;
+                                     color:#102747;font-size:12px;
+                                     font-weight:700;letter-spacing:1px;">
+                            TRANSFER DETAILS
+                          </td>
+                        </tr>
+
+                        {% for label, value in details %}
+                        <tr>
+                          <td style="padding:12px 16px;border-top:1px solid #edf0f4;
+                                     color:#68768a;font-size:13px;">
+                            {{ label }}
+                          </td>
+                          <td style="padding:12px 16px;border-top:1px solid #edf0f4;
+                                     color:#102747;font-size:13px;font-weight:700;
+                                     text-align:right;word-break:break-word;">
+                            {{ value }}
+                          </td>
+                        </tr>
+                        {% endfor %}
+
+                      </table>
+                    </td>
+                  </tr>
+                  {% endif %}
+
+                  <tr>
+                    <td style="padding:0 28px 28px;">
+                      <p style="font-size:13px;line-height:1.8;color:#536174;">
+                        For assistance, contact
+                        <a href="mailto:support@fairmontbank.com"
+                           style="color:#9a772f;text-decoration:none;font-weight:700;">
+                          support@fairmontbank.com
+                        </a>.
+                      </p>
+
+                      <p style="font-size:13px;line-height:1.8;color:#536174;">
+                        Kind regards,<br>
+                        <strong style="color:#102747;">Fairmont Bank</strong><br>
+                        Account Services
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="background:#f6f8fb;border-top:1px solid #e1e7ef;
+                               padding:18px 24px;text-align:center;">
+                      <p style="font-size:11px;line-height:1.7;color:#7b8797;">
+                        
+                      </p>
+                      <p style="font-size:11px;color:#9aa4b2;">
+                        Fairmont Bank - Account Services
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+        """,
+        recipient_name=recipient_name or "Recipient",
+        eyebrow=eyebrow,
+        heading=heading,
+        message_text=message_text,
+        details=details,
+        logo_url=os.getenv("BANK_LOGO_URL", "").strip(),
+    )
+
+    return send_bank_email(
+        recipient_email,
+        subject,
+        "\n".join(text_lines),
+        html_body=html_body,
+    )
+
+def send_account_status_email(customer, status):
+    """Notify a customer after their account application status is saved."""
+    normalized = (status or "").strip().lower()
+    if normalized == "active":
+        subject = "Account Application Approved"
+        eyebrow = "Application Update"
+        heading = "Your Application Has Been Approved"
+        message_text = (
+            "Your account application has been approved in the Fairmont Bank "
+            "fairmontbank.You can sign in to review the account features."
+        )
+    elif normalized == "rejected":
+        subject = "Account Application Update"
+        eyebrow = "Application Update"
+        heading = "Your Application Status Has Been Updated"
+        message_text = (
+            "Your account application has been marked as rejected in the Fairmont "
+            "Bank software notice. If you believe this is an error, please "
+            "contact support for assistance."
+        )
+    else:
+        subject = "Account Application Update"
+        eyebrow = "Application Update"
+        heading = "Your Application Status Has Changed"
+        message_text = f"Your application status is now {status}."
+
+    return send_branded_customer_email(
+        customer,
+        subject,
+        eyebrow,
+        heading,
+        message_text,
+        [
+            ("Application reference", customer.customer_id),
+            ("Account type", customer.account_type),
+            ("Application status", status),
+        ],
+    )
+
+
+def send_payment_status_email(customer, approval, event="submitted"):
+    """Email a clear status update for a submitted, approved, or rejected request."""
+    if customer is None or approval is None:
+        return False
+
+    status = approval.status or "Pending Approval"
+    amount_text = f"£{float(approval.amount or 0):,.2f}"
+    details = [
+        ("Request reference", approval.payment_reference),
+        ("Request type", approval.payment_type),
+        ("Amount", amount_text),
+        ("Status", status),
+    ]
+    if approval.rejection_reason:
+        details.append(("Reason", approval.rejection_reason))
+
+    if event == "approved":
+        subject = "Payment Request Approved"
+        heading = "Your Request Has Been Approved"
+        message_text = (
+            "Your request has been approved and the corresponding entry has been "
+            "recorded in this software . This message does not represent "
+            "a real-world funds transfer."
+        )
+    elif event == "rejected":
+        subject = "Payment Request Update"
+        heading = "Your Request Was Not Approved"
+        message_text = (
+            "Your request has been marked as rejected in this software."
+            "No balance change was made as part of this rejection."
+        )
+    else:
+        subject = "We Received Your Payment Request"
+        heading = "Your Request Has Been Received"
+        if status == "TCC Verification Required":
+            message_text = (
+                "Your request has been received and is awaiting the additional "
+                "verification step shown on the website. It has not been approved."
+            )
+        else:
+            message_text = (
+                "Your request has been recorded and is awaiting review. A pending "
+                "request is not a completed transaction."
+            )
+
+    return send_branded_customer_email(
+        customer,
+        subject,
+        "Payment Request Update",
+        heading,
+        message_text,
+        details,
+    )
+
+
+def send_transaction_alert(customer, transaction):
+    """Send a debit or credit alert only for a transaction already committed as completed."""
+    if customer is None or transaction is None:
+        return False
+    if str(transaction.status or "").strip().lower() not in {
+        "completed", "complete", "success", "successful"
+    }:
+        return False
+    if not bool(getattr(customer, "transaction_notifications", True)):
+        return False
+
+    direction = (transaction.direction or "").strip().lower()
+    if direction not in {"credit", "debit"}:
+        return False
+
+    is_credit = direction == "credit"
+    subject = (
+        "Credit Transaction Alert" if is_credit else "Debit Transaction Alert"
+    )
+    heading = (
+        "Your Account Has Been Credited"
+        if is_credit
+        else "Your Account Has Been Debited"
+    )
+    description = (
+        getattr(transaction, "description", None)
+        or getattr(transaction, "transaction_type", None)
+        or "Bank transaction"
+    )
+    message_text = (
+        (
+            f"A debit transaction of £{float(transaction.amount or 0):,.2f} "
+            "has been recorded on your account.\n\n"
+            "Please review the transaction details below. If you do not "
+            "recognize this transaction, please contact our support team "
+            "at support@fairmontbank.com."
+        )
+        if not is_credit
+        else (
+            f"A credit transaction of £{float(transaction.amount or 0):,.2f} "
+            "has been recorded on your account.\n\n"
+            "Please review the transaction details below. If you have any "
+            "questions about this transaction, please contact our support team "
+            "at support@fairmontbank.com."
+        )
+    )
+    account_number = getattr(customer, "account_number", "") or ""
+    masked_account = ("••••" + account_number[-4:]) if account_number else "Not available"
+    created_at = (
+        transaction.created_at.strftime("%d %b %Y, %H:%M UTC")
+        if transaction.created_at else "Not available"
+    )
+    sender_name = (
+        getattr(transaction, "sender_name", None)
+        or getattr(transaction, "counterparty_name", None)
+        or "Not specified"
+    )
+    return send_branded_customer_email(
+        customer,
+        subject,
+        "Transaction Alert",
+        heading,
+        message_text,
+        [
+            ("Transaction type", transaction.transaction_type or direction.title()),
+            ("Amount", f"£{float(transaction.amount or 0):,.2f}"),
+            ("Reference", transaction.transaction_reference),
+            ("Description", description),
+            ("Sender Name", sender_name or "Not specified"),
+            ("Account", masked_account),
+            ("Date", created_at),
+            ("Status", transaction.status or "Recorded"),
+            ("Account Balance", f"£{float(transaction.balance_after or 0):,.2f}"),
+        ],
+    )
 
 # Flask-Login setup
 login_manager = LoginManager()
@@ -372,6 +889,31 @@ class Customer(UserMixin, db.Model):
 
 
 
+
+# =========================================================
+# TRANSACTION MODEL
+# =========================================================
+
+class Transaction(db.Model):
+    __tablename__ = "transactions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_reference = db.Column(db.String(40), unique=True, nullable=False, index=True)
+    customer_id = db.Column(db.String(20), nullable=False, index=True)
+    transaction_type = db.Column(db.String(80), nullable=False)
+    direction = db.Column(db.String(20), nullable=False)
+    amount = db.Column(db.Float, nullable=False, default=0.0)
+    balance_after = db.Column(db.Float, nullable=False, default=0.0)
+    description = db.Column(db.String(255), nullable=False, default="")
+    counterparty = db.Column(db.String(150), nullable=True)
+    status = db.Column(db.String(30), nullable=False, default="Completed")
+    sender_name = db.Column(db.String(150), nullable=True)
+    sender_account_number = db.Column(db.String(50), nullable=True)
+    sender_bank = db.Column(db.String(150), nullable=True)
+    sender_country = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
 # =========================================================
 # FAIRMONT BANK CUSTOMER INVOICE / BILLING MODEL
 # =========================================================
@@ -564,6 +1106,38 @@ class Notification(db.Model):
     )
 
 
+def create_customer_notification(customer_id, title, message,
+                                 notification_type="General",
+                                 commit=True):
+    """Create an in-site notification while respecting customer preferences."""
+    customer = Customer.query.filter_by(customer_id=str(customer_id)).first()
+    if customer is None:
+        return None
+
+    kind = (notification_type or "General").strip().lower()
+    preference_by_type = {
+        "transaction": "transaction_notifications",
+        "security": "security_notifications",
+        "account": "account_notifications",
+        "promotional": "promotional_notifications",
+    }
+    preference_field = preference_by_type.get(kind)
+    if preference_field and not getattr(customer, preference_field, True):
+        return None
+
+    item = Notification(
+        customer_id=customer.customer_id,
+        title=str(title or "Bank Notification")[:150],
+        message=str(message or "")[:5000],
+        notification_type=(notification_type or "General")[:50],
+        is_read=False,
+    )
+    db.session.add(item)
+    if commit:
+        db.session.commit()
+    return item
+
+
 class BankMessage(db.Model):
     __tablename__ = "bank_messages"
 
@@ -688,6 +1262,13 @@ class PaymentApproval(db.Model):
         nullable=True
     )
 
+    recipient_email = db.Column(
+    db.String(254),
+    nullable=False,
+    default=""
+
+    )
+
     recipient_account_number = db.Column(
         db.String(50),
         nullable=True
@@ -755,13 +1336,16 @@ class PaymentApproval(db.Model):
 # =========================================================
 # VIRTUAL ATM CARD
 # =========================================================
-# Simulated local-app card record. It is not connected to a
-# real card network and stores no CVV/PIN or real credentials.
+# Simulated local-app card record.
+# This is not connected to a real card network.
 
 class VirtualATMCard(db.Model):
     __tablename__ = "virtual_atm_cards"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     customer_id = db.Column(
         db.String(20),
@@ -799,88 +1383,51 @@ class VirtualATMCard(db.Model):
     )
 
 
-class Transaction(db.Model):
+# =========================================================
+# VIRTUAL ATM CARD APPLICATIONS
+# =========================================================
+
+class VirtualCardApplication(db.Model):
+    __tablename__ = "virtual_card_applications"
 
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    transaction_reference = db.Column(
-        db.String(40),
-        unique=True,
-        nullable=False
-    )
-
     customer_id = db.Column(
         db.String(20),
+        unique=True,
         nullable=False,
         index=True
     )
 
-    transaction_type = db.Column(
-        db.String(40),
-        nullable=False
-    )
-
-    direction = db.Column(
-        db.String(20),
-        nullable=False
-    )
-
-    amount = db.Column(
-        db.Float,
-        nullable=False
-    )
-
-    balance_after = db.Column(
-        db.Float,
-        nullable=False
-    )
-
-    description = db.Column(
-        db.String(255),
-        nullable=False
-    )
-
-    counterparty = db.Column(
-        db.String(150),
-        nullable=True
-    )
-
     status = db.Column(
-        db.String(30),
+        db.String(20),
         nullable=False,
-        default="Completed"
+        default="Pending"
     )
 
-    sender_name = db.Column(
-        db.String(150),
-        nullable=True
-    )
-
-    sender_account_number = db.Column(
-        db.String(50),
-        nullable=True
-    )
-
-    sender_bank = db.Column(
-        db.String(150),
-        nullable=True
-    )
-
-    sender_country = db.Column(
-        db.String(100),
-        nullable=True
-    )
-
-
-    created_at = db.Column(
+    submitted_at = db.Column(
         db.DateTime,
         nullable=False,
         default=datetime.utcnow
     )
 
+    reviewed_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+    reviewed_by = db.Column(
+        db.String(100),
+        nullable=True
+    )
+
+    rejection_reason = db.Column(
+        db.String(255),
+        nullable=True
+    )
 
 # =========================================================
 
@@ -999,6 +1546,12 @@ class ExternalTransfer(db.Model):
     recipient_name = db.Column(
         db.String(150),
         nullable=False
+    )
+
+    recipient_email = db.Column(
+        db.String(254),
+        nullable=False,
+        default=""
     )
 
     account_number = db.Column(
@@ -1673,6 +2226,46 @@ def open_account():
 
         db.session.commit()
 
+        account_email_text = f"""FAIRMONT BANK — ACCOUNT SERVICES
+
+WE'VE RECEIVED YOUR ACCOUNT APPLICATION
+
+Dear {customer.full_name},
+
+Thank you for submitting your account application. The details below are provided for your reference.
+
+APPLICATION DETAILS
+Application Reference: {customer.customer_id}
+Account Type: {customer.account_type}
+Application Status: {customer.account_status}
+
+WHAT HAPPENS NEXT?
+Your application is awaiting review. Please check your account dashboard for status updates. Any additional steps will be communicated through the appropriate channels.
+
+NEED ASSISTANCE?
+Contact support@fairmontbank.com if you have questions about your application.
+
+Kind regards,
+Fairmont Bank
+Account Services"""
+
+        account_email_html = render_template(
+            "emails/account_application_received.html",
+            customer=customer
+        )
+
+        email_sent = send_bank_email(
+            customer.email,
+            "We've Received Your Account Application",
+            account_email_text,
+            html_body=account_email_html
+        )
+        if not email_sent:
+            app.logger.warning(
+                "Account application email could not be sent for customer %s",
+                customer.customer_id,
+            )
+
         return render_template(
             "account_created.html",
             customer=customer
@@ -1815,6 +2408,167 @@ def mark_all_notifications_read():
     db.session.commit()
 
     return redirect(url_for("notifications"))
+
+
+
+# =========================================================
+# ADMIN: SITE NOTIFICATIONS
+# =========================================================
+
+@app.route("/admin/notifications", methods=["GET", "POST"])
+def admin_notifications():
+    admin_id = session.get("admin_id")
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+
+    admin = db.session.get(AdminUser, admin_id)
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    customers = Customer.query.order_by(Customer.full_name.asc()).all()
+    error = None
+    success = None
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        message = request.form.get("message", "").strip()
+        notification_type = request.form.get("notification_type", "General").strip()
+        audience = request.form.get("audience", "all").strip()
+        selected_customer_id = request.form.get("customer_id", "").strip()
+
+        allowed_types = {"General", "Transaction", "Security", "Account", "Promotional"}
+        if notification_type not in allowed_types:
+            notification_type = "General"
+
+        if not title or not message:
+            error = "Enter both a notification title and message."
+        elif audience == "one" and not selected_customer_id:
+            error = "Choose a customer for a targeted notification."
+        else:
+            if audience == "one":
+                recipients = Customer.query.filter_by(
+                    customer_id=selected_customer_id
+                ).all()
+            else:
+                recipients = customers
+
+            if not recipients:
+                error = "No matching customer was found."
+            else:
+                created_count = 0
+                for recipient in recipients:
+                    item = create_customer_notification(
+                        recipient.customer_id,
+                        title,
+                        message,
+                        notification_type=notification_type,
+                        commit=False,
+                    )
+                    if item is not None:
+                        created_count += 1
+
+                if created_count:
+                    db.session.commit()
+                    success = f"Notification sent to {created_count} customer(s)."
+                else:
+                    db.session.rollback()
+                    error = (
+                        "No notification was sent. The selected customers may "
+                        "have disabled this notification category."
+                    )
+
+    recent_notifications = Notification.query.order_by(
+        Notification.created_at.desc()
+    ).limit(30).all()
+
+    return render_template_string("""
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Site Notifications | Fairmont Bank Admin</title>
+      <style>
+        *{box-sizing:border-box}body{margin:0;background:#f3f6fb;color:#172033;
+        font-family:Arial,sans-serif}.wrap{max-width:1100px;margin:32px auto;padding:0 18px}
+        .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+        h1{margin:0 0 8px;color:#142b4a}.muted{color:#68758a}
+        .card{background:white;border:1px solid #e1e7ef;border-radius:14px;padding:22px;
+        margin:20px 0;box-shadow:0 5px 18px #1720330b}
+        label{display:block;font-weight:700;margin:14px 0 6px}
+        input,textarea,select{width:100%;padding:12px;border:1px solid #cbd5e1;
+        border-radius:8px;font:inherit}textarea{min-height:120px;resize:vertical}
+        button,.btn{display:inline-block;border:0;border-radius:8px;background:#173b66;
+        color:white;padding:12px 17px;font-weight:700;cursor:pointer;text-decoration:none}
+        .btn.secondary{background:#e8eef6;color:#173b66}
+        .msg{padding:12px 14px;border-radius:8px;margin:14px 0}
+        .ok{background:#e8f8ef;color:#17663b}.err{background:#fff0f0;color:#9d2525}
+        .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .notice{padding:14px 0;border-bottom:1px solid #e7ebf2}
+        .notice:last-child{border-bottom:0}.pill{font-size:12px;background:#edf2f8;
+        padding:4px 8px;border-radius:99px}.unread{font-weight:700}
+        @media(max-width:650px){.row{grid-template-columns:1fr}.card{padding:16px}}
+      </style>
+    </head>
+    <body><main class="wrap">
+      <div class="top">
+        <div><h1>Site Notifications</h1>
+        <div class="muted">Signed in as {{ admin.username }} · Send in-site messages to customers.</div></div>
+        <a class="btn secondary" href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+      </div>
+      {% if success %}<div class="msg ok">{{ success }}</div>{% endif %}
+      {% if error %}<div class="msg err">{{ error }}</div>{% endif %}
+      <section class="card">
+        <h2>Compose notification</h2>
+        <form method="post">
+          <div class="row">
+            <div><label for="title">Title</label>
+              <input id="title" name="title" maxlength="150" required></div>
+            <div><label for="notification_type">Category</label>
+              <select id="notification_type" name="notification_type">
+                <option>General</option><option>Account</option><option>Transaction</option>
+                <option>Security</option><option>Promotional</option>
+              </select></div>
+          </div>
+          <label for="message">Message</label>
+          <textarea id="message" name="message" maxlength="5000" required></textarea>
+          <label for="audience">Recipients</label>
+          <select id="audience" name="audience" onchange="document.getElementById('customer-wrap').style.display=this.value==='one'?'block':'none'">
+            <option value="all">All customers (respecting notification preferences)</option>
+            <option value="one">One customer</option>
+          </select>
+          <div id="customer-wrap" style="display:none">
+            <label for="customer_id">Customer</label>
+            <select id="customer_id" name="customer_id">
+              <option value="">Select customer</option>
+              {% for c in customers %}
+                <option value="{{ c.customer_id }}">{{ c.full_name }} — {{ c.customer_id }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <p><button type="submit">Send Notification</button></p>
+        </form>
+      </section>
+      <section class="card">
+        <h2>Recent notifications</h2>
+        {% for n in recent_notifications %}
+          <div class="notice">
+            <div><strong>{{ n.title }}</strong> <span class="pill">{{ n.notification_type }}</span>
+            {% if not n.is_read %}<span class="pill">Unread</span>{% endif %}</div>
+            <p>{{ n.message }}</p>
+            <div class="muted">Customer ID: {{ n.customer_id }} ·
+              {{ n.created_at.strftime('%d %b %Y, %H:%M') if n.created_at else '' }}</div>
+          </div>
+        {% else %}<p class="muted">No notifications have been created yet.</p>{% endfor %}
+      </section>
+    </main></body></html>
+    """, admin=admin, customers=customers,
+        recent_notifications=recent_notifications,
+        error=error, success=success)
+
+
 
 
 @app.route("/transactions")
@@ -2077,9 +2831,7 @@ def dashboard():
         return render_template(
             "login.html",
             error="Please sign in to access your dashboard.",
-        display_balance=display_balance,
-        currency_symbol=app.config.get("CURRENCY_SYMBOL", "£"),
-    )
+        )
 
     customer = Customer.query.filter_by(
         customer_id=customer_id
@@ -2168,7 +2920,9 @@ def dashboard():
     virtual_card = VirtualATMCard.query.filter_by(
         customer_id=customer.customer_id
     ).first()
-
+    virtual_card_application = VirtualCardApplication.query.filter_by(
+        customer_id=customer.customer_id
+    ).first()
 
     # DASHBOARD BALANCE REPAIR
     # Always provide the real customer account balance
@@ -2180,6 +2934,7 @@ def dashboard():
         notification_unread_count=notification_unread_count,
         recent_transactions=recent_transactions,
         virtual_card=virtual_card,
+        virtual_card_application=virtual_card_application,
         display_balance=display_balance,
         currency_symbol=app.config.get("CURRENCY_SYMBOL", "£"),
         currency_locale=app.config.get("CURRENCY_LOCALE", "en-GB"),
@@ -2188,8 +2943,28 @@ def dashboard():
 # =========================================================
 # CUSTOMER VIRTUAL ATM CARD
 # =========================================================
+@app.route("/virtual-card/details")
+@login_required
+def virtual_card_details():
+    customer_id = session.get("customer_id")
 
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    card = VirtualATMCard.query.filter_by(
+        customer_id=customer_id
+    ).first()
+
+    if card is None:
+        flash("No virtual ATM card was found.", "error")
+        return redirect(url_for("dashboard"))
+
+    return render_template(
+        "virtual_card_details.html",
+        virtual_card=card
+    )
 @app.route("/virtual-card/apply", methods=["POST"])
+@login_required
 def apply_virtual_card():
     customer_id = session.get("customer_id")
 
@@ -2208,77 +2983,72 @@ def apply_virtual_card():
         customer_id=customer.customer_id
     ).first()
 
-    if existing_card is not None:
-        flash(
-            "You already have an active virtual ATM card.",
-            "success"
-        )
+    # An active or frozen card cannot have a replacement application.
+    # A cancelled card may be replaced, but only after admin approval.
+    if existing_card is not None and existing_card.status != "Cancelled":
+        flash("You already have a virtual ATM card.", "info")
         return redirect(url_for("dashboard"))
 
-    card = VirtualATMCard(
-        customer_id=customer.customer_id,
-        card_number=generate_virtual_card_number(),
-        expiry_date=generate_virtual_card_expiry(),
-        security_code=generate_virtual_card_security_code(),
-        status="Active"
-    )
+    application = VirtualCardApplication.query.filter_by(
+        customer_id=customer.customer_id
+    ).first()
+
+    if application is not None:
+        if application.status == "Pending":
+            flash(
+                "Your virtual ATM card application is awaiting "
+                "administrator approval.",
+                "info"
+            )
+            return redirect(url_for("dashboard"))
+
+        if application.status == "Approved" and existing_card is not None:
+            # An approved application with a cancelled card can be
+            # resubmitted as a replacement request.
+            if existing_card.status != "Cancelled":
+                flash(
+                    "Your application has already been approved.",
+                    "info"
+                )
+                return redirect(url_for("dashboard"))
+
+        # Reuse the customer's unique application record.
+        application.status = "Pending"
+        application.submitted_at = datetime.utcnow()
+        application.reviewed_at = None
+        application.reviewed_by = None
+        application.rejection_reason = None
+    else:
+        application = VirtualCardApplication(
+            customer_id=customer.customer_id,
+            status="Pending"
+        )
+        db.session.add(application)
 
     try:
-        db.session.add(card)
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
         flash(
-            "The virtual card could not be created. Please try again.",
+            "Your application could not be submitted. "
+            "Please try again.",
             "error"
         )
         return redirect(url_for("dashboard"))
+
+    create_customer_notification(
+        customer.customer_id,
+        "Virtual card application received",
+        "Your virtual ATM card application has been received and is awaiting administrator review.",
+        notification_type="Account",
+    )
 
     flash(
-        "Your virtual ATM card has been created successfully.",
+        "Your replacement virtual ATM card application has been submitted. "
+        "Please wait for administrator approval.",
         "success"
     )
-
     return redirect(url_for("dashboard"))
-
-
-@app.route("/virtual-card/review")
-def virtual_card_review():
-    customer_id = session.get("customer_id")
-
-    if not customer_id:
-        return redirect(url_for("login"))
-
-    customer = Customer.query.filter_by(
-        customer_id=customer_id
-    ).first()
-
-    if customer is None:
-        session.clear()
-        return redirect(url_for("login"))
-
-    card = VirtualATMCard.query.filter_by(
-        customer_id=customer.customer_id
-    ).first()
-
-    if card is None:
-        flash(
-            "You do not have a virtual ATM card yet.",
-            "error"
-        )
-        return redirect(url_for("dashboard"))
-
-    if not card.security_code:
-        card.security_code = generate_virtual_card_security_code()
-        db.session.commit()
-
-    return render_template(
-        "virtual_card_review.html",
-        customer=customer,
-        virtual_card=card
-    )
-
-
 
 
 # =========================================================
@@ -2328,11 +3098,11 @@ def virtual_card_freeze():
 
     if card.status == "Cancelled":
         flash("A cancelled card cannot be frozen.", "error")
-        return redirect(url_for("virtual_card_review"))
+        return redirect(url_for("virtual_card_details"))
 
     if card.status == "Frozen":
         flash("Your virtual card is already frozen.", "info")
-        return redirect(url_for("virtual_card_review"))
+        return redirect(url_for("virtual_card_details"))
 
     card.status = "Frozen"
 
@@ -2340,7 +3110,7 @@ def virtual_card_freeze():
 
     flash("Your virtual card has been frozen.", "success")
 
-    return redirect(url_for("virtual_card_review"))
+    return redirect(url_for("virtual_card_details"))
 
 
 @app.route("/virtual-card/unfreeze", methods=["POST"])
@@ -2362,11 +3132,11 @@ def virtual_card_unfreeze():
 
     if card.status == "Cancelled":
         flash("A cancelled card cannot be unfrozen.", "error")
-        return redirect(url_for("virtual_card_review"))
+        return redirect(url_for("virtual_card_details"))
 
     if card.status == "Active":
         flash("Your virtual card is already active.", "info")
-        return redirect(url_for("virtual_card_review"))
+        return redirect(url_for("virtual_card_details"))
 
     card.status = "Active"
 
@@ -2377,13 +3147,12 @@ def virtual_card_unfreeze():
         "success"
     )
 
-    return redirect(url_for("virtual_card_review"))
+    return redirect(url_for("virtual_card_details"))
 
 
 @app.route("/virtual-card/cancel", methods=["POST"])
 @login_required
 def virtual_card_cancel():
-
     customer_id = session.get("customer_id")
 
     if not customer_id:
@@ -2395,19 +3164,21 @@ def virtual_card_cancel():
 
     if not card:
         flash("No virtual card was found.", "error")
-        return redirect(url_for("apply_virtual_card"))
+        return redirect(url_for("dashboard"))
 
-    # Permanently remove the cancelled virtual card.
-    db.session.delete(card)
+    if card.status == "Cancelled":
+        flash("Your virtual card is already cancelled.", "info")
+        return redirect(url_for("virtual_card_details"))
+
+    card.status = "Cancelled"
     db.session.commit()
 
     flash(
-        "Your virtual card has been permanently cancelled. "
-        "You can apply for a new virtual card.",
+        "Your virtual card has been cancelled. "
+        "You may apply for a replacement card subject to administrator approval.",
         "success"
     )
-
-    return redirect(url_for("apply_virtual_card"))
+    return redirect(url_for("virtual_card_details"))
 
 
 @app.route("/logout")
@@ -2727,6 +3498,11 @@ def withdraw_paypal():
 
         db.session.add(approval)
         db.session.commit()
+        if not send_payment_status_email(customer, approval, event="submitted"):
+            app.logger.warning(
+                "Payment request email could not be sent for reference %s",
+                approval.payment_reference,
+            )
 
         if approval.status == "TCC Verification Required":
             return redirect(
@@ -2890,6 +3666,11 @@ def withdraw_card():
 
         db.session.add(approval)
         db.session.commit()
+        if not send_payment_status_email(customer, approval, event="submitted"):
+            app.logger.warning(
+                "Payment request email could not be sent for reference %s",
+                approval.payment_reference,
+            )
 
         if approval.status == "TCC Verification Required":
             return redirect(
@@ -3083,6 +3864,11 @@ def withdraw_bank():
 
         db.session.add(approval)
         db.session.commit()
+        if not send_payment_status_email(customer, approval, event="submitted"):
+            app.logger.warning(
+                "Payment request email could not be sent for reference %s",
+                approval.payment_reference,
+            )
 
         if approval.status == "TCC Verification Required":
             return redirect(
@@ -3155,6 +3941,11 @@ def _external_withdrawal_page(method, field_label, payment_type, icon, endpoint)
         apply_tcc_requirement(customer, approval)
         db.session.add(approval)
         db.session.commit()
+        if not send_payment_status_email(customer, approval, event="submitted"):
+            app.logger.warning(
+                "Payment request email could not be sent for reference %s",
+                approval.payment_reference,
+            )
         if approval.status == "TCC Verification Required":
             return redirect(url_for("payment_tcc_verification", approval_id=approval.id))
         flash(f"Your {method} withdrawal request has been submitted successfully and is now pending review.", "success")
@@ -3356,6 +4147,21 @@ def send_fairmont_money():
     db.session.add(sender_transaction)
     db.session.add(recipient_transaction)
 
+    create_customer_notification(
+        customer.customer_id,
+        "Money transfer sent",
+        f"Your transfer of £{amount:,.2f} to {recipient.full_name} was completed successfully. Reference: {sender_transaction_reference}.",
+        notification_type="Transaction",
+        commit=False,
+    )
+    create_customer_notification(
+        recipient.customer_id,
+        "Money received",
+        f"You received £{amount:,.2f} from {customer.full_name}. Reference: {recipient_transaction_reference}.",
+        notification_type="Transaction",
+        commit=False,
+    )
+
     try:
         db.session.commit()
 
@@ -3379,6 +4185,19 @@ def send_fairmont_money():
         )
 
         return redirect(url_for("send_fairmont_money"))
+
+    # Send debit/credit alerts only after both balance changes and
+    # transaction records have been committed successfully.
+    if not send_transaction_alert(customer, sender_transaction):
+        app.logger.info(
+            "Sender transaction alert not sent for reference %s",
+            sender_transaction_reference,
+        )
+    if not send_transaction_alert(recipient, recipient_transaction):
+        app.logger.info(
+            "Recipient transaction alert not sent for reference %s",
+            recipient_transaction_reference,
+        )
 
     return render_template(
         "send_fairmont_money_success.html",
@@ -3573,6 +4392,12 @@ def send_money():
             db.session.add(approval)
             db.session.commit()
 
+        if not send_payment_status_email(customer, approval, event="submitted"):
+            app.logger.warning(
+                "Payment request email could not be sent for reference %s",
+                approval.payment_reference,
+            )
+
         if approval.status == "TCC Verification Required":
 
             return redirect(
@@ -3627,6 +4452,11 @@ def send_money():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     return render_template(
         "payment_pending_confirmation.html",
@@ -3661,6 +4491,7 @@ def international_transfer():
 
     country = request.form.get("country", "").strip()
     recipient_name = request.form.get("recipient_name", "").strip()
+    recipient_email = request.form.get("recipient_email", "").strip().lower()
     recipient_address = request.form.get("recipient_address", "").strip()
     bank_name = request.form.get("bank_name", "").strip()
     account_number = request.form.get("account_number", "").strip()
@@ -3674,6 +4505,7 @@ def international_transfer():
         country,
         recipient_name,
         recipient_address,
+        recipient_email,
         bank_name,
         account_number,
         swift_bic,
@@ -3682,6 +4514,21 @@ def international_transfer():
     ]):
         flash(
             "Please complete all required international transfer fields.",
+            "error"
+        )
+        return render_template(
+            "international_transfer.html",
+            customer=customer
+        )
+    if (
+        len(recipient_email) > 254
+        or "@" not in recipient_email
+        or recipient_email.startswith("@")
+        or recipient_email.endswith("@")
+        or "." not in recipient_email.rsplit("@", 1)[-1]
+    ):
+        flash(
+            "Please enter a valid recipient email address.",
             "error"
         )
         return render_template(
@@ -3727,6 +4574,7 @@ def international_transfer():
         transfer_type="International Transfer",
         bank_name=bank_name,
         recipient_name=recipient_name,
+        recipient_email=recipient_email,
         account_number=account_number,
         sort_code=local_bank_code or None,
         country=country,
@@ -3776,6 +4624,46 @@ def international_transfer():
         db.session.add(transfer)
         db.session.add(approval)
         db.session.commit()
+
+        # 1. Notify the customer who submitted the transfer.
+        if not send_payment_status_email(
+            customer, approval, event="submitted"
+        ):
+            app.logger.warning(
+                "Payment request email could not be sent for reference %s",
+                approval.payment_reference,
+            )
+
+        # 2. Send the recipient a branded pending-status notification.
+        if transfer.recipient_email:
+            pending_email_sent = send_branded_recipient_email(
+                recipient_email=transfer.recipient_email,
+                recipient_name=transfer.recipient_name,
+                subject="International Transfer Pending Approval",
+                eyebrow="International Transfer",
+                heading="International Transfer Pending Approval",
+                message_text=(
+                    "An international transfer request has been submitted "
+                    "with you listed as the recipient.\n\n"
+                    "The request is awaiting review. This notification does "
+                    "not confirm that funds have been sent or credited to "
+                    "your account. You will receive another notification "
+                    "when the request status changes."
+                ),
+                details=[
+                    ("Transfer type", "International Transfer"),
+                    ("Amount", f"{transfer.amount:,.2f} {transfer.currency}"),
+                    ("Reference", transfer.transaction_reference),
+                    ("Sending bank", transfer.bank_name),
+                    ("Country", transfer.country),
+                    ("Status", "Pending Approval"),
+                ],
+            )
+            if not pending_email_sent:
+                app.logger.warning(
+                    "Pending recipient email failed for reference %s",
+                    transfer.transaction_reference,
+                )
 
         # When TCC is enabled, do not show the normal submitted page.
         # Send the customer to the existing TCC verification workflow.
@@ -3931,6 +4819,11 @@ def pay_bills():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     if approval.status == "TCC Verification Required":
         return redirect(
@@ -4040,6 +4933,11 @@ def electric_bills():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     if approval.status == "TCC Verification Required":
         return redirect(
@@ -4146,6 +5044,11 @@ def airtime():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     if approval.status == "TCC Verification Required":
         return redirect(
@@ -4285,6 +5188,11 @@ def data_bundles():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     if approval.status == "TCC Verification Required":
         return redirect(
@@ -4446,6 +5354,11 @@ def tv_subscriptions():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     if approval.status == "TCC Verification Required":
         return redirect(
@@ -4484,6 +5397,51 @@ def bank_statements():
         customer=customer,
         transactions=transactions,
         statement_date=datetime.now()
+    )
+
+
+@app.route("/bank-statements/download.csv")
+@login_required
+def download_bank_statement_csv():
+    """Download the signed-in customer's existing transaction records as CSV."""
+    customer = current_user
+
+    if customer.bank_statements_locked:
+        flash("Statement downloads are currently unavailable for this account. Please contact support.", "warning")
+        return redirect(url_for("bank_statements"))
+
+    transactions = (
+        Transaction.query
+        .filter_by(customer_id=customer.customer_id)
+        .order_by(Transaction.created_at.desc())
+        .all()
+    )
+
+    output = io.StringIO(newline="")
+    writer = csv.writer(output)
+    writer.writerow([
+        "Date", "Transaction Reference", "Type", "Direction", "Description",
+        "Counterparty", "Amount (GBP)", "Balance After (GBP)", "Status"
+    ])
+
+    for transaction in transactions:
+        writer.writerow([
+            transaction.created_at.strftime("%Y-%m-%d %H:%M:%S") if transaction.created_at else "",
+            transaction.transaction_reference or "",
+            transaction.transaction_type or "",
+            transaction.direction or "",
+            transaction.description or "",
+            transaction.counterparty or "",
+            f"{float(transaction.amount or 0):.2f}",
+            f"{float(transaction.balance_after or 0):.2f}",
+            transaction.status or "",
+        ])
+
+    filename = f"statement_{customer.customer_id}_{datetime.now().strftime('%Y%m%d')}.csv"
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
     )
 
 
@@ -4596,6 +5554,11 @@ def lifestyle():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     if approval.status == "TCC Verification Required":
         return redirect(
@@ -4738,6 +5701,11 @@ def flights_travel():
 
     db.session.add(approval)
     db.session.commit()
+    if not send_payment_status_email(customer, approval, event="submitted"):
+        app.logger.warning(
+            "Payment request email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     if approval.status == "TCC Verification Required":
         return redirect(
@@ -5624,6 +6592,165 @@ def admin_logout():
     session.pop("admin_username", None)
 
     return redirect(url_for("admin_login"))
+
+# =========================================================
+# ADMIN: VIRTUAL ATM CARD APPLICATIONS
+# =========================================================
+
+@app.route("/admin/virtual-card-applications")
+def admin_virtual_card_applications():
+    # Require administrator login.
+    if not session.get("admin_id"):
+        return redirect(url_for("admin_login"))
+
+    admin = AdminUser.query.get(session["admin_id"])
+
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    applications = VirtualCardApplication.query.order_by(
+        VirtualCardApplication.submitted_at.desc()
+    ).all()
+
+    return render_template(
+        "admin_virtual_card_applications.html",
+        applications=applications
+    )
+
+
+@app.route(
+    "/admin/virtual-card-applications/<int:application_id>/review",
+    methods=["POST"]
+)
+def admin_review_virtual_card_application(application_id):
+    # Require administrator login.
+    if not session.get("admin_id"):
+        return redirect(url_for("admin_login"))
+
+    admin = AdminUser.query.get(session["admin_id"])
+
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+
+    application = db.session.get(
+        VirtualCardApplication,
+        application_id
+    )
+
+    if application is None:
+        flash("Application not found.", "error")
+        return redirect(
+            url_for("admin_virtual_card_applications")
+        )
+
+    # Only pending applications can be reviewed.
+    if application.status != "Pending":
+        flash(
+            "This application has already been reviewed.",
+            "error"
+        )
+        return redirect(
+            url_for("admin_virtual_card_applications")
+        )
+
+    action = request.form.get("action", "").strip().lower()
+
+    if action == "approve":
+        existing_card = VirtualATMCard.query.filter_by(
+            customer_id=application.customer_id
+        ).first()
+
+        if existing_card is None:
+            card = VirtualATMCard(
+                customer_id=application.customer_id,
+                card_number=generate_virtual_card_number(),
+                expiry_date=generate_virtual_card_expiry(),
+                security_code=generate_virtual_card_security_code(),
+                status="Active"
+            )
+            db.session.add(card)
+        elif existing_card.status == "Cancelled":
+            # Issue replacement credentials only after admin approval.
+            existing_card.card_number = generate_virtual_card_number()
+            existing_card.expiry_date = generate_virtual_card_expiry()
+            existing_card.security_code = generate_virtual_card_security_code()
+            existing_card.status = "Active"
+            existing_card.created_at = datetime.utcnow()
+        else:
+            flash(
+                "This customer already has a card that is not cancelled.",
+                "error"
+            )
+            return redirect(
+                url_for("admin_virtual_card_applications")
+            )
+
+        application.status = "Approved"
+        application.reviewed_at = datetime.utcnow()
+        application.reviewed_by = admin.username
+        application.rejection_reason = None
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash(
+                "The application could not be approved. "
+                "Please check the database and try again.",
+                "error"
+            )
+            return redirect(
+                url_for("admin_virtual_card_applications")
+            )
+
+        create_customer_notification(
+            application.customer_id,
+            "Virtual card application approved",
+            "Your virtual ATM card application has been approved. You can review your card details from your account dashboard.",
+            notification_type="Account",
+        )
+
+        flash(
+            "Virtual card application approved.",
+            "success"
+        )
+
+    elif action == "reject":
+        reason = request.form.get(
+            "rejection_reason", ""
+        ).strip()
+
+        application.status = "Rejected"
+        application.reviewed_at = datetime.utcnow()
+        application.reviewed_by = admin.username
+        application.rejection_reason = (
+            reason[:255] if reason else "Application rejected."
+        )
+
+        db.session.commit()
+
+        create_customer_notification(
+            application.customer_id,
+            "Virtual card application update",
+            f"Your virtual ATM card application was not approved. Reason: {application.rejection_reason}",
+            notification_type="Account",
+        )
+
+        flash(
+            "Virtual card application rejected.",
+            "success"
+        )
+
+    else:
+        flash("Invalid review action.", "error")
+
+    return redirect(
+        url_for("admin_virtual_card_applications")
+    )
 
 
 # =========================================================
@@ -6802,6 +7929,12 @@ def admin_approve_customer(customer_id):
 
     db.session.commit()
 
+    if not send_account_status_email(customer, customer.account_status):
+        app.logger.warning(
+            "Account approval email could not be sent for customer %s",
+            customer.customer_id,
+        )
+
     flash(
         f"Account application for {customer.full_name} has been approved.",
         "success"
@@ -6848,6 +7981,12 @@ def admin_reject_customer(customer_id):
     customer.account_status = "Rejected"
 
     db.session.commit()
+
+    if not send_account_status_email(customer, customer.account_status):
+        app.logger.warning(
+            "Account rejection email could not be sent for customer %s",
+            customer.customer_id,
+        )
 
     flash(
         f"Account application for {customer.full_name} has been rejected.",
@@ -7421,6 +8560,12 @@ def admin_review_payment(approval_id):
 
         db.session.commit()
 
+        if not send_payment_status_email(customer, approval, event="rejected"):
+            app.logger.warning(
+                "Payment rejection email could not be sent for reference %s",
+                approval.payment_reference,
+            )
+
         flash(
             "Payment request rejected. No customer balance was changed.",
             "success"
@@ -7467,6 +8612,7 @@ def admin_review_payment(approval_id):
         )
 
     amount = float(approval.amount)
+    transactions_to_notify = []
 
     # Internal Fairmont transfer:
     # debit sender and credit recipient in the same database transaction.
@@ -7553,6 +8699,7 @@ def admin_review_payment(approval_id):
 
         db.session.add(sender_transaction)
         db.session.add(recipient_transaction)
+        transactions_to_notify.extend([sender_transaction, recipient_transaction])
 
     elif approval.payment_type == "International Transfer":
 
@@ -7586,6 +8733,7 @@ def admin_review_payment(approval_id):
         )
 
         db.session.add(transaction)
+        transactions_to_notify.append(transaction)
 
         external_transfer = None
         if approval.original_transaction_reference:
@@ -7632,6 +8780,7 @@ def admin_review_payment(approval_id):
             )
 
             db.session.add(transaction)
+            transactions_to_notify.append(transaction)
 
         elif approval.direction == "Credit":
 
@@ -7655,6 +8804,7 @@ def admin_review_payment(approval_id):
             )
 
             db.session.add(transaction)
+            transactions_to_notify.append(transaction)
 
         else:
             flash(
@@ -7672,7 +8822,97 @@ def admin_review_payment(approval_id):
     approval.reviewed_at = datetime.utcnow()
     approval.reviewed_by = admin.username
 
+    if approval.payment_type == "Bank Transfer" and approval.recipient_customer_id and recipient is not None:
+        create_customer_notification(
+            customer.customer_id,
+            "Bank transfer completed",
+            f"Your transfer of £{amount:,.2f} to {recipient.full_name} has been approved and completed.",
+            notification_type="Transaction",
+            commit=False,
+        )
+        create_customer_notification(
+            recipient.customer_id,
+            "Money received",
+            f"You received £{amount:,.2f} from {customer.full_name}. The transfer has been completed.",
+            notification_type="Transaction",
+            commit=False,
+        )
+    elif approval.direction == "Credit":
+        sender_label = approval.sender_name or approval.counterparty or "the sender"
+        create_customer_notification(
+            customer.customer_id,
+            "Money received",
+            f"A credit of £{amount:,.2f} from {sender_label} has been posted to your account.",
+            notification_type="Transaction",
+            commit=False,
+        )
+    else:
+        create_customer_notification(
+            customer.customer_id,
+            "Payment completed",
+            f"Your {approval.payment_type.lower()} of £{amount:,.2f} has been approved and processed.",
+            notification_type="Transaction",
+            commit=False,
+        )
+
     db.session.commit()
+
+    if not send_payment_status_email(customer, approval, event="approved"):
+        app.logger.warning(
+            "Payment approval email could not be sent for reference %s",
+            approval.payment_reference,
+        )
+
+    # Send a branded approval-status notification to the external recipient.
+    # Approval in this application does not itself confirm an external bank credit.
+    if approval.payment_type == "International Transfer":
+        external_transfer = None
+        if approval.original_transaction_reference:
+            external_transfer = ExternalTransfer.query.filter_by(
+                transaction_reference=approval.original_transaction_reference
+            ).first()
+
+        if external_transfer and external_transfer.recipient_email:
+            approval_email_sent = send_branded_recipient_email(
+                recipient_email=external_transfer.recipient_email,
+                recipient_name=external_transfer.recipient_name,
+                subject="International Transfer Approved",
+                eyebrow="Transfer Update",
+                heading="International Transfer Approved",
+                message_text=(
+                    "The international transfer request addressed to you "
+                    "has been approved by fairmontbank and is proceeding to the next stage of processing..\n\n"
+                    "Please allow a few business days for the funds to be processed "
+                    "and reflected in the beneficiary’s account, depending on the participating banks and destination.."
+                ),   
+                details=[
+                    ("Transfer type", "International Transfer"),
+                    (
+                        "Amount",
+                        f"{external_transfer.amount:,.2f} "
+                        f"{external_transfer.currency}",
+                    ),
+                    ("Reference", external_transfer.transaction_reference),
+                    ("Sending bank", external_transfer.bank_name),
+                    ("Country", external_transfer.country),
+                    ("Status", "Approved"),
+                ],
+            )
+            if not approval_email_sent:
+                app.logger.warning(
+                    "Recipient approval email failed for reference %s",
+                    external_transfer.transaction_reference,
+                )
+
+    for recorded_transaction in transactions_to_notify:
+        transaction_customer = Customer.query.filter_by(
+            customer_id=recorded_transaction.customer_id
+        ).first()
+        if not send_transaction_alert(transaction_customer, recorded_transaction):
+            app.logger.info(
+                "Transaction alert not sent for reference %s",
+                recorded_transaction.transaction_reference,
+            )
 
     flash(
         "Payment approved successfully and the account balance has been updated.",
@@ -7737,6 +8977,15 @@ def admin_reject_payment(approval_id):
     )
 
     db.session.commit()
+
+    customer = Customer.query.filter_by(
+        customer_id=approval.customer_id
+    ).first()
+    if not send_payment_status_email(customer, approval, event="rejected"):
+        app.logger.warning(
+            "Payment rejection email could not be sent for reference %s",
+            approval.payment_reference,
+        )
 
     flash(
         "Payment request rejected. No customer balance was changed.",
@@ -8008,7 +9257,21 @@ def admin_incoming_payment():
 
         db.session.add(transaction)
 
+        create_customer_notification(
+            receiver.customer_id,
+            "Money received",
+            f"A payment of £{amount:,.2f} from {sender_name} ({sender_bank}) has been credited to your account. Reference: {transaction_reference}.",
+            notification_type="Transaction",
+            commit=False,
+        )
+
         db.session.commit()
+
+        if not send_transaction_alert(receiver, transaction):
+            app.logger.info(
+                "Incoming credit alert not sent for reference %s",
+                transaction_reference,
+            )
 
         return render_template(
             "admin_incoming_payment_success.html",
@@ -8314,6 +9577,34 @@ def admin_create_customer():
 
         db.session.commit()
 
+        if not send_branded_customer_email(
+            customer,
+            "Your Fairmont Bank Account Is Ready",
+            "Account Setup",
+            "Your Account Record Has Been Created",
+            (
+                "An account record has been created for you in the Fairmont Bank "
+                "software. Use the customer reference provided by "
+                "the administrator to access the bank account."
+            ),
+            [
+                ("Customer reference", customer.customer_id),
+                ("Account type", customer.account_type),
+                ("Account status", customer.account_status),
+            ],
+        ):
+            app.logger.warning(
+                "Account setup email could not be sent for customer %s",
+                customer.customer_id,
+            )
+
+        if initial_funding > 0:
+            initial_transaction = Transaction.query.filter_by(
+                transaction_reference=transaction_reference
+            ).first()
+            if initial_transaction is not None:
+                send_transaction_alert(customer, initial_transaction)
+
         return render_template(
             "admin_create_customer_success.html",
             admin=admin,
@@ -8463,6 +9754,12 @@ def admin_fund_customer():
 
         db.session.add(transaction)
         db.session.commit()
+
+        if not send_transaction_alert(customer, transaction):
+            app.logger.info(
+                "Account funding alert not sent for reference %s",
+                transaction_reference,
+            )
 
         return render_template(
             "admin_fund_customer_success.html",

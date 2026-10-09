@@ -1,836 +1,901 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
-<title>Fairmont Bank — Administration</title>
+    <title>Fairmont Bank — Administration</title>
 
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    html,
-    body {
-        margin: 0;
-        min-height: 100%;
-        font-family: Arial, Helvetica, sans-serif;
-        background: #071426;
-        color: #ffffff;
-    }
-
-    body {
-        min-height: 100vh;
-    }
-
-    .admin-shell {
-        min-height: 100vh;
-        display: flex;
-    }
-
-    /* SIDEBAR */
-
-    .sidebar {
-        width: 250px;
-        min-height: 100vh;
-        background: #08182b;
-        border-right: 1px solid rgba(184, 149, 74, 0.18);
-        padding: 26px 18px;
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-    }
-
-    .brand {
-        padding: 6px 10px 28px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-        margin-bottom: 24px;
-    }
-
-    .brand img {
-        display: block;
-        width: 190px;
-        max-width: 100%;
-        height: auto;
-    }
-
-    .admin-badge {
-        margin-top: 15px;
-        color: #d8b96a;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.7px;
-        text-transform: uppercase;
-    }
-
-    .nav-title {
-        padding: 0 10px;
-        margin-bottom: 10px;
-        color: #667d97;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-    }
-
-    .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-        padding: 12px 12px;
-        margin-bottom: 5px;
-        border-radius: 9px;
-        color: #aabbd0;
-        text-decoration: none;
-        font-size: 13px;
-        transition: background 0.2s, color 0.2s;
-    }
-
-    .nav-link:hover,
-    .nav-link.active {
-        background: rgba(184, 149, 74, 0.10);
-        color: #d8b96a;
-    }
-
-    .nav-icon {
-        width: 22px;
-        text-align: center;
-        font-size: 14px;
-    }
-
-    .sidebar-bottom {
-        position: absolute;
-        left: 18px;
-        right: 18px;
-        bottom: 22px;
-    }
-
-    .admin-user {
-        padding: 13px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.035);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        margin-bottom: 10px;
-    }
-
-    .admin-user-label {
-        color: #687f98;
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 5px;
-    }
-
-    .admin-user-name {
-        color: #dce6f2;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .logout {
-        display: block;
-        width: 100%;
-        padding: 11px;
-        text-align: center;
-        border-radius: 9px;
-        border: 1px solid rgba(220, 100, 100, 0.22);
-        color: #d99a9a;
-        text-decoration: none;
-        font-size: 12px;
-    }
-
-    .logout:hover {
-        background: rgba(220, 100, 100, 0.08);
-    }
-
-    /* MAIN */
-
-    .main {
-        margin-left: 250px;
-        width: calc(100% - 250px);
-        min-height: 100vh;
-        padding: 34px;
-        background:
-            radial-gradient(circle at top right, rgba(184, 149, 74, 0.07), transparent 32%),
-            #071426;
-    }
-
-    .topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .page-title {
-        margin: 0;
-        font-size: 26px;
-        font-weight: 700;
-    }
-
-    .page-subtitle {
-        margin: 7px 0 0;
-        color: #8195ad;
-        font-size: 13px;
-    }
-
-    .secure-status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #91b79e;
-        font-size: 12px;
-        white-space: nowrap;
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #6eae82;
-    }
-
-    /* CARDS */
-
-    .stats {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .stat-card {
-        background: rgba(12, 31, 53, 0.82);
-        border: 1px solid rgba(255, 255, 255, 0.065);
-        border-radius: 14px;
-        padding: 20px;
-    }
-
-    .stat-label {
-        color: #7890a9;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 10px;
-    }
-
-    .stat-value {
-        color: #ffffff;
-        font-size: 25px;
-        font-weight: 700;
-    }
-
-    .content-grid {
-        display: grid;
-        grid-template-columns: 1.6fr 1fr;
-        gap: 20px;
-    }
-
-    .panel {
-        background: rgba(12, 31, 53, 0.82);
-        border: 1px solid rgba(255, 255, 255, 0.065);
-        border-radius: 14px;
-        padding: 22px;
-    }
-
-    .panel-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 18px;
-    }
-
-    .panel-title {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 700;
-    }
-
-    .panel-description {
-        margin: 5px 0 0;
-        color: #7890a9;
-        font-size: 12px;
-        line-height: 1.5;
-    }
-
-    .quick-actions {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-
-    .action {
-        display: block;
-        padding: 15px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.035);
-        border: 1px solid rgba(255, 255, 255, 0.055);
-        color: #dce6f2;
-        text-decoration: none;
-        transition: background 0.2s, border-color 0.2s;
-    }
-
-    .action:hover {
-        background: rgba(255, 255, 255, 0.055);
-        border-color: rgba(184, 149, 74, 0.22);
-    }
-
-    .action-title {
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-
-    .action-text {
-        color: #71869e;
-        font-size: 11px;
-        line-height: 1.4;
-    }
-
-    .security-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .security-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.055);
-    }
-
-    .security-row:last-child {
-        border-bottom: 0;
-    }
-
-    .security-name {
-        color: #cbd7e5;
-        font-size: 12px;
-    }
-
-    .security-value {
-        color: #8fa4ba;
-        font-size: 11px;
-    }
-
-    .active-status {
-        color: #8fc29f;
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 1000px) {
-        .stats {
-            grid-template-columns: repeat(2, 1fr);
+    <style>
+        * {
+            box-sizing: border-box;
         }
 
-        .content-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 720px) {
-        .sidebar {
-            position: relative;
-            width: 100%;
-            min-height: auto;
-            padding: 20px;
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #071426;
+            color: #ffffff;
         }
 
-        .sidebar-bottom {
-            position: static;
-            margin-top: 20px;
-        }
-
-        .main {
-            margin-left: 0;
-            width: 100%;
-            padding: 22px 16px;
+        body {
+            min-height: 100vh;
         }
 
         .admin-shell {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: #08182b;
+            border-right: 1px solid rgba(184, 149, 74, 0.18);
+            padding: 26px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+
+        .brand {
+            padding: 6px 10px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            margin-bottom: 24px;
+        }
+
+        .brand img {
             display: block;
+            width: 190px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .admin-badge {
+            margin-top: 15px;
+            color: #d8b96a;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+        }
+
+        .nav-title {
+            padding: 0 10px;
+            margin-bottom: 10px;
+            color: #667d97;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 9px;
+            color: #aabbd0;
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(184, 149, 74, 0.10);
+            color: #d8b96a;
+        }
+
+        .nav-icon {
+            width: 22px;
+            flex-shrink: 0;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .sidebar-bottom {
+            margin-top: 35px;
+            padding-bottom: 5px;
+        }
+
+        .admin-user {
+            padding: 13px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 10px;
+        }
+
+        .admin-user-label {
+            color: #687f98;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .admin-user-name {
+            color: #dce6f2;
+            font-size: 13px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .logout {
+            display: block;
+            width: 100%;
+            padding: 11px;
+            text-align: center;
+            border-radius: 9px;
+            border: 1px solid rgba(220, 100, 100, 0.22);
+            color: #d99a9a;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .logout:hover {
+            background: rgba(220, 100, 100, 0.08);
+        }
+
+        /* MAIN CONTENT */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+            padding: 34px;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(184, 149, 74, 0.07),
+                    transparent 32%
+                ),
+                #071426;
         }
 
         .topbar {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .stats {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .stats {
-            grid-template-columns: 1fr;
-        }
-
-        .quick-actions {
-            grid-template-columns: 1fr;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .page-title {
-            font-size: 22px;
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
         }
-    }
-</style>
-```
 
+        .page-subtitle {
+            margin: 7px 0 0;
+            color: #8195ad;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .secure-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #91b79e;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #6eae82;
+        }
+
+        /* STATISTICS */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: rgba(12, 31, 53, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 14px;
+            padding: 20px;
+            min-width: 0;
+        }
+
+        .stat-label {
+            color: #7890a9;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        /* CONTENT PANELS */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+            gap: 20px;
+        }
+
+        .panel {
+            min-width: 0;
+            background: rgba(12, 31, 53, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .panel-description {
+            margin: 5px 0 0;
+            color: #7890a9;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* ADMINISTRATION ACTIONS */
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .action {
+            display: block;
+            min-width: 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.055);
+            color: #dce6f2;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .action:hover {
+            background: rgba(255, 255, 255, 0.055);
+            border-color: rgba(184, 149, 74, 0.35);
+        }
+
+        .action-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
+            line-height: 1.5;
+        }
+
+        .action-text {
+            color: #9aadc2;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .action-highlight {
+            border-color: rgba(184, 149, 74, 0.25);
+        }
+
+        .action-highlight .action-title {
+            color: #e0c579;
+        }
+
+        /* SECURITY PANEL */
+
+        .security-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .security-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+        }
+
+        .security-row:last-child {
+            border-bottom: 0;
+        }
+
+        .security-name {
+            color: #cbd7e5;
+            font-size: 12px;
+        }
+
+        .security-value {
+            color: #8fa4ba;
+            font-size: 11px;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .active-status {
+            color: #8fc29f;
+        }
+
+        .security-notice {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(110, 174, 130, 0.06);
+            border: 1px solid rgba(110, 174, 130, 0.12);
+            color: #9abca5;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        /* RESPONSIVE LAYOUT */
+
+        @media (max-width: 1200px) {
+            .main {
+                padding: 25px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .admin-shell {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                padding: 20px;
+                overflow: visible;
+            }
+
+            .brand {
+                padding-bottom: 20px;
+            }
+
+            .sidebar-bottom {
+                margin-top: 20px;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 22px 16px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .secure-status {
+                white-space: normal;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            .stat-card {
+                padding: 17px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="admin-shell">
 
-```
-<aside class="sidebar">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-    <div class="brand">
+        <div class="brand">
 
-        <img
-            src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
-            alt="Fairmont Bank">
+            <img
+                src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+                alt="Fairmont Bank"
+            >
 
-        <div class="admin-badge">
-            Administration Portal
+            <div class="admin-badge">
+                Administration Portal
+            </div>
+
         </div>
 
-    </div>
+        <div class="nav-title">
+            Administration
+        </div>
 
-    <div class="nav-title">
-        Administration
-    </div>
+        <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="nav-link active"
+        >
+            <span class="nav-icon">▦</span>
+            Dashboard
+        </a>
 
-    <a href="{{ url_for('admin_dashboard') }}"
-       class="nav-link active">
-        <span class="nav-icon">▦</span>
-        Dashboard
-    </a>
+        <a href="/admin/live-chat" class="nav-link">
+            <span class="nav-icon">?</span>
+            Live Chat
+        </a>
 
-    <a href="/admin/live-chat" class="nav-link">
-        <span class="nav-icon">?</span>
-        Live Chat
-    </a>
+        <a href="/admin/customers" class="nav-link">
+            <span class="nav-icon">◎</span>
+            Customers
+        </a>
 
-    <a href="/admin/customers" class="nav-link">
-        <span class="nav-icon">◎</span>
-        Customers
-    </a>
+        <a href="/admin/transactions" class="nav-link">
+            <span class="nav-icon">▤</span>
+            Transactions
+        </a>
 
-    <a href="/admin/transactions" class="nav-link">
-        <span class="nav-icon">▤</span>
-        Transactions
-    </a>
+        <a href="/admin/accounts" class="nav-link">
+            <span class="nav-icon">◈</span>
+            Accounts
+        </a>
 
-    <a href="/admin/accounts" class="nav-link">
-        <span class="nav-icon">◈</span>
-        Accounts
-    </a>
+        <a
+            href="{{ url_for('admin_invoices') }}"
+            class="nav-link"
+        >
+            <span class="nav-icon">▣</span>
+            Bills &amp; Invoices
+        </a>
 
-    <a href="{{ url_for('admin_invoices') }}" class="nav-link">
-        <span class="nav-icon">▣</span>
-        Bills &amp; Invoices
-    </a>
-
-    
-
-
-    
-        <a href="{{ url_for('admin_login_otp_requests') }}"
-           class="nav-link">
-
+        <a
+            href="{{ url_for('admin_login_otp_requests') }}"
+            class="nav-link"
+        >
             <span class="nav-icon">OTP</span>
             Login OTP Requests
-
         </a>
 
-<div class="sidebar-bottom">
-
-        <div class="admin-user">
-
-            <div class="admin-user-label">
-                Signed in as
-            </div>
-
-            <div class="admin-user-name">
-                {{ admin.username }}
-            </div>
-
-        </div>
-
-        <a href="{{ url_for('admin_logout') }}"
-           class="logout">
-            Sign Out
+        <!-- NEW: VIRTUAL CARD APPLICATIONS -->
+        <a
+            href="{{ url_for('admin_virtual_card_applications') }}"
+            class="nav-link"
+        >
+            <span class="nav-icon">▣</span>
+            Virtual Card Applications
         </a>
 
-    </div>
+        <!-- ADMINISTRATOR ACCOUNT -->
+        <div class="sidebar-bottom">
 
-</aside>
+            <div class="admin-user">
 
+                <div class="admin-user-label">
+                    Signed in as
+                </div>
 
-<main class="main">
+                <div class="admin-user-name">
+                    {{ admin.username }}
+                </div>
 
-    <div class="topbar">
+            </div>
 
-        <div>
-
-            <h1 class="page-title">
-                Administration Dashboard
-            </h1>
-
-            <p class="page-subtitle">
-                Fairmont Bank administrative control center.
-            </p>
+            <a
+                href="{{ url_for('admin_logout') }}"
+                class="logout"
+            >
+                Sign Out
+            </a>
 
         </div>
 
-        <div class="secure-status">
+    </aside>
 
-            <span class="status-dot"></span>
+    <!-- MAIN DASHBOARD -->
+    <main class="main">
 
-            Secure administrator session
+        <div class="topbar">
 
-        </div>
+            <div>
+                <h1 class="page-title">
+                    Administration Dashboard
+                </h1>
 
-    </div>
-
-
-    <section class="stats">
-
-        <div class="stat-card">
-
-            <div class="stat-label">
-                Administrator
+                <p class="page-subtitle">
+                    Fairmont Bank administrative control center.
+                </p>
             </div>
 
-            <div class="stat-value">
-                {{ admin.username }}
-            </div>
-
-        </div>
-
-        <div class="stat-card">
-
-            <div class="stat-label">
-                Account Status
-            </div>
-
-            <div class="stat-value">
-                Active
+            <div class="secure-status">
+                <span class="status-dot"></span>
+                Secure administrator session
             </div>
 
         </div>
 
-        <div class="stat-card">
+        <!-- SUMMARY CARDS -->
+        <section class="stats">
 
-            <div class="stat-label">
-                Support
+            <div class="stat-card">
+                <div class="stat-label">
+                    Administrator
+                </div>
+
+                <div class="stat-value">
+                    {{ admin.username }}
+                </div>
             </div>
 
-            <div class="stat-value">
-                Live Chat
+            <div class="stat-card">
+                <div class="stat-label">
+                    Account Status
+                </div>
+
+                <div class="stat-value">
+                    Active
+                </div>
             </div>
 
-        </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    Support
+                </div>
 
-        <div class="stat-card">
-
-            <div class="stat-label">
-                Security
+                <div class="stat-value">
+                    Live Chat
+                </div>
             </div>
 
-            <div class="stat-value">
-                Protected
+            <div class="stat-card">
+                <div class="stat-label">
+                    Security
+                </div>
+
+                <div class="stat-value">
+                    Protected
+                </div>
             </div>
 
-        </div>
+        </section>
 
-    </section>
+        <!-- DASHBOARD CONTENT -->
+        <section class="content-grid">
 
+            <!-- ADMINISTRATION TOOLS -->
+            <div class="panel">
 
-    <section class="content-grid">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">
+                            Administration Tools
+                        </h2>
 
-        <div class="panel">
+                        <p class="panel-description">
+                            Access administrative functions available
+                            to authorized personnel.
+                        </p>
+                    </div>
+                </div>
 
-            <div class="panel-header">
+                <div class="quick-actions">
 
-                <div>
+                    <a href="/admin/live-chat" class="action">
 
-                    <h2 class="panel-title">
-                        Administration Tools
-                    </h2>
+                        <div class="action-title">
+                            Live Chat
+                        </div>
 
-                    <p class="panel-description">
-                        Access the administrative functions available
-                        to authorized Fairmont Bank personnel.
-                    </p>
+                        <div class="action-text">
+                            View customer conversations and respond
+                            to support messages.
+                        </div>
+
+                    </a>
+
+                    <a href="/admin/customers" class="action">
+
+                        <div class="action-title">
+                            Customer Management
+                        </div>
+
+                        <div class="action-text">
+                            Access customer administration tools.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_accounts') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Account Applications
+                        </div>
+
+                        <div class="action-text">
+                            Review customer account applications
+                            and process pending requests.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_tcc_requests') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            TCC Verification
+                        </div>
+
+                        <div class="action-text">
+                            Receive and review customer TCC codes.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_payment_approvals') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Payment Approvals
+                        </div>
+
+                        <div class="action-text">
+                            Review pending customer payment requests.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_transactions') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Transaction Management
+                        </div>
+
+                        <div class="action-text">
+                            Review banking transaction activity.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_accounts') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Account Management
+                        </div>
+
+                        <div class="action-text">
+                            Manage authorized account information.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_incoming_payment') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Post Incoming Payment
+                        </div>
+
+                        <div class="action-text">
+                            Record incoming payments for existing
+                            customer accounts.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_create_customer') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Create Customer Account
+                        </div>
+
+                        <div class="action-text">
+                            Create a customer account through the
+                            administrator interface.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_fund_customer') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Fund Customer Account
+                        </div>
+
+                        <div class="action-text">
+                            Record an authorized funding adjustment
+                            for an existing customer account.
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin_fund_customer') }}"
+                        class="action"
+                    >
+
+                        <div class="action-title">
+                            Adjust Customer Balance
+                        </div>
+
+                        <div class="action-text">
+                            Access the existing administrator
+                            balance-adjustment function.
+                        </div>
+
+                    </a>
+
+                    <!-- NEW: VIRTUAL CARD APPLICATIONS -->
+                    <a
+                        href="{{ url_for('admin_virtual_card_applications') }}"
+                        class="action action-highlight"
+                    >
+
+                        <div class="action-title">
+                            Virtual Card Applications
+                        </div>
+
+                        <div class="action-text">
+                            Review virtual card applications,
+                            approve eligible requests, and process
+                            replacement applications.
+                        </div>
+
+                    </a>
 
                 </div>
 
             </div>
 
+            <!-- SECURITY PANEL -->
+            <div class="panel">
 
-            <div class="quick-actions">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">
+                            Security
+                        </h2>
 
-                <a href="/admin/live-chat" class="action">
+                        <p class="panel-description">
+                            Current administrator session information.
+                        </p>
+                    </div>
+                </div>
 
-                    <div class="action-title">
-                        Live Chat
+                <div class="security-list">
+
+                    <div class="security-row">
+
+                        <span class="security-name">
+                            Administrator
+                        </span>
+
+                        <span class="security-value">
+                            {{ admin.username }}
+                        </span>
+
                     </div>
 
-                    <div class="action-text">
-                        View customer conversations and respond
-                        to support messages.
+                    <div class="security-row">
+
+                        <span class="security-name">
+                            Account
+                        </span>
+
+                        <span class="security-value active-status">
+                            Active
+                        </span>
+
                     </div>
 
-                </a>
+                    <div class="security-row">
 
+                        <span class="security-name">
+                            Authentication
+                        </span>
 
-                <a href="/admin/customers" class="action">
+                        <span class="security-value">
+                            Password Protected
+                        </span>
 
-                    <div class="action-title">
-                        Customer Management
                     </div>
 
-                    <div class="action-text">
-                        Customer administration tools will be
-                        available here.
+                    <div class="security-row">
+
+                        <span class="security-name">
+                            Session
+                        </span>
+
+                        <span class="security-value active-status">
+                            Active
+                        </span>
+
                     </div>
 
-                </a>
+                </div>
 
-
-                <a href="{{ url_for('admin_accounts') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Account Applications
-                    </div>
-
-                    <div class="action-text">
-                        Open and review new customer account applications
-                        and approve or reject pending requests.
-                    </div>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_tcc_requests') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        TCC Verification
-                    </div>
-
-                    <div class="action-text">
-                        Receive and review customer TCC codes.
-                    </div>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_payment_approvals') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Payment Approvals
-                    </div>
-
-                    <div class="action-text">
-                        Review and approve pending customer payments.
-                    </div>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_transactions') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Transaction Management
-                    </div>
-
-                    <div class="action-text">
-                        Review banking transaction activity.
-                    </div>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_accounts') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Account Management
-                    </div>
-
-                    <div class="action-text">
-                        Manage authorized account information.
-                    </div>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_incoming_payment') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Post Incoming Payment
-                    </div>
-
-                    <div class="action-text">
-                        Credit an existing customer account with
-                        an incoming payment.
-                    </div>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_create_customer') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Create Customer Account
-                    </div>
-
-                    <div class="action-text">
-                        Create a new Fairmont customer account with
-                        optional initial funding.
-                    </div>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_fund_customer') }}"
-                   class="action">
-
-                    <div class="action-title">
-                        Fund Customer Account
-                    </div>
-
-                    <div class="action-text">
-                        Add funds to any existing Fairmont customer account.
-                    </div>
-
-                </a>
-
-
-
-
-                <a
-                    href="{{ url_for('admin_fund_customer') }}"
-                    class="action"
-                >
-
-                    <div class="action-title">
-                        Adjust Customer Balance
-                    </div>
-
-                    <div class="action-text">
-                        Increase an active customer's account balance
-                        through an administrator-only adjustment.
-                    </div>
-
-                </a>
-
-                
-
-
-            </div>
-
-        </div>
-
-
-        <div class="panel">
-
-            <div class="panel-header">
-
-                <div>
-
-                    <h2 class="panel-title">
-                        Security
-                    </h2>
-
-                    <p class="panel-description">
-                        Current administrator session status.
-                    </p>
-
+                <div class="security-notice">
+                    Keep administrator credentials confidential.
+                    Sign out when you have finished managing the
+                    application.
                 </div>
 
             </div>
 
+        </section>
 
-            <div class="security-list">
-
-                <div class="security-row">
-
-                    <span class="security-name">
-                        Administrator
-                    </span>
-
-                    <span class="security-value">
-                        {{ admin.username }}
-                    </span>
-
-                </div>
-
-
-                <div class="security-row">
-
-                    <span class="security-name">
-                        Account
-                    </span>
-
-                    <span class="security-value active-status">
-                        Active
-                    </span>
-
-                </div>
-
-
-                <div class="security-row">
-
-                    <span class="security-name">
-                        Authentication
-                    </span>
-
-                    <span class="security-value">
-                        Password Protected
-                    </span>
-
-                </div>
-
-
-                <div class="security-row">
-
-                    <span class="security-name">
-                        Session
-                    </span>
-
-                    <span class="security-value active-status">
-                        Active
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-</main>
-```
+    </main>
 
 </div>
 

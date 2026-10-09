@@ -349,6 +349,19 @@
 
         </div>
 
+        {% if not customer.bank_statements_locked %}
+        <p style="margin: 0 0 16px;">
+            <a href="{{ url_for('download_bank_statement_csv') }}"
+               style="display:inline-block;padding:11px 16px;border-radius:10px;background:#2e78d1;color:#fff;text-decoration:none;font-weight:600;">
+                Download statement (CSV)
+            </a>
+        </p>
+        {% else %}
+        <p style="margin: 0 0 16px;color:#ffcf8a;">
+            Statement downloads are currently unavailable. Please contact support.
+        </p>
+        {% endif %}
+
         <div class="table-wrap">
 
             {% if transactions %}

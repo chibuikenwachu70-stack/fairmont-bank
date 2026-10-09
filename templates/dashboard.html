@@ -162,6 +162,44 @@
 .account-frozen-modal{position:relative;width:min(560px,100%);max-height:90vh;overflow-y:auto;padding:32px;border-radius:18px;background:#fff;color:#172033;box-shadow:0 25px 80px rgba(0,0,0,.35)}
 .account-frozen-modal h2{margin:12px 0 16px;font-size:25px}.account-frozen-modal p{line-height:1.65;margin:0 0 16px}.account-frozen-close{position:absolute;top:12px;right:15px;border:0;background:transparent;font-size:30px;cursor:pointer;color:#687386}.frozen-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:#f3e1b8;color:#795b19;font-size:25px;font-weight:800}.frozen-contact{display:grid;gap:12px;margin:22px 0}.frozen-contact div{padding:13px 15px;border:1px solid #e2e6ec;border-radius:10px}.frozen-contact strong{display:block;margin-bottom:4px}.frozen-contact a{color:#2454a6;text-decoration:none}.frozen-support-button{width:100%;padding:13px 18px;border:0;border-radius:10px;background:#172d52;color:#fff;font-weight:700;cursor:pointer}@media(max-width:600px){.account-frozen-modal{padding:25px 20px}}
 </style>
+
+<style id="dashboard-layout-fix">
+  .dashboard-page { width:100%; min-height:100vh; padding:28px 24px 48px; box-sizing:border-box; }
+  .dashboard-shell { width:min(1180px,100%); max-width:1180px; margin:0 auto; }
+  .dashboard-header { display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+  .dashboard-overview-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:stretch; gap:22px; margin:22px 0 28px; }
+  .dashboard-overview-grid > .balance-card,
+  .dashboard-overview-grid > .virtual-card-section { width:100%; min-width:0; margin:0 !important; box-sizing:border-box; }
+  .dashboard-overview-grid > .balance-card { min-height:220px; padding:26px !important; display:flex; flex-direction:column; justify-content:center; }
+  .dashboard-overview-grid > .virtual-card-section .section-heading { margin:0 0 12px; }
+  .dashboard-overview-grid > .virtual-card-section .virtual-card,
+  .dashboard-overview-grid > .virtual-card-section .virtual-card-empty { min-height:220px; height:auto; box-sizing:border-box; }
+  .dashboard-overview-grid > .virtual-card-section .virtual-card { display:flex; flex-direction:column; justify-content:space-between; }
+  .services-section { margin-top:24px !important; }
+  #servicesScroll.services-scroll { display:grid !important; grid-template-columns:repeat(7,minmax(0,1fr)) !important; gap:12px !important; width:100%; overflow:visible !important; padding:4px 0 !important; box-sizing:border-box; }
+  #servicesScroll.services-scroll > .service-item { width:100%; min-width:0; min-height:112px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:16px 8px; box-sizing:border-box; text-align:center; white-space:normal; border-radius:16px; }
+  #servicesScroll .service-name { display:block; font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+  #servicesScroll .service-icon { flex:0 0 auto; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .recent-activity-list { display:flex; flex-direction:column; gap:12px; }
+  .recent-activity-item { width:100%; box-sizing:border-box; padding:16px 18px; }
+  .recent-activity-main { min-width:0; }
+  .recent-activity-amount { white-space:nowrap; }
+  @media (max-width:1000px) { #servicesScroll.services-scroll { grid-template-columns:repeat(4,minmax(0,1fr)) !important; } }
+  @media (max-width:700px) {
+    .dashboard-page { padding:16px 12px 32px; }
+    .dashboard-overview-grid { grid-template-columns:minmax(0,1fr); gap:16px; margin:18px 0 24px; }
+    .dashboard-overview-grid > .balance-card { min-height:180px; padding:22px !important; }
+    .dashboard-overview-grid > .virtual-card-section .virtual-card,
+    .dashboard-overview-grid > .virtual-card-section .virtual-card-empty { min-height:210px; }
+    #servicesScroll.services-scroll { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:9px !important; }
+    #servicesScroll.services-scroll > .service-item { min-height:104px; padding:12px 6px; }
+    #servicesScroll .service-name { font-size:11px; }
+    .recent-activity-item { align-items:flex-start; gap:10px; }
+    .recent-activity-amount { padding-top:3px; font-size:12px; }
+  }
+  @media (max-width:380px) { #servicesScroll.services-scroll { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+</style>
+
 </head>
 
 <body>
@@ -239,6 +277,7 @@
         <h1>Hello, {{ customer.full_name.split()[0] }}.</h1>
     </section>
 
+    <div class="dashboard-overview-grid">
     <section class="balance-card">
         <div class="balance-top">
             <p class="balance-label">AVAILABLE BALANCE</p>
@@ -249,126 +288,194 @@
     </section>
 
     <!-- VIRTUAL ATM CARD -->
-    <section class="dashboard-section virtual-card-section">
-        <div class="section-heading">
-            <h2>Virtual ATM Card</h2>
+<section class="dashboard-section virtual-card-section">
+    <div class="section-heading">
+        <h2>Virtual ATM Card</h2>
+    </div>
+
+    {% if virtual_card %}
+
+        <div class="virtual-card">
+            <div class="virtual-card-top">
+                <span class="virtual-card-brand">FAIRMONT BANK</span>
+                <span class="virtual-card-type">VIRTUAL ATM</span>
+            </div>
+
+            <div class="virtual-card-chip" aria-hidden="true"></div>
+
+            <div class="virtual-card-number">
+                {{ virtual_card.card_number }}
+            </div>
+
+            <div class="virtual-card-bottom">
+                <div>
+                    <span class="virtual-card-label">CARDHOLDER</span>
+                    <strong>{{ customer.full_name }}</strong>
+                </div>
+                <div>
+                    <span class="virtual-card-label">EXPIRES</span>
+                    <strong>{{ virtual_card.expiry_date }}</strong>
+                </div>
+                <div>
+                    <span class="virtual-card-label">STATUS</span>
+                    <strong>{{ virtual_card.status }}</strong>
+                </div>
+            </div>
+
+            <div class="virtual-card-security">
+                <span class="virtual-card-label">SECURITY CODE</span>
+                <span class="virtual-card-security-code">
+                    {{ virtual_card.security_code }}
+                </span>
+            </div>
+
+            <a
+    href="{{ url_for('virtual_card_details') }}"
+    class="virtual-card-review"
+    aria-label="Open virtual card details"
+>
+    View Card Details
+</a>
         </div>
 
-        {% if virtual_card %}
-            <div class="virtual-card">
-                <div class="virtual-card-top">
-                    <span class="virtual-card-brand">FAIRMONT BANK</span>
-                    <span class="virtual-card-type">VIRTUAL ATM</span>
-                </div>
+    {% elif virtual_card_application and virtual_card_application.status == 'Pending' %}
 
-                <div class="virtual-card-chip" aria-hidden="true"></div>
-
-                <div class="virtual-card-number">
-                    {{ virtual_card.card_number }}
-                </div>
-
-                <div class="virtual-card-bottom">
-                    <div>
-                        <span class="virtual-card-label">CARDHOLDER</span>
-                        <strong>{{ customer.full_name }}</strong>
-                    </div>
-                    <div>
-                        <span class="virtual-card-label">EXPIRES</span>
-                        <strong>{{ virtual_card.expiry_date }}</strong>
-                    </div>
-                    <div>
-                        <span class="virtual-card-label">STATUS</span>
-                        <strong>{{ virtual_card.status }}</strong>
-                    </div>
-                </div>
-
-                <div class="virtual-card-security">
-                    <span class="virtual-card-label">SECURITY CODE</span>
-                    <span class="virtual-card-security-code">{{ virtual_card.security_code }}</span>
-                </div>
-
-                <a href="{{ url_for('virtual_card_review') }}" class="virtual-card-review">
-                    Review Card
-                </a>
+        <div class="virtual-card-empty">
+            <div class="virtual-card-empty-icon">◷</div>
+            <div class="virtual-card-empty-content">
+                <h3>Application Pending</h3>
+                <p>
+                    Your application has been submitted and is awaiting
+                    administrator approval.
+                </p>
             </div>
-        {% else %}
-            <div class="virtual-card-empty">
-                <div class="virtual-card-empty-icon">▣</div>
-                <div class="virtual-card-empty-content">
-                    <h3>Get your Virtual ATM Card</h3>
-                    <p>Apply once and your virtual card will appear on your dashboard.</p>
-                </div>
-                <form method="POST" action="{{ url_for('apply_virtual_card') }}">
-                    <button type="submit" class="virtual-card-button">Get Virtual ATM Card</button>
-                </form>
+        </div>
+
+    {% elif virtual_card_application and virtual_card_application.status == 'Rejected' %}
+
+        <div class="virtual-card-empty">
+            <div class="virtual-card-empty-icon">!</div>
+            <div class="virtual-card-empty-content">
+                <h3>Application Rejected</h3>
+                <p>
+                    Your application was not approved.
+                    You may submit another application for review.
+                </p>
+
+                {% if virtual_card_application.rejection_reason %}
+                    <p>
+                        Reason: {{ virtual_card_application.rejection_reason }}
+                    </p>
+                {% endif %}
             </div>
-        {% endif %}
-    </section>
+
+            <form method="POST"
+                  action="{{ url_for('apply_virtual_card') }}">
+                <button type="submit" class="virtual-card-button">
+                    Apply Again
+                </button>
+            </form>
+        </div>
+
+    {% elif virtual_card_application and virtual_card_application.status == 'Approved' %}
+
+        <div class="virtual-card-empty">
+            <div class="virtual-card-empty-icon">✓</div>
+            <div class="virtual-card-empty-content">
+                <h3>Application Approved</h3>
+                <p>
+                    Your application has been approved. If your card
+                    is not visible, please contact support.
+                </p>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div class="virtual-card-empty">
+            <div class="virtual-card-empty-icon">▣</div>
+            <div class="virtual-card-empty-content">
+                <h3>Apply for a Virtual ATM Card</h3>
+                <p>
+                    Submit your application and wait for administrator
+                    approval before your virtual card is issued.
+                </p>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('apply_virtual_card') }}">
+                <button type="submit" class="virtual-card-button">
+                    Apply Now
+                </button>
+            </form>
+        </div>
+
+    {% endif %}
+</section>
+    </div>
 
     <!-- SERVICES -->
     <section class="dashboard-section services-section">
-        <div class="section-heading"><h2>Services</h2></div>
+        <div class="section-heading">
+            <h2>Services</h2>
+        </div>
 
         <div class="services-scroll" id="servicesScroll">
             <a href="/send-money" class="service-item">
-                <span class="service-icon">↑</span><span class="service-name">Send Money</span>
+                <span class="service-icon">↑</span>
+                <span class="service-name">Send Money</span>
             </a>
-
             <a href="/withdraw" class="service-item" aria-label="Withdraw Money">
-                <span class="service-icon">↓</span><span class="service-name">Withdraw<br>Money</span>
+                <span class="service-icon">↓</span>
+                <span class="service-name">Withdraw<br>Money</span>
             </a>
-
             <a href="/live-chat" class="service-item">
-                <span class="service-icon">?</span><span class="service-name">Live<br>Chat</span>
+                <span class="service-icon">?</span>
+                <span class="service-name">Live<br>Chat</span>
             </a>
-
             <a href="https://wa.me/17317330071" class="service-item" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Support">
-                <span class="service-icon whatsapp-service-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.49 0 .15 5.34.15 11.9c0 2.1.55 4.15 1.6 5.95L.08 24l6.3-1.65a11.86 11.86 0 0 0 5.67 1.44h.01c6.55 0 11.89-5.34 11.89-11.9 0-3.18-1.24-6.17-3.43-8.41ZM12.06 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98 1-3.65-.23-.37a9.9 9.9 0 1 1 8.38 4.63Zm5.43-7.42c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
-                    </svg>
-                </span>
+                <span class="service-icon whatsapp-service-icon">☎</span>
                 <span class="service-name">WhatsApp<br>Support</span>
             </a>
-
             <a href="/transactions" class="service-item">
-                <span class="service-icon">≡</span><span class="service-name">Transaction<br>History</span>
+                <span class="service-icon">≡</span>
+                <span class="service-name">Transaction<br>History</span>
             </a>
-
             <a href="/pay-bills" class="service-item">
-                <span class="service-icon">£</span><span class="service-name">Pay Bills</span>
+                <span class="service-icon">£</span>
+                <span class="service-name">Pay Bills</span>
             </a>
-
             <a href="/bank-statements" class="service-item">
-                <span class="service-icon">□</span><span class="service-name">Bank<br>Statement</span>
+                <span class="service-icon">□</span>
+                <span class="service-name">Bank<br>Statement</span>
             </a>
-
             <a href="/flights-travel" class="service-item">
-                <span class="service-icon">✈</span><span class="service-name">Flights &<br>Travels</span>
+                <span class="service-icon">✈</span>
+                <span class="service-name">Flights &amp;<br>Travels</span>
             </a>
-
             <a href="/lifestyle" class="service-item">
-                <span class="service-icon">◆</span><span class="service-name">Lifestyles</span>
+                <span class="service-icon">◆</span>
+                <span class="service-name">Lifestyles</span>
             </a>
-
             <a href="/tv-subscriptions" class="service-item">
-                <span class="service-icon">TV</span><span class="service-name">TV<br>Subscriptions</span>
+                <span class="service-icon">TV</span>
+                <span class="service-name">TV<br>Subscriptions</span>
             </a>
-
             <a href="/data-bundles" class="service-item">
-                <span class="service-icon">◇</span><span class="service-name">Data<br>Bundles</span>
+                <span class="service-icon">◇</span>
+                <span class="service-name">Data<br>Bundles</span>
             </a>
-
             <a href="/airtime" class="service-item">
-                <span class="service-icon">☎</span><span class="service-name">Airtime</span>
+                <span class="service-icon">☎</span>
+                <span class="service-name">Airtime</span>
             </a>
-
             <a href="/international-transfer" class="service-item">
-                <span class="service-icon">↔</span><span class="service-name">International<br>Transfer</span>
+                <span class="service-icon">↔</span>
+                <span class="service-name">International<br>Transfer</span>
             </a>
-
-            <a href="#" class="service-item">
-                <span class="service-icon">⚡</span><span class="service-name">Electric<br>Bills</span>
+            <a href="/electricity-bills" class="service-item">
+                <span class="service-icon">⚡</span>
+                <span class="service-name">Electric<br>Bills</span>
             </a>
         </div>
     </section>
@@ -442,79 +549,7 @@ function toggleBalance() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const serviceContainer = document.getElementById("servicesScroll");
-    if (!serviceContainer) return;
 
-    serviceContainer.classList.add("fairmont-services-scroll");
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "fairmont-services-wrapper";
-    serviceContainer.parentNode.insertBefore(wrapper, serviceContainer);
-    wrapper.appendChild(serviceContainer);
-
-    const leftButton = document.createElement("button");
-    leftButton.type = "button";
-    leftButton.className = "fairmont-services-arrow fairmont-services-arrow-left";
-    leftButton.setAttribute("aria-label", "Scroll services left");
-    leftButton.innerHTML = "‹";
-
-    const rightButton = document.createElement("button");
-    rightButton.type = "button";
-    rightButton.className = "fairmont-services-arrow fairmont-services-arrow-right";
-    rightButton.setAttribute("aria-label", "Scroll services right");
-    rightButton.innerHTML = "›";
-
-    wrapper.appendChild(leftButton);
-    wrapper.appendChild(rightButton);
-
-    leftButton.addEventListener("click", () => {
-        serviceContainer.scrollBy({left: -300, behavior: "smooth"});
-    });
-
-    rightButton.addEventListener("click", () => {
-        serviceContainer.scrollBy({left: 300, behavior: "smooth"});
-    });
-
-    serviceContainer.addEventListener("wheel", function (event) {
-        if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-            event.preventDefault();
-            serviceContainer.scrollLeft += event.deltaY;
-        }
-    }, {passive:false});
-
-    let dragging = false;
-    let startX = 0;
-    let startScroll = 0;
-
-    serviceContainer.addEventListener("mousedown", function (event) {
-        dragging = true;
-        startX = event.pageX;
-        startScroll = serviceContainer.scrollLeft;
-        serviceContainer.style.cursor = "grabbing";
-    });
-
-    document.addEventListener("mouseup", function () {
-        dragging = false;
-        serviceContainer.style.cursor = "";
-    });
-
-    serviceContainer.addEventListener("mousemove", function (event) {
-        if (!dragging) return;
-        serviceContainer.scrollLeft = startScroll - (event.pageX - startX);
-    });
-
-    serviceContainer.setAttribute("tabindex", "0");
-    serviceContainer.addEventListener("keydown", function (event) {
-        if (event.key === "ArrowRight") {
-            event.preventDefault();
-            serviceContainer.scrollBy({left: 250, behavior: "smooth"});
-        } else if (event.key === "ArrowLeft") {
-            event.preventDefault();
-            serviceContainer.scrollBy({left: -250, behavior: "smooth"});
-        }
-    });
-});
 </script>
 </body>
 </html>

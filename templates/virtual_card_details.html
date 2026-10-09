@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual ATM Card</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            background: #081426;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .card-page {
+            max-width: 480px;
+            margin: 30px auto;
+        }
+
+        .card-panel {
+            padding: 28px;
+            border-radius: 18px;
+            background: #122844;
+            border: 1px solid #29435f;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 25px;
+        }
+
+        .label {
+            margin-top: 24px;
+            color: #a9bfd8;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .value {
+            margin-top: 8px;
+            font-size: 19px;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #263c55;
+            font-size: 14px;
+        }
+
+        .notice {
+            margin-top: 22px;
+            color: #c4d1df;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .button {
+            display: block;
+            width: 100%;
+            margin-top: 22px;
+            padding: 14px;
+            border: 0;
+            border-radius: 8px;
+            background: #2878e5;
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .button:hover {
+            background: #1d65c4;
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 24px;
+            color: #9bc8ff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .secondary {
+            background: transparent;
+            border: 1px solid #54708f;
+            color: #c7d9ee;
+        }
+
+        .secondary:hover {
+            background: #1a3553;
+        }
+
+        .flash-message {
+            margin-top: 16px;
+            padding: 13px 14px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .flash-success {
+            background: #143d2b;
+            border: 1px solid #2d8052;
+        }
+
+        .flash-error {
+            background: #4a2025;
+            border: 1px solid #a83c48;
+        }
+
+        .flash-info {
+            background: #203953;
+            border: 1px solid #45698f;
+        }
+
+        .flash-warning {
+            background: #49391b;
+            border: 1px solid #9a7831;
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px;
+            height: 38px;
+            margin-bottom: 20px;
+            border: 1px solid #6382a6;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #244c78, #142e4b);
+        }
+
+        .card-icon span {
+            display: block;
+            width: 27px;
+            height: 19px;
+            border: 1px solid #b5cee8;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px 12px;
+            }
+
+            .card-page {
+                margin: 12px auto;
+            }
+
+            .card-panel {
+                padding: 22px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card-page">
+        <section class="card-panel">
+
+            <div class="card-icon" aria-hidden="true">
+                <span></span>
+            </div>
+
+            <h1>Virtual ATM Card</h1>
+
+            <!-- Display Flask success, error, information, and warning messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+
+                        {% if category == "success" %}
+                            <div class="flash-message flash-success" role="status">
+                                {{ message }}
+                            </div>
+                        {% elif category == "error" %}
+                            <div class="flash-message flash-error" role="alert">
+                                {{ message }}
+                            </div>
+                        {% elif category == "warning" %}
+                            <div class="flash-message flash-warning" role="status">
+                                {{ message }}
+                            </div>
+                        {% else %}
+                            <div class="flash-message flash-info" role="status">
+                                {{ message }}
+                            </div>
+                        {% endif %}
+
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="label">CARD NUMBER</div>
+            <div class="value">
+                {{ virtual_card.card_number }}
+            </div>
+
+            <div class="label">EXPIRY DATE</div>
+            <div class="value">
+                {{ virtual_card.expiry_date }}
+            </div>
+
+            <div class="label">CARD STATUS</div>
+            <div class="value">
+                <span class="status">
+                    {{ virtual_card.status }}
+                </span>
+            </div>
+
+            <p class="notice">
+                This is a simulated card record within this application.
+                It is not connected to a real card network and cannot be
+                used to make real-world payments or ATM withdrawals.
+            </p>
+
+            <!-- CANCELLED CARD -->
+            {% if virtual_card.status == "Cancelled" %}
+
+                <p class="notice">
+                    This card is cancelled. You can apply for a replacement.
+                    A replacement will only be issued after administrator
+                    approval.
+
+                    If you cancelled the card by mistake and want the
+                    original card reviewed, contact the bank administrator
+                    before submitting a replacement request.
+                </p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('apply_virtual_card') }}"
+                >
+                    <button type="submit" class="button">
+                        Apply for a New Card
+                    </button>
+                </form>
+
+            <!-- FROZEN CARD -->
+            {% elif virtual_card.status == "Frozen" %}
+
+                <p class="notice">
+                    This card is frozen. It cannot be used while frozen.
+                    You can request to unfreeze it below.
+                </p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('virtual_card_unfreeze') }}"
+                >
+                    <button type="submit" class="button">
+                        Unfreeze Card
+                    </button>
+                </form>
+
+            <!-- ACTIVE CARD -->
+            {% elif virtual_card.status == "Active" %}
+
+                <p class="notice">
+                    Your simulated virtual card is active in this
+                    application.
+                </p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('virtual_card_freeze') }}"
+                >
+                    <button type="submit" class="button secondary">
+                        Freeze Card
+                    </button>
+                </form>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('virtual_card_cancel') }}"
+                    onsubmit="return confirm('Are you sure you want to cancel this virtual card? A replacement will require administrator approval.');"
+                >
+                    <button type="submit" class="button secondary">
+                        Cancel Card
+                    </button>
+                </form>
+
+            {% else %}
+
+                <p class="notice">
+                    This card has a status that does not allow the
+                    available card actions. Please contact the
+                    administrator for assistance.
+                </p>
+
+            {% endif %}
+
+            <a
+                class="back-link"
+                href="{{ url_for('dashboard') }}"
+            >
+                &larr; Back to Dashboard
+            </a>
+
+        </section>
+    </main>
+</body>
+</html>
