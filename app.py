@@ -567,10 +567,11 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-logging.info(
-    "Database backend configured: %s",
-    db.engine.dialect.name
-)
+with app.app_context():
+    logging.info(
+        "Database backend configured: %s",
+        db.engine.dialect.name
+    )
 
 # =========================================================
 # POSTGRES PAYMENT APPROVAL SEQUENCE REPAIR
