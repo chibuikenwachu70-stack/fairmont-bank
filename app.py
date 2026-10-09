@@ -9884,6 +9884,36 @@ def ensure_payment_approvals_schema():
                 )
 
 
+def ensure_external_transfer_schema():
+    """Add columns introduced after the external_transfer table was created."""
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(db.engine)
+    if "external_transfer" not in inspector.get_table_names():
+        return
+
+    existing_columns = {
+        column["name"]
+        for column in inspector.get_columns("external_transfer")
+    }
+
+    # Existing rows receive an empty email value. This is an additive migration
+    # and does not delete or rewrite existing transfer records.
+    missing_columns = {
+        "recipient_email": "VARCHAR(254) NOT NULL DEFAULT ''",
+    }
+
+    with db.engine.begin() as connection:
+        for column_name, sql_definition in missing_columns.items():
+            if column_name not in existing_columns:
+                connection.execute(text(
+                    f'ALTER TABLE external_transfer ADD COLUMN "{column_name}" {sql_definition}'
+                ))
+                app.logger.info(
+                    "Database migration added external_transfer.%s", column_name
+                )
+
+
 # Initialize missing database tables after every SQLAlchemy model has been
 # declared. Render starts this application with Gunicorn, which imports app.py
 # without executing the __main__ block. create_all() creates missing tables
@@ -9893,6 +9923,7 @@ try:
     with app.app_context():
         db.create_all()
         ensure_payment_approvals_schema()
+        ensure_external_transfer_schema()
         from sqlalchemy import inspect
         _database_tables = set(inspect(db.engine).get_table_names())
         if "transactions" not in _database_tables:
