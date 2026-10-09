@@ -563,6 +563,15 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+logging.info(
+    "Database backend configured: %s",
+    db.engine.dialect.name
+)
+
 # =========================================================
 # POSTGRES PAYMENT APPROVAL SEQUENCE REPAIR
 # =========================================================
