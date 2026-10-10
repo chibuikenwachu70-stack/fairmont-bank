@@ -56,8 +56,8 @@ def send_bank_email(recipient_email, subject, body, html_body=None):
         safe_subject = "[BANK] " + safe_subject
 
     disclosure = (
-         
-        
+        "SIMULATED BANKING SOFTWARE NOTICE: This email reports activity "
+        "recorded in the Fairmont Bank."
     )
 
     text_body = disclosure + "\n\n" + str(body or "").strip()
