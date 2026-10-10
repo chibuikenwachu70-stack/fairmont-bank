@@ -9768,6 +9768,22 @@ def admin_fund_customer():
         )
 
         db.session.add(transaction)
+
+        # Add the in-site bell notification in the same database
+        # transaction as the funding record, so it appears unread
+        # immediately after the customer returns to the dashboard.
+        create_customer_notification(
+            customer.customer_id,
+            "Account credited",
+            (
+                f"An account funding of £{amount:,.2f} has been recorded. "
+                f"Description: {description}. "
+                f"Reference: {transaction_reference}."
+            ),
+            notification_type="Transaction",
+            commit=False,
+        )
+
         db.session.commit()
 
         if not send_transaction_alert(customer, transaction):
