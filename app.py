@@ -7735,170 +7735,126 @@ def admin_toggle_customer_freeze(customer_id):
     methods=["POST"]
 )
 def admin_delete_customer(customer_id):
+    """Delete a customer and records owned by that customer.
 
+    This is for the application's simulated banking data. It deletes records
+    keyed to this customer's numeric database ID or public customer code.
+    The operation is transactional: any failure rolls back all pending deletes.
+    """
     admin_id = session.get("admin_id")
 
     if not admin_id:
         return redirect(url_for("admin_login"))
 
     admin = db.session.get(AdminUser, admin_id)
-
     if admin is None or not admin.is_active:
         session.pop("admin_id", None)
         session.pop("admin_username", None)
         return redirect(url_for("admin_login"))
 
     customer = db.session.get(Customer, customer_id)
-
     if customer is None:
-        flash(
-            "The selected customer could not be found.",
-            "error"
-        )
+        flash("The selected customer could not be found.", "error")
         return redirect(url_for("admin_customers"))
 
     customer_name = customer.full_name
     customer_code = customer.customer_id
 
     try:
+        # Live chat messages reference a conversation, not the customer.
+        # Delete the messages first so the conversation FK does not block
+        # deletion of the customer's conversations.
+        conversations = (
+            db.session.query(LiveChatConversation)
+            .filter(LiveChatConversation.customer_id == customer.id)
+            .all()
+        )
+        conversation_ids = [conversation.id for conversation in conversations]
+        if conversation_ids:
+            (
+                db.session.query(LiveChatMessage)
+                .filter(LiveChatMessage.conversation_id.in_(conversation_ids))
+                .delete(synchronize_session=False)
+            )
 
-        # -----------------------------------------------------
-        # Remove related records before deleting the customer.
-        #
-        # This uses the SQLAlchemy model metadata so the cleanup
-        # works with the existing database structure.
-        # -----------------------------------------------------
-
-        for model in list(db.Model.registry._class_registry.values()):
-
-            if not isinstance(model, type):
-                continue
-
-            if not hasattr(model, "__table__"):
-                continue
-
+        # Walk mapped models and delete only rows whose customer_id column
+        # matches the correct identifier type. The old implementation tried
+        # comparing every customer_id column to BOTH an integer and a string;
+        # PostgreSQL rejects the mismatched comparison and aborts the session.
+        for mapper in list(db.Model.registry.mappers):
+            model = mapper.class_
             if model is Customer:
                 continue
 
-            table = model.__table__
+            table = getattr(model, "__table__", None)
+            if table is None:
+                continue
 
-            # Look for direct customer_id references.
             customer_id_column = table.columns.get("customer_id")
-
             if customer_id_column is not None:
-
                 try:
+                    python_type = customer_id_column.type.python_type
+                except (AttributeError, NotImplementedError):
+                    python_type = None
 
-                    query = db.session.query(model).filter(
-                        customer_id_column == customer.id
+                if python_type is int:
+                    matching_id = customer.id
+                elif python_type is str:
+                    matching_id = customer_code
+                else:
+                    # Unknown identifier types are not safe to delete by guess.
+                    matching_id = None
+
+                if matching_id is not None:
+                    rows = (
+                        db.session.query(model)
+                        .filter(customer_id_column == matching_id)
+                        .all()
                     )
-
-                    rows = query.all()
-
                     for row in rows:
                         db.session.delete(row)
 
-                except Exception:
-                    pass
-
-            # Some application tables use the public
-            # Customer ID string instead of the numeric DB ID.
-            customer_code_column = table.columns.get("customer_id")
-
-            if customer_code_column is not None:
-
-                try:
-
-                    rows = (
-                        db.session.query(model)
-                        .filter(
-                            customer_code_column == customer_code
-                        )
-                        .all()
-                    )
-
-                    for row in rows:
-                        if row not in db.session.deleted:
-                            db.session.delete(row)
-
-                except Exception:
-                    pass
-
-            # Handle tables using recipient_customer_id.
-            recipient_column = table.columns.get(
-                "recipient_customer_id"
-            )
-
+            # A payment approval can refer to this customer as the recipient.
+            recipient_column = table.columns.get("recipient_customer_id")
             if recipient_column is not None:
-
-                try:
-
-                    rows = (
-                        db.session.query(model)
-                        .filter(
-                            recipient_column == customer_code
-                        )
-                        .all()
-                    )
-
-                    for row in rows:
-                        if row not in db.session.deleted:
-                            db.session.delete(row)
-
-                except Exception:
-                    pass
-
-        # -----------------------------------------------------
-        # Delete the customer itself.
-        # -----------------------------------------------------
-
-        print(
-            f"DELETE DEBUG: Attempting to delete customer "
-            f"id={customer.id}, customer_id={customer_code}"
-        )
+                rows = (
+                    db.session.query(model)
+                    .filter(recipient_column == customer_code)
+                    .all()
+                )
+                for row in rows:
+                    if row not in db.session.deleted:
+                        db.session.delete(row)
 
         db.session.delete(customer)
-
-        print("DELETE DEBUG: Customer marked for deletion; committing...")
-
         db.session.commit()
 
-        print("DELETE DEBUG: Commit successful.")
-
-        # Remove customer login session if applicable.
-        session.pop("customer_id", None)
-        session.pop("pending_login_customer_id", None)
+        # Clear only session keys that refer to the deleted customer.
+        if session.get("customer_id") == customer_code:
+            session.pop("customer_id", None)
+        if session.get("pending_login_customer_id") == customer_code:
+            session.pop("pending_login_customer_id", None)
 
         flash(
-            f"Customer {customer_name} ({customer_code}) "
-            "has been permanently deleted.",
+            f"Customer {customer_name} ({customer_code}) has been permanently deleted.",
             "success"
         )
+        return redirect(url_for("admin_customers"))
 
-        return redirect(
-            url_for("admin_customers")
-        )
-
-    except Exception as exc:
-
+    except Exception:
         db.session.rollback()
-
-        import traceback
-        traceback.print_exc()
-        app.logger.exception("Customer deletion failed")
-        print("CUSTOMER DELETE ERROR:", repr(exc))
-
+        app.logger.exception(
+            "Customer deletion failed for customer database id=%s, code=%s",
+            customer_id,
+            customer_code,
+        )
         flash(
-            "The customer could not be deleted because "
-            "related account data could not be safely removed.",
+            "The customer could not be deleted. The database operation was rolled back; "
+            "check the application logs for the related table or constraint.",
             "error"
         )
-
         return redirect(
-            url_for(
-                "admin_customer_profile",
-                customer_id=customer.id
-            )
+            url_for("admin_customer_profile", customer_id=customer_id)
         )
 
 
@@ -9983,10 +9939,12 @@ try:
         app.logger.info(
             "Database initialization complete; transactions table is available."
         )
-except Exception:
-    app.logger.exception("Database initialization failed during application startup.")
+except Exception as exc:
+    app.logger.exception(
+        "Customer deletion cleanup failed for table %s",
+        table.name
+    )
     raise
-
 
 if __name__ == "__main__":
     with app.app_context():
