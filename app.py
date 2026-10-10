@@ -7852,9 +7852,18 @@ def admin_delete_customer(customer_id):
         # Delete the customer itself.
         # -----------------------------------------------------
 
+        print(
+            f"DELETE DEBUG: Attempting to delete customer "
+            f"id={customer.id}, customer_id={customer_code}"
+        )
+
         db.session.delete(customer)
 
+        print("DELETE DEBUG: Customer marked for deletion; committing...")
+
         db.session.commit()
+
+        print("DELETE DEBUG: Commit successful.")
 
         # Remove customer login session if applicable.
         session.pop("customer_id", None)
@@ -7874,10 +7883,10 @@ def admin_delete_customer(customer_id):
 
         db.session.rollback()
 
-        print(
-            "CUSTOMER DELETE ERROR:",
-            repr(exc)
-        )
+        import traceback
+        traceback.print_exc()
+        app.logger.exception("Customer deletion failed")
+        print("CUSTOMER DELETE ERROR:", repr(exc))
 
         flash(
             "The customer could not be deleted because "
