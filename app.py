@@ -57,8 +57,7 @@ def send_bank_email(recipient_email, subject, body, html_body=None):
 
     disclosure = (
         "SIMULATED BANKING SOFTWARE NOTICE: This email reports activity "
-        "recorded in the Fairmont Bank application. It does not independently "
-        "confirm that external funds were transferred or credited."
+        "recorded in the Fairmont Bank."
     )
 
     text_body = disclosure + "\n\n" + str(body or "").strip()
