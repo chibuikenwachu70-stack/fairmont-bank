@@ -457,34 +457,45 @@ def send_payment_status_email(customer, approval, event="submitted"):
     if approval.rejection_reason:
         details.append(("Reason", approval.rejection_reason))
 
-    if event == "approved":
+    if status == "TCC Verification Required" and event not in {"approved", "rejected"}:
+        subject = "Action Required: TCC Verification for Your Payment Request"
+        heading = "TCC Verification Required"
+        message_text = (
+            "We are writing to inform you that your payment or withdrawal request "
+            "requires additional verification before it can be completed and reviewed.\n\n"
+            "What you need to do:\n"
+            "1. Sign in to your Fairmont Bank account.\n"
+            "2. Open the payment or withdrawal verification page associated with your request.\n"
+            "3. Follow the instructions on the page and enter the TCC verification code when prompted.\n"
+            "4. Once verification is complete, your request can proceed to the review and approval process.\n"
+            "5. Check your account for further updates regarding your request.\n\n"
+            "Important Notice: TCC verification is required for your payment or withdrawal "
+            "request to proceed to review and potential completion. Completing verification "
+            "does not guarantee approval or mean that funds have been transferred."
+        )
+        details.append(("Next step", "Complete TCC verification in your account"))
+    elif event == "approved":
         subject = "Payment Request Approved"
         heading = "Your Request Has Been Approved"
         message_text = (
             "Your request has been approved and the corresponding entry has been "
-            "recorded in this software . This message does not represent "
+            "recorded in this software. This message does not represent "
             "a real-world funds transfer."
         )
     elif event == "rejected":
         subject = "Payment Request Update"
         heading = "Your Request Was Not Approved"
         message_text = (
-            "Your request has been marked as rejected in this software."
+            "Your request has been marked as rejected in this software. "
             "No balance change was made as part of this rejection."
         )
     else:
         subject = "We Received Your Payment Request"
         heading = "Your Request Has Been Received"
-        if status == "TCC Verification Required":
-            message_text = (
-                "Your request has been received and is awaiting the additional "
-                "verification step shown on the website. It has not been approved."
-            )
-        else:
-            message_text = (
-                "Your request has been recorded and is awaiting review. A pending "
-                "request is not a completed transaction."
-            )
+        message_text = (
+            "Your request has been recorded and is awaiting review. A pending "
+            "request is not a completed transaction."
+        )
 
     return send_branded_customer_email(
         customer,
