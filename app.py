@@ -3747,6 +3747,517 @@ def withdraw_card():
 # BANK ACCOUNT WITHDRAWAL REQUEST
 # =========================================================
 
+WITHDRAWAL_ALLOWED_COUNTRIES = {
+    'Afghanistan',
+    'Albania',
+    'Algeria',
+    'American Samoa',
+    'Andorra',
+    'Angola',
+    'Anguilla',
+    'Antarctica',
+    'Antigua and Barbuda',
+    'Argentina',
+    'Armenia',
+    'Aruba',
+    'Australia',
+    'Austria',
+    'Azerbaijan',
+    'Bahamas',
+    'Bahrain',
+    'Bangladesh',
+    'Barbados',
+    'Belarus',
+    'Belgium',
+    'Belize',
+    'Benin',
+    'Bermuda',
+    'Bhutan',
+    'Bolivia, Plurinational State of',
+    'Bonaire, Sint Eustatius and Saba',
+    'Bosnia and Herzegovina',
+    'Botswana',
+    'Bouvet Island',
+    'Brazil',
+    'British Indian Ocean Territory',
+    'Brunei Darussalam',
+    'Bulgaria',
+    'Burkina Faso',
+    'Burundi',
+    'Cabo Verde',
+    'Cambodia',
+    'Cameroon',
+    'Canada',
+    'Cayman Islands',
+    'Central African Republic',
+    'Chad',
+    'Chile',
+    'China',
+    'Christmas Island',
+    'Cocos (Keeling) Islands',
+    'Colombia',
+    'Comoros',
+    'Congo',
+    'Congo, The Democratic Republic of the',
+    'Cook Islands',
+    'Costa Rica',
+    'Croatia',
+    'Cuba',
+    'Curaçao',
+    'Cyprus',
+    'Czechia',
+    "Côte d'Ivoire",
+    'Denmark',
+    'Djibouti',
+    'Dominica',
+    'Dominican Republic',
+    'Ecuador',
+    'Egypt',
+    'El Salvador',
+    'Equatorial Guinea',
+    'Eritrea',
+    'Estonia',
+    'Eswatini',
+    'Ethiopia',
+    'Falkland Islands (Malvinas)',
+    'Faroe Islands',
+    'Fiji',
+    'Finland',
+    'France',
+    'French Guiana',
+    'French Polynesia',
+    'French Southern Territories',
+    'Gabon',
+    'Gambia',
+    'Georgia',
+    'Germany',
+    'Ghana',
+    'Gibraltar',
+    'Greece',
+    'Greenland',
+    'Grenada',
+    'Guadeloupe',
+    'Guam',
+    'Guatemala',
+    'Guernsey',
+    'Guinea',
+    'Guinea-Bissau',
+    'Guyana',
+    'Haiti',
+    'Heard Island and McDonald Islands',
+    'Holy See (Vatican City State)',
+    'Honduras',
+    'Hong Kong',
+    'Hungary',
+    'Iceland',
+    'India',
+    'Indonesia',
+    'Iran, Islamic Republic of',
+    'Iraq',
+    'Ireland',
+    'Isle of Man',
+    'Israel',
+    'Italy',
+    'Jamaica',
+    'Japan',
+    'Jersey',
+    'Jordan',
+    'Kazakhstan',
+    'Kenya',
+    'Kiribati',
+    "Korea, Democratic People's Republic of",
+    'Korea, Republic of',
+    'Kuwait',
+    'Kyrgyzstan',
+    "Lao People's Democratic Republic",
+    'Latvia',
+    'Lebanon',
+    'Lesotho',
+    'Liberia',
+    'Libya',
+    'Liechtenstein',
+    'Lithuania',
+    'Luxembourg',
+    'Macao',
+    'Madagascar',
+    'Malawi',
+    'Malaysia',
+    'Maldives',
+    'Mali',
+    'Malta',
+    'Marshall Islands',
+    'Martinique',
+    'Mauritania',
+    'Mauritius',
+    'Mayotte',
+    'Mexico',
+    'Micronesia, Federated States of',
+    'Moldova, Republic of',
+    'Monaco',
+    'Mongolia',
+    'Montenegro',
+    'Montserrat',
+    'Morocco',
+    'Mozambique',
+    'Myanmar',
+    'Namibia',
+    'Nauru',
+    'Nepal',
+    'Netherlands',
+    'New Caledonia',
+    'New Zealand',
+    'Nicaragua',
+    'Niger',
+    'Nigeria',
+    'Niue',
+    'Norfolk Island',
+    'North Macedonia',
+    'Northern Mariana Islands',
+    'Norway',
+    'Oman',
+    'Pakistan',
+    'Palau',
+    'Palestine, State of',
+    'Panama',
+    'Papua New Guinea',
+    'Paraguay',
+    'Peru',
+    'Philippines',
+    'Pitcairn',
+    'Poland',
+    'Portugal',
+    'Puerto Rico',
+    'Qatar',
+    'Romania',
+    'Russian Federation',
+    'Rwanda',
+    'Réunion',
+    'Saint Barthélemy',
+    'Saint Helena, Ascension and Tristan da Cunha',
+    'Saint Kitts and Nevis',
+    'Saint Lucia',
+    'Saint Martin (French part)',
+    'Saint Pierre and Miquelon',
+    'Saint Vincent and the Grenadines',
+    'Samoa',
+    'San Marino',
+    'Sao Tome and Principe',
+    'Saudi Arabia',
+    'Senegal',
+    'Serbia',
+    'Seychelles',
+    'Sierra Leone',
+    'Singapore',
+    'Sint Maarten (Dutch part)',
+    'Slovakia',
+    'Slovenia',
+    'Solomon Islands',
+    'Somalia',
+    'South Africa',
+    'South Georgia and the South Sandwich Islands',
+    'South Sudan',
+    'Spain',
+    'Sri Lanka',
+    'Sudan',
+    'Suriname',
+    'Svalbard and Jan Mayen',
+    'Sweden',
+    'Switzerland',
+    'Syrian Arab Republic',
+    'Taiwan, Province of China',
+    'Tajikistan',
+    'Tanzania, United Republic of',
+    'Thailand',
+    'Timor-Leste',
+    'Togo',
+    'Tokelau',
+    'Tonga',
+    'Trinidad and Tobago',
+    'Tunisia',
+    'Turkmenistan',
+    'Turks and Caicos Islands',
+    'Tuvalu',
+    'Türkiye',
+    'Uganda',
+    'Ukraine',
+    'United Arab Emirates',
+    'United Kingdom',
+    'United States',
+    'United States Minor Outlying Islands',
+    'Uruguay',
+    'Uzbekistan',
+    'Vanuatu',
+    'Venezuela, Bolivarian Republic of',
+    'Viet Nam',
+    'Virgin Islands, British',
+    'Virgin Islands, U.S.',
+    'Wallis and Futuna',
+    'Western Sahara',
+    'Yemen',
+    'Zambia',
+    'Zimbabwe',
+    'Åland Islands',
+}
+
+WITHDRAWAL_ALLOWED_CURRENCIES = {
+    'AED',
+    'AFN',
+    'ALL',
+    'AMD',
+    'ANG',
+    'AOA',
+    'ARS',
+    'AUD',
+    'AWG',
+    'AZN',
+    'BAM',
+    'BBD',
+    'BDT',
+    'BGN',
+    'BHD',
+    'BIF',
+    'BMD',
+    'BND',
+    'BOB',
+    'BOV',
+    'BRL',
+    'BSD',
+    'BTN',
+    'BWP',
+    'BYN',
+    'BZD',
+    'CAD',
+    'CDF',
+    'CHE',
+    'CHF',
+    'CHW',
+    'CLF',
+    'CLP',
+    'CNY',
+    'COP',
+    'COU',
+    'CRC',
+    'CUC',
+    'CUP',
+    'CVE',
+    'CZK',
+    'DJF',
+    'DKK',
+    'DOP',
+    'DZD',
+    'EGP',
+    'ERN',
+    'ETB',
+    'EUR',
+    'FJD',
+    'FKP',
+    'GBP',
+    'GEL',
+    'GHS',
+    'GIP',
+    'GMD',
+    'GNF',
+    'GTQ',
+    'GYD',
+    'HKD',
+    'HNL',
+    'HRK',
+    'HTG',
+    'HUF',
+    'IDR',
+    'ILS',
+    'INR',
+    'IQD',
+    'IRR',
+    'ISK',
+    'JMD',
+    'JOD',
+    'JPY',
+    'KES',
+    'KGS',
+    'KHR',
+    'KMF',
+    'KPW',
+    'KRW',
+    'KWD',
+    'KYD',
+    'KZT',
+    'LAK',
+    'LBP',
+    'LKR',
+    'LRD',
+    'LSL',
+    'LYD',
+    'MAD',
+    'MDL',
+    'MGA',
+    'MKD',
+    'MMK',
+    'MNT',
+    'MOP',
+    'MRU',
+    'MUR',
+    'MVR',
+    'MWK',
+    'MXN',
+    'MXV',
+    'MYR',
+    'MZN',
+    'NAD',
+    'NGN',
+    'NIO',
+    'NOK',
+    'NPR',
+    'NZD',
+    'OMR',
+    'PAB',
+    'PEN',
+    'PGK',
+    'PHP',
+    'PKR',
+    'PLN',
+    'PYG',
+    'QAR',
+    'RON',
+    'RSD',
+    'RUB',
+    'RWF',
+    'SAR',
+    'SBD',
+    'SCR',
+    'SDG',
+    'SEK',
+    'SGD',
+    'SHP',
+    'SLE',
+    'SLL',
+    'SOS',
+    'SRD',
+    'SSP',
+    'STN',
+    'SVC',
+    'SYP',
+    'SZL',
+    'THB',
+    'TJS',
+    'TMT',
+    'TND',
+    'TOP',
+    'TRY',
+    'TTD',
+    'TWD',
+    'TZS',
+    'UAH',
+    'UGX',
+    'USD',
+    'USN',
+    'UYI',
+    'UYU',
+    'UYW',
+    'UZS',
+    'VED',
+    'VES',
+    'VND',
+    'VUV',
+    'WST',
+    'XAF',
+    'XAG',
+    'XAU',
+    'XBA',
+    'XBB',
+    'XBC',
+    'XBD',
+    'XCD',
+    'XDR',
+    'XOF',
+    'XPD',
+    'XPF',
+    'XPT',
+    'XSU',
+    'XTS',
+    'XUA',
+    'XXX',
+    'YER',
+    'ZAR',
+    'ZMW',
+    'ZWL',
+}
+
+
+# =========================================================
+# WITHDRAWAL REQUEST RECEIPT
+# =========================================================
+@app.route("/withdrawal-receipt/<int:approval_id>")
+def withdrawal_receipt(approval_id):
+    customer_id = session.get("customer_id")
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(customer_id=customer_id).first()
+    if customer is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    approval = PaymentApproval.query.filter_by(
+        id=approval_id,
+        customer_id=customer.customer_id
+    ).first_or_404()
+
+    receipt_html = r"""
+    <!doctype html>
+    <html lang="en"><head>
+      <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Withdrawal Request Receipt</title>
+      <style>
+        *{box-sizing:border-box}
+        body{margin:0;padding:24px 14px;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+          background:radial-gradient(circle at top right,rgba(42,90,150,.28),transparent 35%),
+          linear-gradient(145deg,#06111f,#0a1727 55%,#071321);color:#eef5ff;min-height:100vh}
+        .wrap{max-width:700px;margin:20px auto}
+        .card{background:rgba(10,25,43,.96);border:1px solid rgba(255,255,255,.1);
+          border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .head{padding:26px 28px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .badge{display:inline-block;padding:7px 11px;border-radius:20px;background:rgba(234,179,8,.13);
+          border:1px solid rgba(234,179,8,.28);color:#f5d779;font-size:12px;font-weight:700}
+        h1{font-size:25px;margin:14px 0 8px}.muted{color:#a6bad3;line-height:1.6}
+        .body{padding:26px 28px}
+        .notice{padding:13px 14px;background:rgba(103,169,255,.08);border:1px solid rgba(103,169,255,.16);
+          border-radius:12px;color:#c1d2e7;font-size:13px;line-height:1.6;margin-bottom:20px}
+        .row{display:flex;justify-content:space-between;gap:18px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+        .row span{color:#9eb2cb}.row strong{text-align:right;overflow-wrap:anywhere}
+        .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+        a,button{display:inline-block;border:0;border-radius:10px;padding:12px 16px;font-weight:700;text-decoration:none;cursor:pointer}
+        .primary{background:linear-gradient(135deg,#2f73c7,#3c8ce0);color:#fff}
+        .secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#eaf2ff}
+        @media print{body{background:#fff;color:#111;padding:0}.card{box-shadow:none;border:1px solid #ccc;background:#fff;color:#111}
+          .head,.body{padding:18px}.muted,.row span,.notice{color:#333}.notice{background:#f5f5f5;border-color:#ddd}.actions{display:none}.badge{color:#654d00;background:#fff7d6}}
+      </style>
+    </head><body><main class="wrap"><section class="card">
+      <header class="head">
+        <span class="badge">PENDING REVIEW</span>
+        <h1>Withdrawal Request Receipt</h1>
+        <p class="muted">Your request has been recorded in the Fairmont Bank application.</p>
+      </header>
+      <div class="body">
+        <div class="notice"><strong>Important:</strong> This receipt confirms submission of a withdrawal request only. It is not proof that money has been transferred or paid. The request remains subject to review and approval.</div>
+        <div class="row"><span>Request reference</span><strong>{{ approval.payment_reference }}</strong></div>
+        <div class="row"><span>Request type</span><strong>{{ approval.payment_type }}</strong></div>
+        <div class="row"><span>Amount requested</span><strong>£{{ "%.2f"|format(approval.amount or 0) }}</strong></div>
+        <div class="row"><span>Status</span><strong>{{ approval.status }}</strong></div>
+        <div class="row"><span>Submitted</span><strong>{{ approval.created_at.strftime("%d %b %Y, %H:%M UTC") if approval.created_at else "Not available" }}</strong></div>
+        <div class="row"><span>Description</span><strong>{{ approval.description }}</strong></div>
+        <div class="actions">
+          <button class="primary" type="button" onclick="window.print()">Print / Save Receipt</button>
+          <a class="secondary" href="{{ url_for('withdraw') }}">Back to withdrawals</a>
+          <a class="secondary" href="{{ url_for('dashboard') }}">Dashboard</a>
+        </div>
+      </div>
+    </section></main></body></html>
+    """
+    return render_template_string(receipt_html, approval=approval)
+
+
+
 @app.route("/withdraw/bank", methods=["GET", "POST"])
 def withdraw_bank():
 
@@ -3774,6 +4285,16 @@ def withdraw_bank():
             "bank_name",
             ""
         ).strip()
+
+        bank_country = request.form.get(
+            "bank_country",
+            ""
+        ).strip()
+
+        currency = request.form.get(
+            "currency",
+            ""
+        ).strip().upper()
 
         account_number = request.form.get(
             "account_number",
@@ -3812,6 +4333,26 @@ def withdraw_bank():
         if not bank_name:
             flash(
                 "Please enter the bank name.",
+                "error"
+            )
+            return render_template(
+                "withdraw_bank.html",
+                customer=customer
+            )
+
+        if bank_country not in WITHDRAWAL_ALLOWED_COUNTRIES:
+            flash(
+                "Please choose a valid destination country from the country list.",
+                "error"
+            )
+            return render_template(
+                "withdraw_bank.html",
+                customer=customer
+            )
+
+        if currency not in WITHDRAWAL_ALLOWED_CURRENCIES:
+            flash(
+                "Please choose a valid destination currency.",
                 "error"
             )
             return render_template(
@@ -3883,8 +4424,9 @@ def withdraw_bank():
         account_suffix = account_number[-4:] if len(account_number) >= 4 else account_number
 
         description = (
-            f"Bank account withdrawal to {account_holder_name} - "
-            f"{bank_name} - Account ending {account_suffix}"
+            f"International bank withdrawal request to {account_holder_name} - "
+            f"{bank_name}, {bank_country}, destination currency {currency} - "
+            f"Account ending {account_suffix}"
         )
 
         if reference:
@@ -3933,7 +4475,7 @@ def withdraw_bank():
             "success"
         )
 
-        return redirect(url_for("withdraw"))
+        return redirect(url_for("withdrawal_receipt", approval_id=approval.id))
 
     return render_template(
         "withdraw_bank.html",
@@ -3999,7 +4541,7 @@ def _external_withdrawal_page(method, field_label, payment_type, icon, endpoint)
         if approval.status == "TCC Verification Required":
             return redirect(url_for("payment_tcc_verification", approval_id=approval.id))
         flash(f"Your {method} withdrawal request has been submitted successfully and is now pending review.", "success")
-        return redirect(url_for("withdraw"))
+        return redirect(url_for("withdrawal_receipt", approval_id=approval.id))
 
     return render_template_string(_EXTERNAL_WITHDRAWAL_TEMPLATE, customer=customer, method=method, field_label=field_label, icon=icon, action_url=url_for(endpoint))
 
@@ -4023,6 +4565,57 @@ def withdraw_venmo():
 # =========================================================
 # SEND MONEY TO ANOTHER FAIRMONT BANK CUSTOMER
 # =========================================================
+
+
+# =========================================================
+# INTERNAL TRANSFER RECEIPT
+# =========================================================
+@app.route("/transaction-receipt/<transaction_reference>")
+def transaction_receipt(transaction_reference):
+    customer_id = session.get("customer_id")
+    if not customer_id:
+        return redirect(url_for("login"))
+
+    customer = Customer.query.filter_by(customer_id=customer_id).first()
+    if customer is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    transaction = Transaction.query.filter_by(
+        transaction_reference=transaction_reference,
+        customer_id=customer.customer_id
+    ).first_or_404()
+
+    receipt_html = r"""
+    <!doctype html><html lang="en"><head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Transfer Receipt</title>
+    <style>
+    *{box-sizing:border-box}body{margin:0;padding:24px 14px;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(145deg,#06111f,#0a1727 55%,#071321);color:#eef5ff;min-height:100vh}
+    .wrap{max-width:700px;margin:20px auto}.card{background:#0a192b;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .head{padding:26px 28px;border-bottom:1px solid rgba(255,255,255,.08)}h1{font-size:25px;margin:0 0 8px}.muted{color:#a6bad3;line-height:1.6}
+    .body{padding:26px 28px}.badge{display:inline-block;padding:7px 11px;border-radius:20px;background:rgba(30,140,80,.15);border:1px solid rgba(90,210,140,.24);color:#a8efc2;font-size:12px;font-weight:700;margin-bottom:14px}
+    .notice{padding:13px 14px;background:rgba(103,169,255,.08);border:1px solid rgba(103,169,255,.16);border-radius:12px;color:#c1d2e7;font-size:13px;line-height:1.6;margin-bottom:20px}
+    .row{display:flex;justify-content:space-between;gap:18px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08)}.row span{color:#9eb2cb}.row strong{text-align:right;overflow-wrap:anywhere}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}a,button{display:inline-block;border:0;border-radius:10px;padding:12px 16px;font-weight:700;text-decoration:none;cursor:pointer}
+    .primary{background:linear-gradient(135deg,#2f73c7,#3c8ce0);color:#fff}.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#eaf2ff}
+    @media print{body{background:#fff;color:#111;padding:0}.card{box-shadow:none;border:1px solid #ccc;background:#fff;color:#111}.head,.body{padding:18px}.muted,.row span,.notice{color:#333}.notice{background:#f5f5f5;border-color:#ddd}.actions{display:none}.badge{color:#176b3a;background:#effaf3}}
+    </style></head><body><main class="wrap"><section class="card">
+    <header class="head"><span class="badge">{{ transaction.status }}</span><h1>Transfer Receipt</h1><p class="muted">Fairmont Bank internal transfer record</p></header>
+    <div class="body"><div class="notice"><strong>Receipt details:</strong> This receipt records the transfer status shown in the application. For internal transfers, verify the transaction in your account history if you have questions.</div>
+    <div class="row"><span>Transaction reference</span><strong>{{ transaction.transaction_reference }}</strong></div>
+    <div class="row"><span>Transaction type</span><strong>{{ transaction.transaction_type }}</strong></div>
+    <div class="row"><span>Direction</span><strong>{{ transaction.direction }}</strong></div>
+    <div class="row"><span>Amount</span><strong>£{{ "%.2f"|format(transaction.amount or 0) }}</strong></div>
+    <div class="row"><span>Counterparty</span><strong>{{ transaction.counterparty or "Not specified" }}</strong></div>
+    <div class="row"><span>Description</span><strong>{{ transaction.description or "—" }}</strong></div>
+    <div class="row"><span>Balance after transaction</span><strong>£{{ "%.2f"|format(transaction.balance_after or 0) }}</strong></div>
+    <div class="actions"><button class="primary" type="button" onclick="window.print()">Print / Save Receipt</button><a class="secondary" href="{{ url_for('dashboard') }}">Back to dashboard</a></div>
+    </div></section></main></body></html>
+    """
+    return render_template_string(receipt_html, transaction=transaction)
+
+
 
 @app.route("/send-fairmont-money", methods=["GET", "POST"])
 def send_fairmont_money():
@@ -4249,18 +4842,10 @@ def send_fairmont_money():
             recipient_transaction_reference,
         )
 
-    return render_template(
-        "send_fairmont_money_success.html",
-        customer=customer,
-        recipient=recipient,
-        amount=amount,
-        previous_sender_balance=previous_sender_balance,
-        new_sender_balance=new_sender_balance,
-        previous_recipient_balance=previous_recipient_balance,
-        new_recipient_balance=new_recipient_balance,
-        reference=reference,
+    return redirect(url_for(
+        "transaction_receipt",
         transaction_reference=sender_transaction_reference
-    )
+    ))
 
 
 @app.route("/send-money", methods=["GET", "POST"])
@@ -4736,13 +5321,10 @@ def international_transfer():
             customer=customer
         )
 
-    return render_template(
-        "international_confirmation.html",
-        customer=customer,
-        transfer=transfer,
-        transfer_reference=transaction_reference,
-        approval=approval
-    )
+    return redirect(url_for(
+        "withdrawal_receipt",
+        approval_id=approval.id
+    ))
 
 
 # ============================================================
