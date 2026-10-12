@@ -114,59 +114,62 @@
         .recent-activity-amount-credit{color:#55d68a}
         .recent-activity-amount-debit{color:#ff7777}
 
-        /* Virtual ATM card */
+        /* Virtual ATM card: front and back */
         .virtual-card-section{margin-top:14px!important}
+        .virtual-card-collection{width:min(420px,100%)}
         .virtual-card{
-            position:relative;overflow:hidden;width:min(420px,100%);aspect-ratio:1.586 / 1;
-            min-height:0;padding:22px;box-sizing:border-box;border-radius:20px;
-            color:#fff;background:linear-gradient(135deg,#17365f 0%,#245c96 52%,#102844 100%);
+            position:relative;overflow:hidden;width:100%;aspect-ratio:1.586 / 1;
+            min-height:0;padding:22px;box-sizing:border-box;border-radius:20px;color:#fff;
             box-shadow:0 14px 32px rgba(12,35,66,.24)
         }
-        .virtual-card::after{
-            content:"";position:absolute;width:180px;height:180px;right:-65px;bottom:-95px;
+        .virtual-card-front{
+            display:flex;flex-direction:column;justify-content:flex-start;
+            background:radial-gradient(circle at 95% 100%,rgba(255,255,255,.12),transparent 36%),
+                       linear-gradient(135deg,#17365f 0%,#245c96 52%,#102844 100%)
+        }
+        .virtual-card-front::after{
+            content:"";position:absolute;width:180px;height:180px;right:-75px;bottom:-110px;
             border-radius:50%;border:1px solid rgba(255,255,255,.16);
             box-shadow:0 0 0 22px rgba(255,255,255,.04),0 0 0 44px rgba(255,255,255,.025)
         }
-        .virtual-card-top,.virtual-card-bottom{
-            position:relative;z-index:1;display:flex;align-items:center;
-            justify-content:space-between;gap:12px
-        }
-        .virtual-card-brand{font-size:13px;font-weight:800;letter-spacing:1.4px}
-        .virtual-card-type{font-size:10px;font-weight:700;letter-spacing:1px;opacity:.82}
+        .virtual-card-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px}
+        .virtual-card-brand{font-size:13px;font-weight:800;letter-spacing:1.2px}
+        .virtual-card-type{font-size:9px;font-weight:700;letter-spacing:.8px;opacity:.82}
         .virtual-card-chip{
-            position:relative;z-index:1;width:42px;height:29px;margin:20px 0 13px;
-            border-radius:7px;background:linear-gradient(135deg,#d8bd70,#f0df9c)
+            position:relative;z-index:1;width:42px;height:30px;margin:20px 0 13px;
+            border-radius:7px;background:linear-gradient(135deg,#d8bd70,#f0df9c);
+            box-shadow:inset 0 0 0 1px rgba(100,75,15,.18)
         }
-        .virtual-card-number{
-            position:relative;z-index:1;margin-bottom:16px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-            font-size:clamp(14px,3.5vw,17px);letter-spacing:1.2px;word-spacing:3px;
-            overflow-wrap:anywhere
+        .virtual-card-chip::before,.virtual-card-chip::after{
+            content:"";position:absolute;background:rgba(115,91,33,.32)
         }
-        .virtual-card-bottom{justify-content:flex-start;flex-wrap:wrap}
-        .virtual-card-bottom>div{display:flex;flex-direction:column;gap:4px;margin-right:28px}
-        .virtual-card-label{font-size:8px;letter-spacing:1.2px;opacity:.68}
-        .virtual-card-bottom strong{font-size:11px;font-weight:700;white-space:nowrap}
-        .virtual-card-security{
-            position:relative;z-index:2;display:flex;align-items:center;gap:8px;
-            margin-top:10px;font-size:11px
-        }
-        .virtual-card-security-code{
-            min-width:42px;padding:5px 8px;border-radius:7px;
-            background:rgba(255,255,255,.13);font-family:ui-monospace,monospace;
-            letter-spacing:2px;font-weight:800;text-align:center
-        }
-        .virtual-card-code-toggle{
-            border:1px solid rgba(255,255,255,.22);border-radius:7px;
-            padding:5px 9px;background:rgba(255,255,255,.08);color:#fff;
-            font:inherit;font-size:10px;font-weight:700;cursor:pointer
-        }
-        .virtual-card-code-toggle:hover{background:rgba(255,255,255,.16)}
-        .virtual-card-code-toggle:focus-visible{outline:2px solid #fff;outline-offset:2px}
-        .virtual-card-review{
-            position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;
-            margin-top:14px;padding:10px 15px;border-radius:10px;text-decoration:none;
-            background:#fff;color:#17365f;font-size:12px;font-weight:800
-        }
+        .virtual-card-chip::before{left:33%;top:0;bottom:0;width:1px}
+        .virtual-card-chip::after{left:0;right:0;top:50%;height:1px}
+        .virtual-card-number{position:relative;z-index:1;margin-bottom:14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:clamp(13px,3.5vw,17px);letter-spacing:1px;overflow-wrap:anywhere}
+        .virtual-card-front-footer{position:relative;z-index:1;display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}
+        .virtual-card-holder{min-width:0;max-width:60%}
+        .virtual-card-label{display:block;font-size:7px;letter-spacing:1px;opacity:.7;margin-bottom:4px}
+        .virtual-card-front-footer strong{display:block;font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+        .virtual-card-front-bottom{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px}
+        .virtual-card-network-mark{font-size:22px;font-weight:900;font-style:italic;letter-spacing:-1px}
+        .virtual-card-status{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+        .virtual-card-back{display:none;background:linear-gradient(135deg,#1a3b63,#102844)}
+        .virtual-card-collection.show-back .virtual-card-front{display:none}
+        .virtual-card-collection.show-back .virtual-card-back{display:block}
+        .virtual-card-back-stripe{height:42px;background:linear-gradient(180deg,#111827,#303746);margin:5px -22px 22px}
+        .virtual-card-signature-row{display:flex;align-items:flex-end;gap:10px}
+        .virtual-card-signature{flex:1;min-width:0}
+        .virtual-card-signature-strip{height:34px;padding:0 10px;display:flex;align-items:center;overflow:hidden;background:repeating-linear-gradient(0deg,#e7e8e8 0 3px,#d3d6d9 3px 5px);color:#253449;font-size:10px;font-style:italic;white-space:nowrap;text-overflow:ellipsis}
+        .virtual-card-cvv-block{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+        .virtual-card-security-code{min-width:42px;padding:7px 9px;border-radius:6px;background:#fff;color:#172033;font-family:ui-monospace,monospace;letter-spacing:2px;font-weight:800;text-align:center}
+        .virtual-card-back-note{position:relative;z-index:1;margin:18px 0 10px;font-size:9px;line-height:1.5;opacity:.78}
+        .virtual-card-back-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:9px;font-weight:800;letter-spacing:1px}
+        .virtual-card-code-toggle,.virtual-card-side-button{border:1px solid rgba(255,255,255,.24);border-radius:8px;padding:7px 10px;background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
+        .virtual-card-code-toggle:hover,.virtual-card-side-button:hover{background:rgba(255,255,255,.16)}
+        .virtual-card-controls{display:flex;gap:8px;margin-top:10px}
+        .virtual-card-side-button{color:inherit;background:rgba(255,255,255,.06)}
+        .virtual-card-side-button.is-active{background:#fff;color:#17365f;border-color:#fff}
+        .virtual-card-review{display:inline-flex;align-items:center;justify-content:center;margin-top:12px;padding:10px 15px;border-radius:10px;text-decoration:none;background:#fff;color:#17365f;font-size:12px;font-weight:800}
         .virtual-card-review:hover{opacity:.92}
         .virtual-card-empty{
             display:flex;align-items:center;gap:16px;padding:18px;
@@ -426,55 +429,61 @@
 
     {% if virtual_card %}
 
-        <div class="virtual-card">
+        <div class="virtual-card-collection">
+          <div class="virtual-card virtual-card-front" id="virtualCardFront" aria-label="Virtual card front">
             <div class="virtual-card-top">
-                <span class="virtual-card-brand">FAIRMONT BANK</span>
-                <span class="virtual-card-type">VIRTUAL ATM</span>
+              <span class="virtual-card-brand">FAIRMONT BANK</span>
+              <span class="virtual-card-type">VIRTUAL DEBIT</span>
             </div>
-
-            <div class="virtual-card-chip" aria-hidden="true"></div>
-
-            <div class="virtual-card-number">
-                {{ virtual_card.card_number }}
+            <div class="virtual-card-chip" aria-hidden="true"><span></span></div>
+            <div class="virtual-card-number">{{ virtual_card.card_number }}</div>
+            <div class="virtual-card-front-footer">
+              <div class="virtual-card-holder">
+                <span class="virtual-card-label">CARDHOLDER</span>
+                <strong>{{ customer.full_name }}</strong>
+              </div>
+              <div>
+                <span class="virtual-card-label">VALID THRU</span>
+                <strong>{{ virtual_card.expiry_date }}</strong>
+              </div>
             </div>
-
-            <div class="virtual-card-bottom">
-                <div>
-                    <span class="virtual-card-label">CARDHOLDER</span>
-                    <strong>{{ customer.full_name }}</strong>
-                </div>
-                <div>
-                    <span class="virtual-card-label">EXPIRES</span>
-                    <strong>{{ virtual_card.expiry_date }}</strong>
-                </div>
-                <div>
-                    <span class="virtual-card-label">STATUS</span>
-                    <strong>{{ virtual_card.status }}</strong>
-                </div>
+            <div class="virtual-card-front-bottom">
+              <span class="virtual-card-network-mark" aria-label="Card network">VISA</span>
+              <span class="virtual-card-status">{{ virtual_card.status }}</span>
             </div>
+          </div>
 
-            <div class="virtual-card-security">
+          <div class="virtual-card virtual-card-back" id="virtualCardBack" aria-label="Virtual card back">
+            <div class="virtual-card-back-stripe"></div>
+            <div class="virtual-card-signature-row">
+              <div class="virtual-card-signature">
+                <span class="virtual-card-label">AUTHORIZED SIGNATURE</span>
+                <div class="virtual-card-signature-strip">{{ customer.full_name }}</div>
+              </div>
+              <div class="virtual-card-cvv-block">
                 <span class="virtual-card-label">SECURITY CODE</span>
-                <span class="virtual-card-security-code"
-                      id="virtualCardSecurityCode"
-                      data-code="{{ virtual_card.security_code }}"
-                      aria-live="polite">•••</span>
-                <button type="button"
-                        class="virtual-card-code-toggle"
-                        id="virtualCardCodeToggle"
-                        aria-controls="virtualCardSecurityCode"
-                        aria-pressed="false"
-                        onclick="toggleVirtualCardSecurityCode()">Show</button>
+                <span class="virtual-card-security-code" id="virtualCardSecurityCode"
+                      data-code="{{ virtual_card.security_code }}" aria-live="polite">•••</span>
+              </div>
             </div>
-
-            <a
-    href="{{ url_for('virtual_card_details') }}"
-    class="virtual-card-review"
-    aria-label="Open virtual card details"
->
-    View Card Details
-</a>
+            <p class="virtual-card-back-note">For customer support, contact Fairmont Bank using your account's official support channel.</p>
+            <div class="virtual-card-back-footer">
+              <span>FAIRMONT BANK</span>
+              <button type="button" class="virtual-card-code-toggle" id="virtualCardCodeToggle"
+                      aria-controls="virtualCardSecurityCode" aria-pressed="false"
+                      onclick="toggleVirtualCardSecurityCode()">Show security code</button>
+            </div>
+          </div>
+          <div class="virtual-card-controls" role="group" aria-label="Choose card side">
+            <button type="button" class="virtual-card-side-button is-active" id="showCardFront"
+                    aria-pressed="true" onclick="showVirtualCardSide('front')">Front</button>
+            <button type="button" class="virtual-card-side-button" id="showCardBack"
+                    aria-pressed="false" onclick="showVirtualCardSide('back')">Back</button>
+          </div>
         </div>
+
+        <a href="{{ url_for('virtual_card_details') }}" class="virtual-card-review"
+           aria-label="Open virtual card details">View Card Details</a>
 
     {% elif virtual_card_application and virtual_card_application.status == 'Pending' %}
 
@@ -604,25 +613,27 @@
 </main>
 
 <script>
+function showVirtualCardSide(side) {
+    const collection = document.querySelector(".virtual-card-collection");
+    const frontButton = document.getElementById("showCardFront");
+    const backButton = document.getElementById("showCardBack");
+    if (!collection || !frontButton || !backButton) return;
+    const showBack = side === "back";
+    collection.classList.toggle("show-back", showBack);
+    frontButton.classList.toggle("is-active", !showBack);
+    backButton.classList.toggle("is-active", showBack);
+    frontButton.setAttribute("aria-pressed", String(!showBack));
+    backButton.setAttribute("aria-pressed", String(showBack));
+}
 function toggleVirtualCardSecurityCode() {
     const code = document.getElementById("virtualCardSecurityCode");
     const button = document.getElementById("virtualCardCodeToggle");
     if (!code || !button) return;
-
-    const isVisible = button.getAttribute("aria-pressed") === "true";
-    if (isVisible) {
-        code.textContent = "•••";
-        button.textContent = "Show";
-        button.setAttribute("aria-pressed", "false");
-        code.setAttribute("aria-label", "Security code hidden");
-    } else {
-        code.textContent = code.dataset.code || "•••";
-        button.textContent = "Hide";
-        button.setAttribute("aria-pressed", "true");
-        code.setAttribute("aria-label", "Security code visible");
-    }
+    const visible = button.getAttribute("aria-pressed") === "true";
+    code.textContent = visible ? "•••" : (code.dataset.code || "•••");
+    button.textContent = visible ? "Show security code" : "Hide security code";
+    button.setAttribute("aria-pressed", String(!visible));
 }
-
 function toggleBalance() {
     const balance = document.getElementById("balance");
     const button = document.querySelector(".balance-toggle");
