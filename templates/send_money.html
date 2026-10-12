@@ -279,6 +279,36 @@
             font-size: 16px;
         }
 
+
+        .currency-select {
+            display: block;
+            width: 100%;
+            min-height: 54px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255,255,255,0.15);
+            outline: none;
+            border-radius: 15px;
+            background: #254766;
+            color: #ffffff;
+            padding: 0 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            appearance: auto;
+        }
+
+        .currency-select:focus {
+            border-color: rgba(130,190,255,0.72);
+            box-shadow: 0 0 0 3px rgba(80,150,230,0.12);
+        }
+
+        .currency-select option {
+            background: #0b2340;
+            color: #ffffff;
+        }
+
+        .field-hint { margin: 7px 0 0; color: rgba(255,255,255,.68); font-size: 12px; line-height: 1.45; }
+
         .submit-button {
             width: 100%;
             border: 0;
@@ -324,10 +354,18 @@
 </head>
 
 <body>
+{% set supported_currencies = {
+    "GBP": {"name": "British Pound Sterling", "symbol": "£"},
+    "EUR": {"name": "Euro", "symbol": "€"},
+    "USD": {"name": "US Dollar", "symbol": "$"}
+} %}
+{% set sender_currency = (customer.account_currency or "GBP")|upper %}
+{% if sender_currency not in supported_currencies %}{% set sender_currency = "GBP" %}{% endif %}
+
 
 <div class="page">
 
-    <a href="{{ url_for('send_fairmont_money') }}"dashboard') }}" class="back-button">
+    <a href="{{ url_for('dashboard') }}" class="back-button">
         ← Back to Dashboard
     </a>
 
@@ -365,9 +403,9 @@
         </p>
 
         <div class="balance-box">
-            Available Balance:
+            Available Balance ({{ sender_currency }}):
             <strong>
-                £{{ "{:,.2f}".format(customer.account_balance or 0) }}
+                {{ supported_currencies[sender_currency].symbol }}{{ "{:,.2f}".format(customer.account_balance or 0) }}
             </strong>
         </div>
 
@@ -446,8 +484,19 @@
             </div>
 
             <div class="field">
-                <label for="amount">Amount</label>
+                <label for="transfer_currency">Transfer Currency</label>
+                <select id="transfer_currency" name="transfer_currency" class="currency-select" data-default-currency="{{ sender_currency }}" required>
+                    {% for code, details in supported_currencies.items() %}
+                    <option value="{{ code }}" {% if code == sender_currency %}selected{% endif %}>
+                        {{ details.symbol }} — {{ details.name }} ({{ code }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <p class="field-hint">Choose GBP, EUR, or USD. The amount you enter is in the selected currency.</p>
+            </div>
 
+            <div class="field">
+                <label for="amount">Amount (<span id="amountCurrencyCode">{{ sender_currency }}</span>)</label>
                 <input
                     type="number"
                     id="amount"
@@ -517,41 +566,41 @@
 (function () {
 
     const UK_BANKS = [
-            'Allied Irish Bank (GB)',,
-            'Bank of Ireland UK',,
-            'Bank of Scotland',,
-            'Barclays Bank',,
-            'Birmingham Bank',,
-            'Card One Money',,
-            'Cashplus Bank',,
-            'Chase UK',,
-            'Citibank UK',,
-            'ClearBank',,
-            'C. Hoare & Co.',,
-            'Co-operative Bank',,
-            'Coutts',,
+            'Allied Irish Bank (GB)',
+            'Bank of Ireland UK',
+            'Bank of Scotland',
+            'Barclays Bank',
+            'Birmingham Bank',
+            'Card One Money',
+            'Cashplus Bank',
+            'Chase UK',
+            'Citibank UK',
+            'ClearBank',
+            'C. Hoare & Co.',
+            'Co-operative Bank',
+            'Coutts',
             'Danske Bank',
-            'Fairmont Bank',,
-            'First Direct',,
-            'Halifax',,
-            'Handelsbanken UK',,
-            'HSBC UK',,
-            'Investec Bank',,
-            'Lloyds Bank',,
-            'Metro Bank',,
-            'Monzo Bank',,
-            'Nationwide Building Society',,
-            'NatWest',,
-            'Revolut',,
-            'Royal Bank of Scotland',,
-            'Santander UK',,
-            'Skipton Building Society',,
-            'Starling Bank',,
-            'TSB Bank',,
-            'Ulster Bank',,
-            'Virgin Money',,
-            'Yorkshire Building Society',,
-            'Zopa Bank',,
+            'Fairmont Bank',
+            'First Direct',
+            'Halifax',
+            'Handelsbanken UK',
+            'HSBC UK',
+            'Investec Bank',
+            'Lloyds Bank',
+            'Metro Bank',
+            'Monzo Bank',
+            'Nationwide Building Society',
+            'NatWest',
+            'Revolut',
+            'Royal Bank of Scotland',
+            'Santander UK',
+            'Skipton Building Society',
+            'Starling Bank',
+            'TSB Bank',
+            'Ulster Bank',
+            'Virgin Money',
+            'Yorkshire Building Society',
+            'Zopa Bank',
             'Other UK Bank or Building Society',
     ];
 
@@ -809,6 +858,28 @@
 
 })();
 
+</script>
+
+
+<script>
+(function () {
+    const currencySelect = document.getElementById("transfer_currency");
+    const amountCurrencyCode = document.getElementById("amountCurrencyCode");
+    if (!currencySelect) return;
+
+    // Use the account currency as the initial default (e.g. USD for a USD account).
+    const defaultCurrency = currencySelect.dataset.defaultCurrency;
+    if (defaultCurrency && Array.from(currencySelect.options).some(o => o.value === defaultCurrency)) {
+        currencySelect.value = defaultCurrency;
+    }
+
+    function updateAmountCurrency() {
+        if (amountCurrencyCode) amountCurrencyCode.textContent = currencySelect.value;
+    }
+
+    currencySelect.addEventListener("change", updateAmountCurrency);
+    updateAmountCurrency();
+})();
 </script>
 
 </body>

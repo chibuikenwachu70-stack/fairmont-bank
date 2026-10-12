@@ -260,6 +260,206 @@
   }
 </style>
 
+
+<style id="fairmont-balance-layout-polish">
+/* Clearer balance hierarchy and account details */
+.dashboard-overview-grid > .balance-card,
+.balance-card {
+  position:relative;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"top details" "amount details" "reference details";
+  align-items:center;
+  column-gap:28px;
+  row-gap:4px;
+  min-height:142px;
+  padding:22px 26px !important;
+  border:1px solid rgba(216,180,87,.38) !important;
+  border-radius:24px !important;
+  background:linear-gradient(115deg,rgba(31,59,78,.98),rgba(20,49,67,.96)) !important;
+  box-shadow:0 14px 32px rgba(0,0,0,.12),inset 0 1px rgba(255,255,255,.035);
+  box-sizing:border-box;
+}
+.balance-card .balance-top {
+  grid-area:top;
+  display:flex !important;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:0 !important;
+  min-width:0;
+}
+.balance-card .balance-label {
+  margin:0 !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  letter-spacing:.16em !important;
+  line-height:1.4;
+  color:#c6d1dc !important;
+}
+.balance-card #balance {
+  grid-area:amount;
+  margin:2px 0 0 !important;
+  font-size:clamp(30px,3.2vw,44px) !important;
+  font-weight:600 !important;
+  letter-spacing:-.035em;
+  line-height:1.15 !important;
+  overflow-wrap:anywhere;
+  font-variant-numeric:tabular-nums;
+  color:#fff !important;
+}
+.balance-card .customer-reference {
+  grid-area:reference;
+  margin:3px 0 0 !important;
+  color:#c0ccd7 !important;
+  font-size:12px !important;
+  line-height:1.45;
+}
+.balance-card .balance-toggle {
+  flex:0 0 auto;
+  padding:7px 11px !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  border-radius:9px !important;
+  background:rgba(255,255,255,.06) !important;
+  color:#f5d37b !important;
+  font-size:12px !important;
+  font-weight:700;
+}
+.balance-account-side {
+  grid-area:details;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:10px;
+  min-width:190px;
+  padding-left:24px;
+  border-left:1px solid rgba(255,255,255,.13);
+}
+.balance-account-detail {display:flex;flex-direction:column;gap:4px;min-width:0}
+.balance-account-detail span {
+  color:#b7c6d4;
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.balance-account-detail strong {
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+@media(max-width:620px) {
+  .dashboard-overview-grid > .balance-card,.balance-card {
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"top" "amount" "reference" "details";
+    row-gap:8px;
+    padding:18px !important;
+    min-height:0;
+  }
+  .balance-card #balance {font-size:clamp(28px,8vw,36px) !important}
+  .balance-account-side {
+    min-width:0;
+    padding:12px 0 0;
+    margin-top:5px;
+    border-left:0;
+    border-top:1px solid rgba(255,255,255,.13);
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+}
+</style>
+
+
+<style id="fairmont-balance-final-alignment">
+/* Final balance-card alignment override */
+.dashboard-overview-grid > .balance-card,
+.balance-card {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(190px,240px) !important;
+  grid-template-areas:
+    "top details"
+    "amount details"
+    "reference details" !important;
+  align-items:center !important;
+  column-gap:32px !important;
+  row-gap:3px !important;
+  min-height:164px !important;
+  padding:24px 28px !important;
+  position:relative !important;
+  box-sizing:border-box !important;
+}
+.balance-card .balance-top {
+  grid-area:top !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  min-height:20px !important;
+  margin:0 !important;
+  padding-right:80px !important;
+}
+.balance-card .balance-toggle {
+  position:absolute !important;
+  top:20px !important;
+  right:28px !important;
+  z-index:2 !important;
+}
+.balance-card #balance {
+  grid-area:amount !important;
+  display:block !important;
+  width:100% !important;
+  margin:3px 0 0 !important;
+  text-align:left !important;
+  line-height:1.12 !important;
+  font-size:clamp(32px,3.1vw,46px) !important;
+  font-variant-numeric:tabular-nums !important;
+}
+.balance-card .customer-reference {
+  grid-area:reference !important;
+  margin:2px 0 0 !important;
+  text-align:left !important;
+}
+.balance-card .balance-account-side {
+  grid-area:details !important;
+  align-self:stretch !important;
+  justify-content:center !important;
+  min-width:0 !important;
+  padding:18px 0 18px 24px !important;
+  margin:0 !important;
+  border-left:1px solid rgba(255,255,255,.15) !important;
+  border-top:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:16px !important;
+}
+.balance-card .balance-account-detail {min-width:0 !important}
+.balance-card .balance-account-detail span {line-height:1.35 !important}
+.balance-card .balance-account-detail strong {line-height:1.4 !important}
+@media(max-width:620px) {
+  .dashboard-overview-grid > .balance-card,
+  .balance-card {
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-areas:"top" "amount" "reference" "details" !important;
+    row-gap:7px !important;
+    min-height:0 !important;
+    padding:18px !important;
+  }
+  .balance-card .balance-toggle {top:14px !important;right:16px !important}
+  .balance-card .balance-top {padding-right:68px !important}
+  .balance-card #balance {font-size:clamp(29px,8vw,38px) !important;overflow-wrap:anywhere !important}
+  .balance-card .balance-account-side {
+    align-self:auto !important;
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:12px !important;
+    padding:13px 0 0 !important;
+    margin-top:5px !important;
+    border-left:0 !important;
+    border-top:1px solid rgba(255,255,255,.15) !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -336,7 +536,7 @@
 
     <section class="dashboard-greeting">
         <div class="fairmont-dashboard-brand">
-            <img src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}"
+            <img src="{{ url_for('static', filename='images/fairmont-bank-logo.svg') }}"
                  alt="Fairmont Bank" class="fairmont-dashboard-logo">
         </div>
         <h1>Hello, {{ customer.full_name.split()[0] }}.</h1>
@@ -348,8 +548,18 @@
             <p class="balance-label">AVAILABLE BALANCE</p>
             <button type="button" class="balance-toggle" onclick="toggleBalance()">Hide</button>
         </div>
-        <h2 id="balance">£{{ "{:,.2f}".format(customer.account_balance or 0) }}</h2>
+        <h2 id="balance" data-hidden="false">{{ currency_symbol|default("£") }}{{ "{:,.2f}".format(customer.account_balance or 0) }}</h2>
         <p class="customer-reference">Customer ID · {{ customer.customer_id }}</p>
+        <div class="balance-account-side" aria-label="Account details">
+            <div class="balance-account-detail">
+                <span>Account number</span>
+                <strong>{{ customer.account_number|default("Not assigned", true) }}</strong>
+            </div>
+            <div class="balance-account-detail">
+                <span>Account currency</span>
+                <strong>{{ customer.account_currency|default("GBP", true)|upper }}</strong>
+            </div>
+        </div>
     </section>
 
 
@@ -590,9 +800,9 @@
                         <div class="recent-activity-amount
                             {% if transaction.direction == 'Credit' %}recent-activity-amount-credit{% else %}recent-activity-amount-debit{% endif %}">
                             {% if transaction.direction == 'Credit' %}
-                                +£{{ "{:,.2f}".format(transaction.amount|float) }}
+                                +{{ currency_symbol|default("£") }}{{ "{:,.2f}".format(transaction.amount|float) }}
                             {% else %}
-                                -£{{ "{:,.2f}".format(transaction.amount|float) }}
+                                -{{ currency_symbol|default("£") }}{{ "{:,.2f}".format(transaction.amount|float) }}
                             {% endif %}
                         </div>
                     </a>
@@ -639,7 +849,7 @@ function toggleBalance() {
     const button = document.querySelector(".balance-toggle");
 
     if (balance.dataset.hidden === "true") {
-        balance.textContent = "£" + Number({{ customer.account_balance or 0 }}).toLocaleString("en-GB", {
+        balance.textContent = {{ currency_symbol|default("£")|tojson }} + Number({{ customer.account_balance or 0 }}).toLocaleString({{ currency_locale|default("en-GB")|tojson }}, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });

@@ -113,6 +113,14 @@
     </style>
 </head>
 <body>
+{% set account_currency = (customer.account_currency or "GBP")|upper %}
+{% set account_currency_symbol = {
+    "GBP": "£", "USD": "$", "EUR": "€", "KES": "KSh",
+    "NGN": "₦", "INR": "₹", "JPY": "¥", "CAD": "C$",
+    "AUD": "A$", "CHF": "CHF ", "ZAR": "R", "GHS": "GH₵",
+    "UGX": "USh", "TZS": "TSh", "AED": "د.إ "
+}.get(account_currency, account_currency + " ") %}
+
 <div class="page">
     <a class="back" href="{{ url_for('withdraw') }}">← Back to withdrawal methods</a>
 
@@ -131,8 +139,8 @@
         {% endwith %}
 
         <div class="balance">
-            Available balance:
-            <strong>£{{ "%.2f"|format(customer.account_balance or 0) }}</strong>
+            Available balance ({{ account_currency }}):
+            <strong>{{ account_currency_symbol }}{{ "%.2f"|format(customer.account_balance or 0) }}</strong>
         </div>
 
         <form method="POST" autocomplete="off">
@@ -187,7 +195,7 @@
                 </div>
             </div>
 
-            <label for="amount">Withdrawal Amount</label>
+            <label for="amount">Withdrawal Amount ({{ account_currency }})</label>
             <input
                 id="amount"
                 name="amount"

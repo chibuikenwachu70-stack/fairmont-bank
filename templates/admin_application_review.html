@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Account Application Review | Fairmont Bank</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            background: #07111f;
+            color: #edf3f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .panel {
+            background: #0d1c2e;
+            border: 1px solid #263b51;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 27px;
+        }
+
+        h2 {
+            color: #e4c779;
+            font-size: 19px;
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .item {
+            padding: 13px;
+            border: 1px solid #263b51;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .label {
+            display: block;
+            color: #9aacc0;
+            font-size: 12px;
+            margin-bottom: 7px;
+            text-transform: uppercase;
+        }
+
+        .value {
+            font-weight: bold;
+            white-space: pre-wrap;
+        }
+
+        a {
+            color: #e4c779;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 15px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 4px 3px 4px 0;
+        }
+
+        .secondary {
+            background: #1b3047;
+            color: white;
+        }
+
+        .approve {
+            background: #25875a;
+            color: white;
+        }
+
+        .reject {
+            background: #a3434a;
+            color: white;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 85px;
+            margin: 10px 0;
+            padding: 12px;
+            background: #081827;
+            color: white;
+            border: 1px solid #354a60;
+            border-radius: 7px;
+        }
+
+        .notice {
+            padding: 14px;
+            margin: 15px 0;
+            background: #352d18;
+            border: 1px solid #75612c;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        .muted {
+            color: #9aacc0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 12px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<main class="container">
+
+    <h1>Account Application Review</h1>
+
+    <p class="muted">
+        Application reference:
+        {{ customer.customer_id }}
+    </p>
+
+    <p>
+        <a class="button secondary"
+           href="{{ url_for('admin_accounts', status='Pending Approval') }}">
+            Back to Applications
+        </a>
+
+        <a class="button secondary"
+           href="{{ url_for('admin_logout') }}">
+            Sign Out
+        </a>
+    </p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="notice">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="notice">
+        Review applications and identity documents only for legitimate
+        verification purposes. Uploaded documents must be checked before
+        an account application is approved.
+    </div>
+
+    <section class="panel">
+        <h2>Application Status</h2>
+
+        <div class="grid">
+            <div class="item">
+                <span class="label">Current Status</span>
+                <div class="value">{{ customer.account_status }}</div>
+            </div>
+
+            <div class="item">
+                <span class="label">Submission Date</span>
+                <div class="value">
+                    {{ customer.application_submitted_at or "Not recorded" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Reviewed By</span>
+                <div class="value">
+                    {{ customer.application_reviewed_by or "Not yet reviewed" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Review Date</span>
+                <div class="value">
+                    {{ customer.application_reviewed_at or "Not yet reviewed" }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Applicant Information</h2>
+
+        <div class="grid">
+            <div class="item">
+                <span class="label">Full Name</span>
+                <div class="value">{{ customer.full_name }}</div>
+            </div>
+
+            <div class="item">
+                <span class="label">Date of Birth</span>
+                <div class="value">
+                    {{ customer.birth_date or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Email</span>
+                <div class="value">{{ customer.email }}</div>
+            </div>
+
+            <div class="item">
+                <span class="label">Phone</span>
+                <div class="value">{{ customer.phone }}</div>
+            </div>
+
+            <div class="item">
+                <span class="label">Nationality</span>
+                <div class="value">
+                    {{ customer.nationality or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Country of Residence</span>
+                <div class="value">{{ customer.country }}</div>
+            </div>
+
+            <div class="item">
+                <span class="label">Residential Address</span>
+                <div class="value">
+                    {{ customer.residential_address or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Postal Code</span>
+                <div class="value">
+                    {{ customer.postal_code or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Occupation</span>
+                <div class="value">
+                    {{ customer.occupation or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Source of Funds</span>
+                <div class="value">
+                    {{ customer.source_of_funds or "Not supplied" }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Requested Account</h2>
+
+        <div class="grid">
+            <div class="item">
+                <span class="label">Account Type</span>
+                <div class="value">{{ customer.account_type }}</div>
+            </div>
+
+            <div class="item">
+                <span class="label">Requested Currency</span>
+                <div class="value">
+                    {{ customer.account_currency or "GBP" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Account Number</span>
+                <div class="value">
+                    {{ customer.account_number or "Not assigned" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Opening Balance</span>
+                <div class="value">
+                    {{ customer.account_currency or "GBP" }} 0.00
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Identity Document Details</h2>
+
+        <div class="grid">
+            <div class="item">
+                <span class="label">Document Type</span>
+                <div class="value">
+                    {{ customer.id_document_type or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Document Number</span>
+                <div class="value">
+                    {{ customer.id_document_number or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Issuing Country</span>
+                <div class="value">
+                    {{ customer.id_issuing_country or "Not supplied" }}
+                </div>
+            </div>
+
+            <div class="item">
+                <span class="label">Expiry Date</span>
+                <div class="value">
+                    {{ customer.id_expiry_date or "Not supplied" }}
+                </div>
+            </div>
+        </div>
+
+        <p class="muted">
+            Identity documents should only be accessible to authorized
+            administrators.
+        </p>
+
+        {% if customer.id_front_filename %}
+            <a class="button secondary"
+               href="{{ url_for('admin_application_document',
+                                customer_id=customer.id,
+                                side='front') }}">
+                Download Front / Passport Page
+            </a>
+        {% else %}
+            <p class="muted">No front document uploaded.</p>
+        {% endif %}
+
+        {% if customer.id_back_filename %}
+            <a class="button secondary"
+               href="{{ url_for('admin_application_document',
+                                customer_id=customer.id,
+                                side='back') }}">
+                Download Back of ID
+            </a>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Management Decision</h2>
+
+        {% if customer.account_status == "Pending Approval" %}
+
+            <form method="POST"
+                  action="{{ url_for('admin_approve_customer',
+                                     customer_id=customer.id) }}">
+
+                <label class="label" for="approve-note">
+                    Approval Review Notes
+                </label>
+
+                <textarea
+                    id="approve-note"
+                    name="review_note"
+                    placeholder="Record the verification checks completed.">
+                </textarea>
+
+                <button class="button approve"
+                        type="submit"
+                        onclick="return confirm('Approve this application after completing the required checks?')">
+                    Approve Application
+                </button>
+            </form>
+
+            <hr style="border-color:#263b51;margin:25px 0;">
+
+            <form method="POST"
+                  action="{{ url_for('admin_reject_customer',
+                                     customer_id=customer.id) }}">
+
+                <label class="label" for="reject-note">
+                    Rejection Reason or Review Notes
+                </label>
+
+                <textarea
+                    id="reject-note"
+                    name="review_note"
+                    placeholder="Record the reason for rejection.">
+                </textarea>
+
+                <button class="button reject"
+                        type="submit"
+                        onclick="return confirm('Reject this application?')">
+                    Reject Application
+                </button>
+            </form>
+
+        {% else %}
+
+            <div class="item">
+                <span class="label">Recorded Decision</span>
+                <div class="value">
+                    {{ customer.application_review_note or "No note recorded" }}
+                </div>
+            </div>
+
+            <p class="muted">
+                This application has already been reviewed.
+            </p>
+
+        {% endif %}
+    </section>
+
+</main>
+</body>
+</html>

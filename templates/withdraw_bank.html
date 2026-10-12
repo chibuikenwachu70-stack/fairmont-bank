@@ -49,7 +49,9 @@ select option{background:#0b1a2d;color:#eef5ff}
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}
 {% endwith %}
-<div class="balance"><span>Available balance</span><strong>£{{ "%.2f"|format(customer.account_balance or 0) }}</strong></div>
+{% set account_currency = (customer.account_currency or "GBP")|upper %}
+{% set account_currency_symbol = {"GBP": "£", "USD": "$", "EUR": "€", "KES": "KSh", "NGN": "₦", "INR": "₹", "JPY": "¥", "CAD": "C$", "AUD": "A$", "CHF": "CHF ", "ZAR": "R", "GHS": "GH₵", "UGX": "USh", "TZS": "TSh", "AED": "د.إ "}.get(account_currency, account_currency + " ") %}
+<div class="balance"><span>Available balance ({{ account_currency }})</span><strong>{{ account_currency_symbol }}{{ "%.2f"|format(customer.account_balance or 0) }}</strong></div>
 <form method="POST" action="{{ url_for('withdraw_bank') }}">
 <label>Destination country</label>
 <button type="button" class="picker-trigger" data-picker="country" id="countryTrigger"><span id="countryDisplay" class="picker-placeholder">Select country</span><span class="picker-arrow">▼</span></button>
@@ -362,7 +364,7 @@ select option{background:#0b1a2d;color:#eef5ff}
 <option value="EUR" >EUR — Euro</option>
 <option value="FJD" >FJD — Fiji Dollar</option>
 <option value="FKP" >FKP — Falkland Islands Pound</option>
-<option value="GBP" {% if request.form.get("currency", "GBP") == "GBP" %}selected{% endif %}>GBP — Pound Sterling</option>
+<option value="GBP" {% if request.form.get("currency", account_currency) == "GBP" %}selected{% endif %}>GBP — Pound Sterling</option>
 <option value="GEL" >GEL — Lari</option>
 <option value="GHS" >GHS — Ghana Cedi</option>
 <option value="GIP" >GIP — Gibraltar Pound</option>
@@ -493,7 +495,7 @@ select option{background:#0b1a2d;color:#eef5ff}
 <option value="ZMW" >ZMW — Zambian Kwacha</option>
 <option value="ZWL" >ZWL — Zimbabwe Dollar</option>
 </select>
-<p class="hint">Choose the currency requested for the destination account. The amount below is entered in GBP; this form does not calculate an exchange rate or send funds.</p>
+<p class="hint">The destination currency is selected automatically when a country is chosen. The withdrawal amount is entered in your account currency ({{ account_currency }}); selecting a destination currency does not convert the amount or send funds.</p>
 <label>Destination bank</label>
 <button type="button" class="picker-trigger" data-picker="bank" id="bankTrigger"><span id="bankDisplay" class="picker-placeholder">Select country first</span><span class="picker-arrow">▼</span></button>
 <select id="bank_select" class="hidden-select" aria-label="Choose a bank"><option value="">Choose a bank</option></select>
@@ -508,7 +510,7 @@ select option{background:#0b1a2d;color:#eef5ff}
 <input id="sort_code" name="sort_code" type="text" value="{{ request.form.get('sort_code','') }}" autocomplete="off" required>
 <p class="hint">Enter the code required for your destination country and bank. Never enter your online banking password, card PIN, or one-time security code.</p>
 <div class="grid">
-<div><label for="amount">Withdrawal amount (GBP)</label><input id="amount" name="amount" type="number" min="0.01" step="0.01" max="{{ customer.account_balance or 0 }}" value="{{ request.form.get('amount','') }}" inputmode="decimal" required></div>
+<div><label for="amount">Withdrawal amount ({{ account_currency }})</label><input id="amount" name="amount" type="number" min="0.01" step="0.01" max="{{ customer.account_balance or 0 }}" value="{{ request.form.get('amount','') }}" inputmode="decimal" required></div>
 <div><label for="reference">Reference (optional)</label><input id="reference" name="reference" type="text" value="{{ request.form.get('reference','') }}" maxlength="120"></div>
 </div>
 <button class="button" type="submit">Review &amp; Submit Request</button>
@@ -625,6 +627,48 @@ const pickerOptions = document.getElementById('pickerOptions');
 const pickerClose = document.getElementById('pickerClose');
 let activePicker = null;
 
+
+const customerAccountCurrency = {{ account_currency|tojson }};
+const countryCurrencyMap = {
+  "United States":"USD", "United States of America":"USD",
+  "United Kingdom":"GBP", "United Kingdom of Great Britain and Northern Ireland":"GBP",
+  "Kenya":"KES", "Canada":"CAD", "Australia":"AUD", "New Zealand":"NZD",
+  "India":"INR", "Nigeria":"NGN", "South Africa":"ZAR", "Ghana":"GHS",
+  "Uganda":"UGX", "Tanzania":"TZS", "Rwanda":"RWF", "Japan":"JPY",
+  "China":"CNY", "Singapore":"SGD", "Hong Kong":"HKD", "Switzerland":"CHF",
+  "United Arab Emirates":"AED", "Saudi Arabia":"SAR", "Qatar":"QAR",
+  "Pakistan":"PKR", "Bangladesh":"BDT", "Sri Lanka":"LKR", "Nepal":"NPR",
+  "Philippines":"PHP", "Indonesia":"IDR", "Malaysia":"MYR", "Thailand":"THB",
+  "Vietnam":"VND", "South Korea":"KRW", "Turkey":"TRY", "Brazil":"BRL",
+  "Mexico":"MXN", "Argentina":"ARS", "Egypt":"EGP", "Morocco":"MAD",
+  "Zambia":"ZMW", "Zimbabwe":"ZWG", "Botswana":"BWP", "Namibia":"NAD",
+  "Ethiopia":"ETB", "Israel":"ILS", "Norway":"NOK", "Sweden":"SEK",
+  "Denmark":"DKK", "Poland":"PLN", "Czechia":"CZK", "Czech Republic":"CZK",
+  "Hungary":"HUF", "Romania":"RON", "Bulgaria":"BGN", "Iceland":"ISK"
+};
+const euroAreaCountries = new Set([
+  "Austria","Belgium","Croatia","Cyprus","Estonia","Finland","France",
+  "Germany","Greece","Ireland","Italy","Latvia","Lithuania","Luxembourg",
+  "Malta","Netherlands","Portugal","Slovakia","Slovenia","Spain"
+]);
+
+function setCurrency(code) {
+  const option = Array.from(currencySelect.options).find(o => o.value === code);
+  if (!option) return false;
+  currencySelect.value = code;
+  currencyDisplay.textContent = option.textContent.trim();
+  currencyDisplay.classList.remove('picker-placeholder');
+  return true;
+}
+
+function setCurrencyForCountry(country) {
+  let code = countryCurrencyMap[country];
+  if (!code && euroAreaCountries.has(country)) code = "EUR";
+  // If the country has no mapped currency, keep the customer's own account currency.
+  if (!code) code = customerAccountCurrency;
+  setCurrency(code);
+}
+
 function updateBanks() {
   const selected = countrySelect.value;
   const names = bankDirectory[selected] || [];
@@ -685,6 +729,7 @@ function selectValue(value) {
     countrySelect.value=value;
     countryDisplay.textContent=countrySelect.options[countrySelect.selectedIndex].textContent;
     countryDisplay.classList.remove('picker-placeholder');
+    setCurrencyForCountry(value);
     updateBanks();
     // If country changes, require the user to confirm the bank again.
     bankInput.value='';
@@ -711,18 +756,25 @@ pickerSearch.addEventListener('input', () => renderOptions(pickerSearch.value));
 pickerClose.addEventListener('click', closePicker);
 overlay.addEventListener('click', e => {if(e.target===overlay) closePicker();});
 document.addEventListener('keydown', e => {if(e.key==='Escape' && overlay.classList.contains('open')) closePicker();});
-countrySelect.addEventListener('change', updateBanks);
+countrySelect.addEventListener('change', () => {
+  if (countrySelect.value) setCurrencyForCountry(countrySelect.value);
+  updateBanks();
+});
 updateBanks();
+if (!{{ request.form.get('currency','')|tojson }}) {
+  setCurrency(customerAccountCurrency);
+}
 
 // Restore submitted values when Flask re-renders the form after validation.
 const previousCountry = {{ request.form.get('bank_country','')|tojson }};
-const previousCurrency = {{ request.form.get('currency','GBP')|tojson }};
+const previousCurrency = {{ request.form.get('currency', account_currency)|tojson }};
 const previousBank = {{ request.form.get('bank_name','')|tojson }};
 if (previousCountry && Array.from(countrySelect.options).some(o => o.value === previousCountry)) {
   countrySelect.value = previousCountry;
   countryDisplay.textContent = countrySelect.options[countrySelect.selectedIndex].textContent;
   countryDisplay.classList.remove('picker-placeholder');
   updateBanks();
+  if (!{{ request.form.get('currency','')|tojson }}) setCurrencyForCountry(previousCountry);
 }
 if (previousCurrency && Array.from(currencySelect.options).some(o => o.value === previousCurrency)) {
   currencySelect.value = previousCurrency;

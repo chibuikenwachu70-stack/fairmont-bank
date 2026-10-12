@@ -467,7 +467,17 @@
                 <div class="grid">
 
                     <div class="field">
-                        <label for="amount">Amount</label>
+                        <label for="payment_currency">Payment Currency</label>
+                        <select id="payment_currency" name="payment_currency" required>
+                            <option value="GBP" {% if form_data.get('payment_currency', '') == 'GBP' %}selected{% endif %}>GBP — Pound Sterling (£)</option>
+                            <option value="USD" {% if form_data.get('payment_currency', '') == 'USD' %}selected{% endif %}>USD — US Dollar ($)</option>
+                            <option value="EUR" {% if form_data.get('payment_currency', '') == 'EUR' %}selected{% endif %}>EUR — Euro (€)</option>
+                        </select>
+                        <div class="hint" id="currencyHint">Choose the currency that matches the receiving account.</div>
+                    </div>
+
+                    <div class="field">
+                        <label for="amount">Amount (<span id="amountCurrencySymbol">£</span>)</label>
                         <input
                             type="number"
                             id="amount"
@@ -567,22 +577,36 @@
         accountNumber.textContent =
             customer.account_number || "Not assigned";
 
+        const symbols = {GBP: "£", USD: "$", EUR: "€"};
+        const code = String(customer.currency || "GBP").toUpperCase();
         balance.textContent =
-            "£" + Number(customer.balance || 0).toLocaleString(
+            (symbols[code] || "") + Number(customer.balance || 0).toLocaleString(
                 "en-GB",
                 {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }
-            );
+            ) + " " + code;
+
+        const currencySelect = document.getElementById("payment_currency");
+        const currencyHint = document.getElementById("currencyHint");
+        if (currencySelect && customer.currency) {
+            currencySelect.value = code;
+            currencyHint.textContent = "Receiving account currency: " + code +
+                ". The payment currency must match the account currency.";
+        }
     }
 
-    customerSelect.addEventListener(
-        "change",
-        updateReceiverPreview
-    );
+    const paymentCurrency = document.getElementById("payment_currency");
+    const amountCurrencySymbol = document.getElementById("amountCurrencySymbol");
+    const currencySymbols = {GBP: "£", USD: "$", EUR: "€"};
+    paymentCurrency.addEventListener("change", function () {
+        amountCurrencySymbol.textContent = currencySymbols[paymentCurrency.value] || "";
+    });
 
+    customerSelect.addEventListener("change", updateReceiverPreview);
     updateReceiverPreview();
+    amountCurrencySymbol.textContent = currencySymbols[paymentCurrency.value] || "";
 </script>
 
 </body>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="180" viewBox="0 0 720 180" role="img" aria-labelledby="title desc">
+<title id="title">Fairmont Bank</title><desc id="desc">Gold F emblem and Fairmont Bank wordmark on a navy background.</desc>
+<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0ae"/><stop offset=".28" stop-color="#d6a83e"/><stop offset=".62" stop-color="#f4d77b"/><stop offset="1" stop-color="#a97720"/></linearGradient></defs>
+<rect width="720" height="180" rx="12" fill="#061629"/>
+<path d="M43 25 H142 Q151 25 151 34 L151 48 H92 Q80 48 80 60 V75 H134 Q143 75 143 84 L143 97 H80 V145 Q80 154 71 154 H43 Z" fill="url(#gold)"/>
+<path d="M80 75 C102 72 119 63 143 48 L143 66 C124 83 105 95 80 102 Z" fill="#f6d77b" opacity=".95"/>
+<path d="M80 102 C102 99 122 88 143 74 L143 91 C123 108 103 120 80 128 Z" fill="#b9892e" opacity=".9"/>
+<path d="M174 35 V145" stroke="#c8a24c" stroke-width="1.5" opacity=".75"/>
+<text x="205" y="86" fill="#f8f7f2" font-family="Georgia, 'Times New Roman', serif" font-size="43" letter-spacing="3">FAIRMONT BANK</text>
+<text x="208" y="121" fill="#e3bd5f" font-family="Arial, Helvetica, sans-serif" font-size="14" letter-spacing="6">BANKING MADE SIMPLE</text>
+</svg>

@@ -14,8 +14,8 @@
             margin: 0;
             font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
                          "Segoe UI", sans-serif;
-            background: radial-gradient(circle at top right,rgba(42,90,150,.28),transparent 35%),linear-gradient(145deg,#06111f,#0a1727 55%,#071321);
-            color: #eef5ff;
+            background: linear-gradient(135deg, #061525 0%, #0b2340 58%, #102844 100%);
+            color: #f3f7ff;
         }
 
         .wrap {
@@ -27,26 +27,26 @@
         .back {
             display: inline-block;
             margin-bottom: 20px;
-            color: #b8d5ff;
+            color: #dce9f8;
             text-decoration: none;
             font-weight: 600;
         }
 
         .back:hover {
-            color: #79b7ff;
+            color: #48a5ff;
         }
 
         .card {
-            background: rgba(10,25,43,.9);
-            border: 1px solid rgba(255,255,255,.09);
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,.32);
+            background: #0b1b2d;
+            border: 1px solid #20364d;
+            border-radius: 20px;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, .30);
             overflow: hidden;
         }
 
         .head {
             padding: 30px 30px 24px;
-            border-bottom: 1px solid rgba(255,255,255,.08);
+            border-bottom: 1px solid #20364d;
         }
 
         .icon {
@@ -56,8 +56,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #eef5ff;
-            color: #79b7ff;
+            background: #f0f6ff;
+            color: #087fca;
             font-size: 26px;
             margin-bottom: 15px;
         }
@@ -65,11 +65,12 @@
         h1 {
             margin: 0 0 8px;
             font-size: 28px;
+            color: #f7faff;
         }
 
         .sub {
             margin: 0;
-            color: #91a8c3;
+            color: #b5c7dc;
             line-height: 1.5;
         }
 
@@ -80,14 +81,14 @@
         .balance {
             padding: 16px 17px;
             margin-bottom: 25px;
-            background: rgba(255,255,255,.045);
-            border: 1px solid rgba(255,255,255,.07);
-            border-radius: 16px;
+            background: #15283d;
+            border: 1px solid #263e57;
+            border-radius: 12px;
         }
 
         .balance span {
             display: block;
-            color: #8da6c2;
+            color: #a9bdd4;
             font-size: 13px;
             margin-bottom: 4px;
         }
@@ -100,6 +101,7 @@
             font-size: 15px;
             font-weight: 700;
             margin-bottom: 13px;
+            color: #edf5ff;
         }
 
         .methods {
@@ -114,17 +116,17 @@
             gap: 14px;
             padding: 18px;
             min-height: 96px;
-            background: rgba(3,12,22,.45);
-            border: 1px solid rgba(255,255,255,.1);
+            background: #0a1726;
+            border: 1px solid #20364d;
             border-radius: 15px;
-            color: #eef5ff;
+            color: #f3f7ff;
             text-decoration: none;
             transition: .18s ease;
         }
 
         .method-card:hover {
-            border-color: #4b91e0;
-            box-shadow: 0 7px 24px rgba(35, 103, 200, .18);
+            border-color: #168bd5;
+            box-shadow: 0 7px 20px rgba(8, 127, 202, .18);
             transform: translateY(-1px);
         }
 
@@ -144,23 +146,23 @@
         }
 
         .paypal-logo {
-            background: #eef5ff;
-            color: #79b7ff;
+            background: #f0f6ff;
+            color: #087fca;
         }
 
         .card-logo {
-            background: rgba(255,255,255,.07);
-            color: #c3d2e4;
+            background: #1a2a3d;
+            color: #c2d2e3;
         }
 
         .bank-logo {
-            background: rgba(32,131,76,.16);
-            color: #64d49a;
+            background: #0b302e;
+            color: #43d6a0;
         }
 
         .wise-logo {
-            background: rgba(25,135,84,.16);
-            color: #64d49a;
+            background: #0b302e;
+            color: #43d6a0;
         }
 
         .method-info {
@@ -176,13 +178,13 @@
 
         .method-info span {
             display: block;
-            color: #8da6c2;
+            color: #a9bdd4;
             font-size: 12px;
             line-height: 1.4;
         }
 
         .arrow {
-            color: #8ba6c4;
+            color: #8fa9c5;
             font-size: 25px;
             line-height: 1;
         }
@@ -191,9 +193,9 @@
             margin-top: 22px;
             padding: 14px 15px;
             border-radius: 11px;
-            background: #f8fafc;
-            border: 1px solid rgba(91,157,224,.12);
-            color: #91a8c3;
+            background: #15283d;
+            border: 1px solid #263e57;
+            color: #b5c7dc;
             font-size: 12px;
             line-height: 1.5;
         }
@@ -206,15 +208,15 @@
         }
 
         .flash.error {
-            background: rgba(173,61,61,.15);
-            color: #ffc2c2;
-            border: 1px solid rgba(229,100,100,.25);
+            background: #462632;
+            color: #ffd5dc;
+            border: 1px solid #71404b;
         }
 
         .flash.success {
-            background: rgba(30,140,80,.14);
-            color: #a8efc2;
-            border: 1px solid rgba(90,210,140,.24);
+            background: #12392f;
+            color: #b7f3d0;
+            border: 1px solid #27644f;
         }
 
         @media (max-width: 650px) {
@@ -235,6 +237,15 @@
 </head>
 
 <body>
+
+{% set account_currency = (customer.account_currency or "GBP")|upper %}
+{% set account_currency_symbol = {
+    "GBP": "£", "USD": "$", "EUR": "€", "KES": "KSh",
+    "NGN": "₦", "INR": "₹", "JPY": "¥", "CAD": "C$",
+    "AUD": "A$", "CHF": "CHF ", "ZAR": "R", "GHS": "GH₵",
+    "UGX": "USh", "TZS": "TSh", "AED": "د.إ "
+}.get(account_currency, account_currency + " ") %}
+
 
 <div class="wrap">
 
@@ -269,10 +280,10 @@
             {% endwith %}
 
             <div class="balance">
-                <span>Available balance</span>
+                <span>Available balance ({{ account_currency }})</span>
 
                 <strong>
-                    £{{ "%.2f"|format(customer.account_balance or 0) }}
+                    {{ account_currency_symbol }}{{ "{:,.2f}".format(customer.account_balance or 0) }}
                 </strong>
             </div>
 

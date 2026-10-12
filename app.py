@@ -1,4 +1,4 @@
-from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash, jsonify, Response
+from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash, jsonify, Response, send_file, abort
 from flask_login import login_required, current_user
 from flask_login import UserMixin
 from flask_login import login_user
@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from sqlalchemy.exc import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 import secrets
 import string
 import csv
@@ -27,6 +28,7 @@ except ImportError:
 
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # 8 MB total application upload
 
 
 def send_bank_email(recipient_email, subject, body, html_body=None):
@@ -536,9 +538,12 @@ def send_transaction_alert(customer, transaction):
         or getattr(transaction, "transaction_type", None)
         or "Bank transaction"
     )
+    currency_code = str(getattr(customer, "account_currency", "GBP") or "GBP").upper()
+    currency_symbols = {"GBP": "\u00a3", "USD": "$", "EUR": "\u20ac"}
+    currency_symbol = currency_symbols.get(currency_code, "£")
     message_text = (
         (
-            f"A debit transaction of £{float(transaction.amount or 0):,.2f} "
+            f"A debit transaction of {currency_symbol}{float(transaction.amount or 0):,.2f} {currency_code} "
             "has been recorded on your account.\n\n"
             "Please review the transaction details below. If you do not "
             "recognize this transaction, please contact our support team "
@@ -546,7 +551,7 @@ def send_transaction_alert(customer, transaction):
         )
         if not is_credit
         else (
-            f"A credit transaction of £{float(transaction.amount or 0):,.2f} "
+            f"A credit transaction of {currency_symbol}{float(transaction.amount or 0):,.2f} {currency_code} "
             "has been recorded on your account.\n\n"
             "Please review the transaction details below. If you have any "
             "questions about this transaction, please contact our support team "
@@ -572,14 +577,14 @@ def send_transaction_alert(customer, transaction):
         message_text,
         [
             ("Transaction type", transaction.transaction_type or direction.title()),
-            ("Amount", f"£{float(transaction.amount or 0):,.2f}"),
+            ("Amount", f"{currency_symbol}{float(transaction.amount or 0):,.2f} {currency_code}"),
             ("Reference", transaction.transaction_reference),
             ("Description", description),
             ("Sender Name", sender_name or "Not specified"),
             ("Account", masked_account),
             ("Date", created_at),
             ("Status", transaction.status or "Recorded"),
-            ("Account Balance", f"£{float(transaction.balance_after or 0):,.2f}"),
+            ("Account Balance", f"{currency_symbol}{float(transaction.balance_after or 0):,.2f} {currency_code}"),
         ],
     )
 
@@ -826,6 +831,24 @@ class Customer(UserMixin, db.Model):
         nullable=False
     )
 
+    # Account application / KYC fields. Identity documents are stored outside static/.
+    birth_date = db.Column(db.String(20), nullable=True)
+    nationality = db.Column(db.String(100), nullable=True)
+    residential_address = db.Column(db.String(255), nullable=True)
+    postal_code = db.Column(db.String(30), nullable=True)
+    occupation = db.Column(db.String(120), nullable=True)
+    source_of_funds = db.Column(db.String(120), nullable=True)
+    account_currency = db.Column(db.String(3), nullable=False, default="GBP")
+    id_document_type = db.Column(db.String(40), nullable=True)
+    id_document_number = db.Column(db.String(100), nullable=True)
+    id_issuing_country = db.Column(db.String(100), nullable=True)
+    id_expiry_date = db.Column(db.String(20), nullable=True)
+    id_front_filename = db.Column(db.String(255), nullable=True)
+    id_back_filename = db.Column(db.String(255), nullable=True)
+    application_submitted_at = db.Column(db.DateTime, nullable=True)
+    application_reviewed_at = db.Column(db.DateTime, nullable=True)
+    application_reviewed_by = db.Column(db.String(80), nullable=True)
+    application_review_note = db.Column(db.Text, nullable=True)
 
     account_number = db.Column(
         db.String(12),
@@ -2178,114 +2201,130 @@ def verify_login_otp():
 
 @app.route("/open-account", methods=["GET", "POST"])
 def open_account():
-
     if request.method == "POST":
+        fields = {
+            "full_name": request.form.get("full_name", "").strip(),
+            "email": request.form.get("email", "").strip().lower(),
+            "phone": request.form.get("phone", "").strip(),
+            "account_type": request.form.get("account_type", "").strip().lower(),
+            "country": request.form.get("country", "").strip(),
+            "birth_date": request.form.get("birth_date", "").strip(),
+            "nationality": request.form.get("nationality", "").strip(),
+            "residential_address": request.form.get("residential_address", "").strip(),
+            "postal_code": request.form.get("postal_code", "").strip(),
+            "occupation": request.form.get("occupation", "").strip(),
+            "source_of_funds": request.form.get("source_of_funds", "").strip(),
+            "account_currency": request.form.get("account_currency", "").strip().upper(),
+            "id_document_type": request.form.get("id_document_type", "").strip(),
+            "id_document_number": request.form.get("id_document_number", "").strip(),
+            "id_issuing_country": request.form.get("id_issuing_country", "").strip(),
+            "id_expiry_date": request.form.get("id_expiry_date", "").strip(),
+        }
+        password = request.form.get("password", "")
+        if not all(fields[k] for k in (
+            "full_name", "email", "phone", "account_type", "country",
+            "birth_date", "nationality", "residential_address", "occupation",
+            "source_of_funds", "account_currency", "id_document_type",
+            "id_document_number", "id_issuing_country"
+        )) or not password:
+            flash("Please complete all required fields.", "error")
+            return render_template("open_account.html"), 400
 
-        full_name = request.form.get(
-            "full_name",
-            ""
-        ).strip()
+        if fields["account_type"] not in {"personal", "savings", "current", "business"}:
+            flash("Please select a valid account type.", "error")
+            return render_template("open_account.html"), 400
+        if fields["account_currency"] not in {"GBP", "EUR", "USD"}:
+            flash("Please select GBP, EUR, or USD as the account currency.", "error")
+            return render_template("open_account.html"), 400
+        if fields["id_document_type"] not in {"National ID", "Passport"}:
+            flash("Please select a valid identity document type.", "error")
+            return render_template("open_account.html"), 400
+        if request.form.get("terms") != "on":
+            flash("You must accept the account terms and privacy notice.", "error")
+            return render_template("open_account.html"), 400
 
-        email = request.form.get(
-            "email",
-            ""
-        ).strip().lower()
+        front = request.files.get("id_front")
+        back = request.files.get("id_back")
+        if not front or not front.filename:
+            flash("Upload the front of your ID or the passport identity page.", "error")
+            return render_template("open_account.html"), 400
+        allowed_exts = {"png", "jpg", "jpeg", "webp", "pdf"}
+        def valid_upload(upload):
+            name = secure_filename(upload.filename or "")
+            return bool(name and "." in name and name.rsplit(".", 1)[1].lower() in allowed_exts)
+        if not valid_upload(front) or (back and back.filename and not valid_upload(back)):
+            flash("ID files must be PNG, JPG, JPEG, WEBP, or PDF.", "error")
+            return render_template("open_account.html"), 400
+        if fields["id_document_type"] == "National ID" and (not back or not back.filename):
+            flash("Please upload both sides of your national ID.", "error")
+            return render_template("open_account.html"), 400
 
-        phone = request.form.get(
-            "phone",
-            ""
-        ).strip()
+        if Customer.query.filter_by(email=fields["email"]).first():
+            flash("An account with this email address already exists.", "error")
+            return render_template("open_account.html"), 400
+        if Customer.query.filter_by(phone=fields["phone"]).first():
+            flash("An account with this phone number already exists.", "error")
+            return render_template("open_account.html"), 400
 
-        account_type = request.form.get(
-            "account_type",
-            ""
-        ).strip()
+        # Keep ID documents outside the public static directory.
+        import uuid
+        private_dir = os.path.join(app.instance_path, "private_identity_documents")
+        os.makedirs(private_dir, mode=0o700, exist_ok=True)
+        def save_private(upload):
+            if not upload or not upload.filename:
+                return None
+            ext = secure_filename(upload.filename).rsplit(".", 1)[1].lower()
+            filename = f"{uuid.uuid4().hex}.{ext}"
+            destination = os.path.join(private_dir, filename)
+            upload.save(destination)
+            try:
+                os.chmod(destination, 0o600)
+            except OSError:
+                pass
+            return filename
 
-        country = request.form.get(
-            "country",
-            ""
-        ).strip()
-
-        password = request.form.get(
-            "password",
-            ""
-        )
-
-        terms = request.form.get(
-            "terms"
-        )
-
-        if not all([
-            full_name,
-            email,
-            phone,
-            account_type,
-            country,
-            password
-        ]):
-
-            return (
-                "Please complete all required fields.",
-                400
+        front_filename = save_private(front)
+        try:
+            back_filename = save_private(back)
+            customer = Customer(
+                customer_id=generate_customer_id(),
+                account_number=generate_account_number(),  # reserved while application is pending
+                full_name=fields["full_name"],
+                email=fields["email"],
+                phone=fields["phone"],
+                account_type=fields["account_type"],
+                country=fields["country"],
+                birth_date=fields["birth_date"],
+                nationality=fields["nationality"],
+                residential_address=fields["residential_address"],
+                postal_code=fields["postal_code"],
+                occupation=fields["occupation"],
+                source_of_funds=fields["source_of_funds"],
+                account_currency=fields["account_currency"],
+                id_document_type=fields["id_document_type"],
+                id_document_number=fields["id_document_number"],
+                id_issuing_country=fields["id_issuing_country"],
+                id_expiry_date=fields["id_expiry_date"] or None,
+                id_front_filename=front_filename,
+                id_back_filename=back_filename,
+                application_submitted_at=datetime.utcnow(),
+                password_hash=generate_password_hash(password),
+                account_status="Pending Approval",
+                account_balance=0.0,
             )
-
-        if not terms:
-
-            return (
-                "You must accept the account terms.",
-                400
-            )
-
-        existing_email = Customer.query.filter_by(
-            email=email
-        ).first()
-
-        if existing_email:
-
-            return (
-                "An account with this email address already exists.",
-                400
-            )
-
-        existing_phone = Customer.query.filter_by(
-            phone=phone
-        ).first()
-
-        if existing_phone:
-
-            return (
-                "An account with this phone number already exists.",
-                400
-            )
-
-        customer = Customer(
-
-            customer_id=generate_customer_id(),
-
-            account_number=generate_account_number(),
-
-            full_name=full_name,
-
-            email=email,
-
-            phone=phone,
-
-            account_type=account_type,
-
-            country=country,
-
-            password_hash=generate_password_hash(
-                password
-            ),
-
-            account_status="Pending Approval",
-
-            account_balance=0.0
-        )
-
-        db.session.add(customer)
-
-        db.session.commit()
+            db.session.add(customer)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            for filename in (front_filename, locals().get("back_filename")):
+                if filename:
+                    try:
+                        os.remove(os.path.join(private_dir, filename))
+                    except OSError:
+                        pass
+            app.logger.exception("Could not save account application")
+            flash("We could not submit your application. Please try again.", "error")
+            return render_template("open_account.html"), 500
 
         account_email_text = f"""FAIRMONT BANK — ACCOUNT SERVICES
 
@@ -2293,48 +2332,49 @@ WE'VE RECEIVED YOUR ACCOUNT APPLICATION
 
 Dear {customer.full_name},
 
-Thank you for submitting your account application. The details below are provided for your reference.
+Your application has been recorded for review.
 
-APPLICATION DETAILS
-Application Reference: {customer.customer_id}
-Account Type: {customer.account_type}
-Application Status: {customer.account_status}
+Application reference: {customer.customer_id}
+Requested account type: {customer.account_type}
+Requested base currency: {customer.account_currency}
+Status: {customer.account_status}
 
-WHAT HAPPENS NEXT?
-Your application is awaiting review. Please check your account dashboard for status updates. Any additional steps will be communicated through the appropriate channels.
+The account is not active until an authorized reviewer completes the review and approves it. This application software is not itself proof of a regulated bank account or identity verification.
 
-NEED ASSISTANCE?
-Contact support@fairmontbank.com if you have questions about your application.
+For assistance, contact support@fairmontbank.com.
 
 Kind regards,
-Fairmont Bank
-Account Services"""
-
-        account_email_html = render_template(
-            "emails/account_application_received.html",
-            customer=customer
-        )
-
-        email_sent = send_bank_email(
+Fairmont Bank Account Services"""
+        send_bank_email(
             customer.email,
             "We've Received Your Account Application",
-            account_email_text,
-            html_body=account_email_html
+            account_email_text
         )
-        if not email_sent:
-            app.logger.warning(
-                "Account application email could not be sent for customer %s",
-                customer.customer_id,
+
+        admin_email = os.getenv("BANK_ADMIN_EMAIL", "").strip()
+        if admin_email:
+            review_url = request.url_root.rstrip("/") + url_for("admin_application_review", customer_id=customer.id)
+            admin_body = (
+                "A new account application requires review.\n\n"
+                f"Reference: {customer.customer_id}\n"
+                f"Applicant: {customer.full_name}\n"
+                f"Email: {customer.email}\n"
+                f"Phone: {customer.phone}\n"
+                f"Requested account type: {customer.account_type}\n"
+                f"Requested currency: {customer.account_currency}\n"
+                f"Country: {customer.country}\n"
+                "Identity documents were uploaded and are available only through the authenticated admin review page.\n\n"
+                f"Review application: {review_url}\n\n"
+                "Do not approve until identity and application checks have been completed."
             )
+            if not send_bank_email(admin_email, "New Account Application Requires Review", admin_body):
+                app.logger.warning("Admin notification email could not be sent for application %s", customer.customer_id)
+        else:
+            app.logger.warning("BANK_ADMIN_EMAIL is not configured; new application email alert was not sent.")
 
-        return render_template(
-            "account_created.html",
-            customer=customer
-        )
+        return render_template("account_created.html", customer=customer)
 
-    return render_template(
-        "open_account.html"
-    )
+    return render_template("open_account.html")
 
 
 # =========================================================
@@ -2989,6 +3029,21 @@ def dashboard():
     # Always provide the real customer account balance
     # to dashboard.html.
     display_balance = customer.account_balance or 0
+    # Choose the currency shown for this customer rather than a global symbol.
+    # This changes display formatting only; it does not perform FX conversion.
+    allowed_currency_codes = {"GBP", "USD", "EUR"}
+    customer_currency = (
+        (getattr(customer, "account_currency", None) or "").strip().upper()
+        or (getattr(customer, "preferred_currency_display", None) or "GBP").strip().upper()
+    )
+    if customer_currency not in allowed_currency_codes:
+        customer_currency = "GBP"
+
+    currency_symbols = {"GBP": "\u00a3", "USD": "$", "EUR": "\u20ac"}
+    currency_locales = {"GBP": "en-GB", "USD": "en-US", "EUR": "de-DE"}
+    currency_symbol = currency_symbols[customer_currency]
+    currency_locale = currency_locales[customer_currency]
+
     return render_template(
         "dashboard.html",
         customer=customer,
@@ -2997,8 +3052,9 @@ def dashboard():
         virtual_card=virtual_card,
         virtual_card_application=virtual_card_application,
         display_balance=display_balance,
-        currency_symbol=app.config.get("CURRENCY_SYMBOL", "£"),
-        currency_locale=app.config.get("CURRENCY_LOCALE", "en-GB"),
+        currency_code=customer_currency,
+        currency_symbol=currency_symbol,
+        currency_locale=currency_locale,
     )
 
 # =========================================================
@@ -4617,20 +4673,31 @@ def transaction_receipt(transaction_reference):
     <div class="row"><span>Transaction reference</span><strong>{{ transaction.transaction_reference }}</strong></div>
     <div class="row"><span>Transaction type</span><strong>{{ transaction.transaction_type }}</strong></div>
     <div class="row"><span>Direction</span><strong>{{ transaction.direction }}</strong></div>
-    <div class="row"><span>Amount</span><strong>£{{ "%.2f"|format(transaction.amount or 0) }}</strong></div>
+    <div class="row"><span>Amount</span><strong>{{ currency_symbol }}{{ "%.2f"|format(transaction.amount or 0) }} {{ currency_code }}</strong></div>
     <div class="row"><span>Counterparty</span><strong>{{ transaction.counterparty or "Not specified" }}</strong></div>
     <div class="row"><span>Description</span><strong>{{ transaction.description or "—" }}</strong></div>
-    <div class="row"><span>Balance after transaction</span><strong>£{{ "%.2f"|format(transaction.balance_after or 0) }}</strong></div>
+    <div class="row"><span>Balance after transaction</span><strong>{{ currency_symbol }}{{ "%.2f"|format(transaction.balance_after or 0) }} {{ currency_code }}</strong></div>
     <div class="actions"><button class="primary" type="button" onclick="window.print()">Print / Save Receipt</button><a class="secondary" href="{{ url_for('dashboard') }}">Back to dashboard</a></div>
     </div></section></main></body></html>
     """
-    return render_template_string(receipt_html, transaction=transaction)
+    currency_code = str(getattr(customer, "account_currency", "GBP") or "GBP").upper()
+    currency_symbol = {"GBP": "£", "USD": "$", "EUR": "€"}.get(currency_code, "£")
+    return render_template_string(
+        receipt_html,
+        transaction=transaction,
+        currency_code=currency_code,
+        currency_symbol=currency_symbol,
+    )
 
 
 
 @app.route("/send-fairmont-money", methods=["GET", "POST"])
 def send_fairmont_money():
+    """Internal transfer for the simulated Fairmont Bank application.
 
+    Amount entered is denominated in the sender-selected currency. Both account
+    balances are updated in each customer's own account currency.
+    """
     if "customer_id" not in session:
         return redirect(url_for("login"))
 
@@ -4642,62 +4709,78 @@ def send_fairmont_money():
         session.clear()
         return redirect(url_for("login"))
 
+    supported_currencies = {
+        "GBP": {"name": "British Pound", "symbol": "£"},
+        "USD": {"name": "US Dollar", "symbol": "$"},
+        "EUR": {"name": "Euro", "symbol": "€"},
+    }
+
+    def normalized_currency(value):
+        code = str(value or "GBP").strip().upper()
+        return code if code in supported_currencies else "GBP"
+
+    def get_exchange_rates(base_currency):
+        """Fetch latest indicative rates; never silently guess a conversion."""
+        cache = app.config.setdefault("_FAIRMONT_FX_CACHE", {})
+        cached = cache.get(base_currency)
+        now = datetime.utcnow().timestamp()
+        if cached and now - cached["timestamp"] < 300:
+            return cached["rates"]
+
+        url = f"https://open.er-api.com/v6/latest/{base_currency}"
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "FairmontBank-SimulatedApp/1.0"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=5) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            rates = payload.get("rates", {})
+            if payload.get("result") != "success" or not rates:
+                raise ValueError("Exchange-rate service returned no usable rates.")
+            cache[base_currency] = {"timestamp": now, "rates": rates}
+            return rates
+        except Exception as exc:
+            app.logger.warning("Currency conversion rate lookup failed: %s", exc)
+            if cached:
+                # Permit a previously fetched rate during a temporary outage.
+                return cached["rates"]
+            return None
+
+    sender_currency = normalized_currency(
+        getattr(customer, "account_currency", "GBP")
+    )
+
     if request.method == "GET":
         return render_template(
             "send_fairmont_money.html",
-            customer=customer
+            customer=customer,
+            supported_currencies=supported_currencies,
+            sender_currency=sender_currency,
+            sender_currency_symbol=supported_currencies[sender_currency]["symbol"],
         )
 
     recipient_account_number = request.form.get(
-        "recipient_account_number",
-        ""
+        "recipient_account_number", ""
     ).strip()
+    amount_text = request.form.get("amount", "").strip()
+    selected_currency = normalized_currency(
+        request.form.get("transfer_currency", sender_currency)
+    )
+    reference = request.form.get("reference", "").strip()
 
-    amount_text = request.form.get(
-        "amount",
-        ""
-    ).strip()
-
-    reference = request.form.get(
-        "reference",
-        ""
-    ).strip()
-
-    if not re.fullmatch(
-        r"\d{10}",
-        recipient_account_number
-    ):
-        flash(
-            "Fairmont account number must contain exactly 10 digits.",
-            "error"
-        )
+    if not re.fullmatch(r"\d{10}", recipient_account_number):
+        flash("Fairmont account number must contain exactly 10 digits.", "error")
         return redirect(url_for("send_fairmont_money"))
 
     try:
         amount = float(amount_text)
     except (TypeError, ValueError):
-        flash(
-            "Please enter a valid amount.",
-            "error"
-        )
+        flash("Please enter a valid amount.", "error")
         return redirect(url_for("send_fairmont_money"))
 
-    if amount <= 0:
-        flash(
-            "Transfer amount must be greater than zero.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
-
-    sender_balance = float(
-        customer.account_balance or 0
-    )
-
-    if amount > sender_balance:
-        flash(
-            "Insufficient available balance.",
-            "error"
-        )
+    if not (amount > 0 and amount < 1e12):
+        flash("Transfer amount must be greater than zero.", "error")
         return redirect(url_for("send_fairmont_money"))
 
     recipient = Customer.query.filter_by(
@@ -4705,76 +4788,95 @@ def send_fairmont_money():
     ).first()
 
     if recipient is None:
-        flash(
-            "No Fairmont customer was found with that account number.",
-            "error"
-        )
+        flash("No Fairmont customer was found with that account number.", "error")
         return redirect(url_for("send_fairmont_money"))
 
     if recipient.id == customer.id:
+        flash("You cannot send money to your own account.", "error")
+        return redirect(url_for("send_fairmont_money"))
+
+    if str(recipient.account_status or "").lower() != "active":
+        flash("The recipient account is not active.", "error")
+        return redirect(url_for("send_fairmont_money"))
+
+    recipient_currency = normalized_currency(
+        getattr(recipient, "account_currency", "GBP")
+    )
+
+    # Convert the entered amount into the sender's account currency for the
+    # debit, and into the recipient's account currency for the credit.
+    if selected_currency == sender_currency:
+        sender_debit = round(amount, 2)
+    else:
+        rates = get_exchange_rates(selected_currency)
+        if not rates or sender_currency not in rates:
+            flash(
+                "Currency conversion is temporarily unavailable. No money was moved; please try again later.",
+                "error",
+            )
+            return redirect(url_for("send_fairmont_money"))
+        sender_debit = round(amount * float(rates[sender_currency]), 2)
+
+    if selected_currency == recipient_currency:
+        recipient_credit = round(amount, 2)
+    else:
+        rates = get_exchange_rates(selected_currency)
+        if not rates or recipient_currency not in rates:
+            flash(
+                "Currency conversion is temporarily unavailable. No money was moved; please try again later.",
+                "error",
+            )
+            return redirect(url_for("send_fairmont_money"))
+        recipient_credit = round(amount * float(rates[recipient_currency]), 2)
+
+    previous_sender_balance = float(customer.account_balance or 0)
+    previous_recipient_balance = float(recipient.account_balance or 0)
+
+    if sender_debit > previous_sender_balance:
+        sender_symbol = supported_currencies[sender_currency]["symbol"]
         flash(
-            "You cannot send money to your own account.",
-            "error"
+            f"Insufficient available balance. This transfer requires "
+            f"{sender_symbol}{sender_debit:,.2f} from your account.",
+            "error",
         )
         return redirect(url_for("send_fairmont_money"))
 
-    if str(
-        recipient.account_status
-    ).lower() != "active":
-        flash(
-            "The recipient account is not active.",
-            "error"
-        )
-        return redirect(url_for("send_fairmont_money"))
+    new_sender_balance = round(previous_sender_balance - sender_debit, 2)
+    new_recipient_balance = round(previous_recipient_balance + recipient_credit, 2)
 
-    previous_sender_balance = float(
-        customer.account_balance or 0
-    )
+    sender_symbol = supported_currencies[sender_currency]["symbol"]
+    selected_symbol = supported_currencies[selected_currency]["symbol"]
+    recipient_symbol = supported_currencies[recipient_currency]["symbol"]
 
-    previous_recipient_balance = float(
-        recipient.account_balance or 0
-    )
-
-    new_sender_balance = (
-        previous_sender_balance - amount
-    )
-
-    new_recipient_balance = (
-        previous_recipient_balance + amount
-    )
-
-    sender_transaction_reference = (
-        generate_transaction_reference()
-    )
-
-    recipient_transaction_reference = (
-        generate_transaction_reference()
-    )
-
-    # The database requires transaction_reference to be unique.
-    # Make absolutely sure the two references are different.
+    sender_transaction_reference = generate_transaction_reference()
+    recipient_transaction_reference = generate_transaction_reference()
     while recipient_transaction_reference == sender_transaction_reference:
-        recipient_transaction_reference = (
-            generate_transaction_reference()
-        )
+        recipient_transaction_reference = generate_transaction_reference()
+
+    sender_description = (
+        f"Sent {selected_symbol}{amount:,.2f} {selected_currency}; "
+        f"debited {sender_symbol}{sender_debit:,.2f} {sender_currency} "
+        f"to {recipient.full_name}"
+    )
+    recipient_description = (
+        f"Received {recipient_symbol}{recipient_credit:,.2f} {recipient_currency} "
+        f"from {customer.full_name} (sent {selected_symbol}{amount:,.2f} {selected_currency})"
+    )
 
     sender_transaction = Transaction(
         transaction_reference=sender_transaction_reference,
         customer_id=customer.customer_id,
         transaction_type="Fairmont Internal Transfer",
         direction="Debit",
-        amount=amount,
+        amount=sender_debit,
         balance_after=new_sender_balance,
-        description=(
-            reference
-            or f"Transfer to {recipient.full_name}"
-        ),
+        description=(reference + " — " if reference else "") + sender_description,
         counterparty=recipient.full_name,
         status="Completed",
         sender_name=customer.full_name,
         sender_account_number=customer.account_number,
         sender_bank="Fairmont Bank",
-        sender_country=customer.country
+        sender_country=customer.country,
     )
 
     recipient_transaction = Transaction(
@@ -4782,66 +4884,51 @@ def send_fairmont_money():
         customer_id=recipient.customer_id,
         transaction_type="Fairmont Internal Transfer",
         direction="Credit",
-        amount=amount,
+        amount=recipient_credit,
         balance_after=new_recipient_balance,
-        description=(
-            f"Transfer from {customer.full_name}"
-        ),
+        description=recipient_description,
         counterparty=customer.full_name,
         status="Completed",
         sender_name=customer.full_name,
         sender_account_number=customer.account_number,
         sender_bank="Fairmont Bank",
-        sender_country=customer.country
+        sender_country=customer.country,
     )
 
     customer.account_balance = new_sender_balance
     recipient.account_balance = new_recipient_balance
-
     db.session.add(sender_transaction)
     db.session.add(recipient_transaction)
 
     create_customer_notification(
         customer.customer_id,
         "Money transfer sent",
-        f"Your transfer of £{amount:,.2f} to {recipient.full_name} was completed successfully. Reference: {sender_transaction_reference}.",
+        f"You sent {selected_symbol}{amount:,.2f} {selected_currency} to "
+        f"{recipient.full_name}. Your account was debited "
+        f"{sender_symbol}{sender_debit:,.2f} {sender_currency}. "
+        f"Reference: {sender_transaction_reference}.",
         notification_type="Transaction",
         commit=False,
     )
     create_customer_notification(
         recipient.customer_id,
         "Money received",
-        f"You received £{amount:,.2f} from {customer.full_name}. Reference: {recipient_transaction_reference}.",
+        f"You received {recipient_symbol}{recipient_credit:,.2f} "
+        f"{recipient_currency} from {customer.full_name}. "
+        f"Reference: {recipient_transaction_reference}.",
         notification_type="Transaction",
         commit=False,
     )
 
     try:
         db.session.commit()
-
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-
-        print("=" * 70)
-        print(" FAIRMONT TRANSFER DATABASE ERROR")
-        print("=" * 70)
-        print()
-        print("Exception type:", type(e).__name__)
-        print("Exception message:", str(e))
-        print()
-        print("FULL DATABASE ERROR:")
-        print(repr(e))
-        print("=" * 70)
-
-        flash(
-            "Transfer failed. Check the server console for the database error.",
-            "error"
-        )
-
+        app.logger.exception("FAIRMONT INTERNAL TRANSFER DATABASE ERROR")
+        flash("Transfer failed. No transfer was recorded; please try again.", "error")
         return redirect(url_for("send_fairmont_money"))
 
-    # Send debit/credit alerts only after both balance changes and
-    # transaction records have been committed successfully.
+    # Alerts are sent only after the database commit succeeds.
     if not send_transaction_alert(customer, sender_transaction):
         app.logger.info(
             "Sender transaction alert not sent for reference %s",
@@ -4853,11 +4940,16 @@ def send_fairmont_money():
             recipient_transaction_reference,
         )
 
+    flash(
+        f"Transfer recorded: {selected_symbol}{amount:,.2f} {selected_currency}; "
+        f"recipient credited {recipient_symbol}{recipient_credit:,.2f} "
+        f"{recipient_currency}. This is a simulated banking application.",
+        "success",
+    )
     return redirect(url_for(
         "transaction_receipt",
-        transaction_reference=sender_transaction_reference
+        transaction_reference=sender_transaction_reference,
     ))
-
 
 @app.route("/send-money", methods=["GET", "POST"])
 def send_money():
@@ -8503,6 +8595,50 @@ def admin_customer_profile(customer_id):
 # ADMIN — ACCOUNT APPLICATION APPROVAL
 # ============================================================
 
+@app.route("/admin/application/<int:customer_id>")
+def admin_application_review(customer_id):
+    admin_id = session.get("admin_id")
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+    admin = db.session.get(AdminUser, admin_id)
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+    customer = db.session.get(Customer, customer_id)
+    if customer is None:
+        flash("Application not found.", "error")
+        return redirect(url_for("admin_accounts"))
+    return render_template("admin_application_review.html", admin=admin, customer=customer)
+
+
+@app.route("/admin/application/<int:customer_id>/document/<side>")
+def admin_application_document(customer_id, side):
+    admin_id = session.get("admin_id")
+    if not admin_id:
+        return redirect(url_for("admin_login"))
+    admin = db.session.get(AdminUser, admin_id)
+    if admin is None or not admin.is_active:
+        session.pop("admin_id", None)
+        session.pop("admin_username", None)
+        return redirect(url_for("admin_login"))
+    customer = db.session.get(Customer, customer_id)
+    if customer is None or side not in {"front", "back"}:
+        abort(404)
+    filename = customer.id_front_filename if side == "front" else customer.id_back_filename
+    if not filename:
+        abort(404)
+    private_dir = os.path.realpath(os.path.join(app.instance_path, "private_identity_documents"))
+    path = os.path.realpath(os.path.join(private_dir, filename))
+    if os.path.commonpath([private_dir, path]) != private_dir or not os.path.isfile(path):
+        abort(404)
+    ext = os.path.splitext(path)[1].lower()
+    mimetype = {" .pdf": "application/pdf", ".pdf": "application/pdf",
+                ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+                ".webp": "image/webp"}.get(ext, "application/octet-stream")
+    return send_file(path, mimetype=mimetype, as_attachment=True, download_name=f"{customer.customer_id}_id_{side}{ext}")
+
+
 @app.route("/admin/customer/<int:customer_id>/approve", methods=["POST"])
 def admin_approve_customer(customer_id):
 
@@ -8534,6 +8670,11 @@ def admin_approve_customer(customer_id):
         )
 
     customer.account_status = "Active"
+    if not customer.account_number:
+        customer.account_number = generate_account_number()
+    customer.application_reviewed_at = datetime.utcnow()
+    customer.application_reviewed_by = admin.username
+    customer.application_review_note = request.form.get("review_note", "").strip() or None
 
     db.session.commit()
 
@@ -8587,6 +8728,9 @@ def admin_reject_customer(customer_id):
         )
 
     customer.account_status = "Rejected"
+    customer.application_reviewed_at = datetime.utcnow()
+    customer.application_reviewed_by = admin.username
+    customer.application_review_note = request.form.get("review_note", "").strip() or None
 
     db.session.commit()
 
@@ -9076,8 +9220,6 @@ def admin_payment_approvals():
         rejected_count=rejected_count
     )
 
-
-@app.route("/admin/incoming-payment", methods=["GET", "POST"])
 
 @app.route(
     "/admin/payment-approval/<int:approval_id>",
@@ -9607,6 +9749,7 @@ def admin_reject_payment(approval_id):
         )
     )
 
+@app.route("/admin/incoming-payment", methods=["GET", "POST"])
 def admin_incoming_payment():
 
     admin_id = session.get("admin_id")
@@ -9632,7 +9775,8 @@ def admin_incoming_payment():
             "customer_id": customer.customer_id,
             "account_number": customer.account_number or "",
             "full_name": customer.full_name or "",
-            "balance": float(customer.account_balance or 0)
+            "balance": float(customer.account_balance or 0),
+            "currency": (customer.account_currency or "GBP").upper()
         }
         for customer in customers
     ]
@@ -9701,6 +9845,11 @@ def admin_incoming_payment():
             ).strip()
         )
 
+        payment_currency = request.form.get(
+            "payment_currency", ""
+        ).strip().upper()
+        supported_currencies = {"GBP": "£", "USD": "$", "EUR": "€"}
+
         if not receiver_customer_id:
             flash(
                 "Please select the receiving Fairmont customer.",
@@ -9759,6 +9908,34 @@ def admin_incoming_payment():
                 "error"
             )
 
+            return render_template(
+                "admin_incoming_payment.html",
+                admin=admin,
+                customers=customers,
+                customer_data=customer_data,
+                form_data=form_data
+            )
+
+        receiver_currency = (getattr(receiver, "account_currency", "GBP") or "GBP").upper()
+        if payment_currency not in supported_currencies:
+            flash("Please select a supported payment currency.", "error")
+            return render_template(
+                "admin_incoming_payment.html",
+                admin=admin,
+                customers=customers,
+                customer_data=customer_data,
+                form_data=form_data
+            )
+
+        # Balances are maintained in the account's denomination. Do not credit
+        # a different currency amount without an explicit exchange-rate process.
+        if payment_currency != receiver_currency:
+            flash(
+                f"This customer's account is denominated in {receiver_currency}. "
+                f"Choose {receiver_currency} for this payment; cross-currency "
+                "conversion is not performed automatically.",
+                "error"
+            )
             return render_template(
                 "admin_incoming_payment.html",
                 admin=admin,
@@ -9868,7 +10045,7 @@ def admin_incoming_payment():
         create_customer_notification(
             receiver.customer_id,
             "Money received",
-            f"A payment of £{amount:,.2f} from {sender_name} ({sender_bank}) has been credited to your account. Reference: {transaction_reference}.",
+            f"A payment of {supported_currencies[payment_currency]}{amount:,.2f} {payment_currency} from {sender_name} ({sender_bank}) has been credited to your account. Reference: {transaction_reference}.",
             notification_type="Transaction",
             commit=False,
         )
@@ -9895,7 +10072,9 @@ def admin_incoming_payment():
             transaction_reference=transaction_reference,
             previous_balance=previous_balance,
             new_balance=new_balance,
-            posted_at=posted_at
+            posted_at=posted_at,
+            currency_code=payment_currency,
+            currency_symbol=supported_currencies[payment_currency]
         )
 
     return render_template(
@@ -9953,6 +10132,14 @@ def admin_create_customer():
         country = (
             request.form.get("country", "").strip()
         )
+
+        birth_date = request.form.get("birth_date", "").strip()
+        nationality = request.form.get("nationality", "").strip()
+        residential_address = request.form.get("residential_address", "").strip()
+        postal_code = request.form.get("postal_code", "").strip()
+        occupation = request.form.get("occupation", "").strip()
+        source_of_funds = request.form.get("source_of_funds", "").strip()
+        account_currency = request.form.get("account_currency", "GBP").strip().upper()
 
         password = request.form.get("password", "")
 
@@ -10041,6 +10228,10 @@ def admin_create_customer():
                 admin=admin,
                 form_data=form_data
             )
+
+        if account_currency not in {"GBP", "USD", "EUR"}:
+            flash("Please select GBP, USD, or EUR as the account currency.", "error")
+            return render_template("admin_create_customer.html", admin=admin, form_data=form_data)
 
         if len(password) < 6:
             flash(
@@ -10145,6 +10336,14 @@ def admin_create_customer():
             phone=phone,
             account_type=account_type,
             country=country,
+            birth_date=birth_date or None,
+            nationality=nationality or None,
+            residential_address=residential_address or None,
+            postal_code=postal_code or None,
+            occupation=occupation or None,
+            source_of_funds=source_of_funds or None,
+            account_currency=account_currency,
+            preferred_currency_display=account_currency,
             password_hash=generate_password_hash(password),
             account_status="Active",
             account_balance=initial_funding
@@ -10197,7 +10396,10 @@ def admin_create_customer():
             ),
             [
                 ("Customer reference", customer.customer_id),
+                ("Account number", customer.account_number),
                 ("Account type", customer.account_type),
+                ("Account currency", customer.account_currency),
+                ("Opening balance", f"{customer.account_currency} {customer.account_balance:,.2f}"),
                 ("Account status", customer.account_status),
             ],
         ):
@@ -10237,113 +10439,84 @@ def admin_create_customer():
 
 @app.route("/admin/fund-customer", methods=["GET", "POST"])
 def admin_fund_customer():
+    """Credit an active customer in that customer's configured account currency."""
     admin_id = session.get("admin_id")
-
     if not admin_id:
         return redirect(url_for("admin_login"))
 
     admin = db.session.get(AdminUser, admin_id)
-
     if not admin or not admin.is_active:
         session.pop("admin_id", None)
         return redirect(url_for("admin_login"))
 
+    currency_symbols = {"GBP": "\u00a3", "USD": "$", "EUR": "\u20ac"}
+    currency_names = {
+        "GBP": "British Pound Sterling",
+        "USD": "US Dollar",
+        "EUR": "Euro",
+    }
+
+    def customer_currency(customer):
+        code = str(getattr(customer, "account_currency", None) or "GBP").strip().upper()
+        return code if code in currency_symbols else "GBP"
+
     customers = Customer.query.order_by(Customer.full_name.asc()).all()
+    selected_customer_id = (
+        request.form.get("customer_id", "").strip()
+        if request.method == "POST"
+        else request.args.get("customer_id", "").strip()
+    )
+
+    def render_funding_form(status=200):
+        return render_template(
+            "admin_fund_customer.html",
+            admin=admin,
+            customers=customers,
+            selected_customer_id=selected_customer_id,
+            currency_symbols=currency_symbols,
+            currency_names=currency_names,
+        ), status
 
     if request.method == "POST":
-        receiver_customer_id = request.form.get(
-            "customer_id",
-            ""
-        ).strip()
+        amount_text = request.form.get("amount", "").strip()
+        funding_reference = request.form.get("funding_reference", "").strip()
+        funding_description = request.form.get("funding_description", "").strip()
 
-        amount_text = request.form.get(
-            "amount",
-            ""
-        ).strip()
-
-        funding_reference = request.form.get(
-            "funding_reference",
-            ""
-        ).strip()
-
-        funding_description = request.form.get(
-            "funding_description",
-            ""
-        ).strip()
-
-        if not receiver_customer_id:
+        if not selected_customer_id:
             flash("Please select a customer.", "error")
+            return render_funding_form(400)
 
-            return render_template(
-                "admin_fund_customer.html",
-                admin=admin,
-                customers=customers
-            )
-
-        customer = Customer.query.filter_by(
-            customer_id=receiver_customer_id
-        ).first()
-
+        customer = Customer.query.filter_by(customer_id=selected_customer_id).first()
         if not customer:
             flash("The selected customer could not be found.", "error")
-
-            return render_template(
-                "admin_fund_customer.html",
-                admin=admin,
-                customers=customers
-            )
+            return render_funding_form(404)
 
         if customer.account_status != "Active":
-            flash(
-                "Funds can only be added to an active customer account.",
-                "error"
-            )
-
-            return render_template(
-                "admin_fund_customer.html",
-                admin=admin,
-                customers=customers
-            )
+            flash("Funds can only be added to an active customer account.", "error")
+            return render_funding_form(400)
 
         try:
             amount = float(amount_text)
         except (TypeError, ValueError):
-            amount = 0
+            amount = 0.0
 
-        if amount <= 0:
-            flash(
-                "Funding amount must be greater than zero.",
-                "error"
-            )
+        if not (amount > 0 and amount < 1e12):
+            flash("Enter a valid funding amount greater than zero.", "error")
+            return render_funding_form(400)
 
-            return render_template(
-                "admin_fund_customer.html",
-                admin=admin,
-                customers=customers
-            )
-
-        current_balance = float(
-            customer.account_balance or 0
-        )
-
-        new_balance = current_balance + amount
-
+        code = customer_currency(customer)
+        symbol = currency_symbols[code]
+        current_balance = round(float(customer.account_balance or 0), 2)
+        amount = round(amount, 2)
+        new_balance = round(current_balance + amount, 2)
         transaction_reference = generate_transaction_reference()
 
-        description = (
-            funding_description
-            if funding_description
-            else "Account Funding"
-        )
-
+        description = funding_description or "Account Funding"
         if funding_reference:
-            description = (
-                f"{description} "
-                f"(Reference: {funding_reference})"
-            )
+            description = f"{description} (Reference: {funding_reference})"
+        description = f"{description} — {code}"
 
         customer.account_balance = new_balance
-
         transaction = Transaction(
             transaction_reference=transaction_reference,
             customer_id=customer.customer_id,
@@ -10357,21 +10530,16 @@ def admin_fund_customer():
             sender_name="Fairmont Bank",
             sender_account_number="",
             sender_bank="Fairmont Bank",
-            sender_country="United Kingdom"
+            sender_country="United Kingdom",
         )
-
         db.session.add(transaction)
 
-        # Add the in-site bell notification in the same database
-        # transaction as the funding record, so it appears unread
-        # immediately after the customer returns to the dashboard.
         create_customer_notification(
             customer.customer_id,
             "Account credited",
             (
-                f"An account funding of £{amount:,.2f} has been recorded. "
-                f"Description: {description}. "
-                f"Reference: {transaction_reference}."
+                f"An account funding of {symbol}{amount:,.2f} {code} has been recorded. "
+                f"Description: {description}. Reference: {transaction_reference}."
             ),
             notification_type="Transaction",
             commit=False,
@@ -10394,32 +10562,13 @@ def admin_fund_customer():
             new_balance=new_balance,
             funding_reference=funding_reference,
             funding_description=funding_description,
-            transaction_reference=transaction_reference
+            transaction_reference=transaction_reference,
+            currency_code=code,
+            currency_symbol=symbol,
+            currency_name=currency_names[code],
         )
 
-    return render_template(
-        "admin_fund_customer.html",
-        admin=admin,
-        customers=customers
-    )
-
-
-# FAIRMont_ADMIN_INCOMING_ENDPOINT_FIX
-#
-# Explicitly register the existing admin incoming-payment function
-# under the endpoint name used by admin_dashboard.html.
-#
-# This repairs the endpoint without changing the existing payment
-# processing logic.
-
-if "admin_incoming_payment" not in app.view_functions:
-
-    app.add_url_rule(
-        "/admin/incoming-payment",
-        endpoint="admin_incoming_payment",
-        view_func=admin_incoming_payment,
-        methods=["GET", "POST"]
-    )
+    return render_funding_form()
 
 
 def ensure_bank_invoice_schema():
@@ -10528,6 +10677,39 @@ def ensure_external_transfer_schema():
                 )
 
 
+def ensure_customer_application_schema():
+    """Idempotently add onboarding/KYC columns to existing customer tables."""
+    from sqlalchemy import inspect, text
+    db.create_all()
+    inspector = inspect(db.engine)
+    if "customer" not in inspector.get_table_names():
+        return
+    existing = {col["name"] for col in inspector.get_columns("customer")}
+    missing = {
+        "birth_date": "VARCHAR(20)",
+        "nationality": "VARCHAR(100)",
+        "residential_address": "VARCHAR(255)",
+        "postal_code": "VARCHAR(30)",
+        "occupation": "VARCHAR(120)",
+        "source_of_funds": "VARCHAR(120)",
+        "account_currency": "VARCHAR(3) NOT NULL DEFAULT 'GBP'",
+        "id_document_type": "VARCHAR(40)",
+        "id_document_number": "VARCHAR(100)",
+        "id_issuing_country": "VARCHAR(100)",
+        "id_expiry_date": "VARCHAR(20)",
+        "id_front_filename": "VARCHAR(255)",
+        "id_back_filename": "VARCHAR(255)",
+        "application_submitted_at": "TIMESTAMP",
+        "application_reviewed_at": "TIMESTAMP",
+        "application_reviewed_by": "VARCHAR(80)",
+        "application_review_note": "TEXT",
+    }
+    with db.engine.begin() as conn:
+        for name, sql_type in missing.items():
+            if name not in existing:
+                conn.execute(text(f'ALTER TABLE customer ADD COLUMN "{name}" {sql_type}'))
+
+
 # Initialize missing database tables after every SQLAlchemy model has been
 # declared. Render starts this application with Gunicorn, which imports app.py
 # without executing the __main__ block. create_all() creates missing tables
@@ -10536,6 +10718,7 @@ def ensure_external_transfer_schema():
 try:
     with app.app_context():
         db.create_all()
+        ensure_customer_application_schema()
         ensure_payment_approvals_schema()
         ensure_external_transfer_schema()
         from sqlalchemy import inspect
@@ -10559,6 +10742,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         ensure_bank_invoice_schema()
+        ensure_customer_application_schema()
         ensure_account_preference_columns()
         ensure_virtual_card_security_code_column()
         ensure_live_chat_guest_column()

@@ -380,7 +380,7 @@
             </div>
 
             <div class="amount">
-                £{{ "{:,.2f}".format(amount|float) }}
+                {{ currency_symbol }}{{ "{:,.2f}".format(amount|float) }} {{ currency_code }}
             </div>
 
             <div class="amount-type">
@@ -577,7 +577,7 @@
                         </div>
 
                         <div class="balance-value">
-                            £{{ "{:,.2f}".format(previous_balance|float) }}
+                            {{ currency_symbol }}{{ "{:,.2f}".format(previous_balance|float) }} {{ currency_code }}
                         </div>
 
                     </div>
@@ -593,7 +593,7 @@
                         </div>
 
                         <div class="balance-value">
-                            £{{ "{:,.2f}".format(new_balance|float) }}
+                            {{ currency_symbol }}{{ "{:,.2f}".format(new_balance|float) }} {{ currency_code }}
                         </div>
 
                     </div>

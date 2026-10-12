@@ -693,6 +693,9 @@
                         <th>
                             Account Type
                         </th>
+                        <th>
+                            Base Currency
+                        </th>
 
                         <th>
                             Country
@@ -770,6 +773,11 @@
                         </td>
 
 
+                        <!-- BASE CURRENCY -->
+                        <td>
+                            {{ customer.account_currency or "GBP" }}
+                        </td>
+
                         <!-- COUNTRY -->
                         <td>
                             {{ customer.country|title }}
@@ -792,7 +800,8 @@
                         <td>
 
                             <span class="balance">
-                                £{{ "%.2f"|format(customer.account_balance or 0) }}
+                                {% set currency = customer.account_currency or "GBP" %}
+                                {% if currency == "USD" %}${% elif currency == "EUR" %}€{% else %}£{% endif %}{{ "%.2f"|format(customer.account_balance or 0) }}
                             </span>
 
                         </td>
@@ -881,10 +890,10 @@
                                     </form>
 
 
-                                    <!-- REVIEW -->
+                                    <!-- REVIEW APPLICATION -->
                                     <a
                                         href="{{ url_for(
-                                            'admin_customer_profile',
+                                            'admin_application_review',
                                             customer_id=customer.id
                                         ) }}"
                                         class="action-btn view">

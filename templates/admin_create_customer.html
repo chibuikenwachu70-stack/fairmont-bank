@@ -418,6 +418,50 @@
 
                     </div>
 
+                    <div class="field">
+                        <label for="birth_date">Date of Birth</label>
+                        <input type="date" id="birth_date" name="birth_date" value="{{ form_data.get('birth_date', '') }}">
+                    </div>
+
+                    <div class="field">
+                        <label for="nationality">Nationality</label>
+                        <input type="text" id="nationality" name="nationality" maxlength="100" value="{{ form_data.get('nationality', '') }}">
+                    </div>
+
+                    <div class="field full">
+                        <label for="residential_address">Residential Address</label>
+                        <textarea id="residential_address" name="residential_address" rows="2" maxlength="255">{{ form_data.get('residential_address', '') }}</textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="postal_code">Postal / ZIP Code</label>
+                        <input type="text" id="postal_code" name="postal_code" maxlength="30" value="{{ form_data.get('postal_code', '') }}">
+                    </div>
+
+                    <div class="field">
+                        <label for="occupation">Occupation</label>
+                        <input type="text" id="occupation" name="occupation" maxlength="120" value="{{ form_data.get('occupation', '') }}">
+                    </div>
+
+                    <div class="field">
+                        <label for="source_of_funds">Source of Funds</label>
+                        <select id="source_of_funds" name="source_of_funds">
+                            <option value="">Select source</option>
+                            {% for source in ['Employment', 'Business', 'Savings', 'Investment', 'Pension', 'Family Support', 'Other'] %}
+                            <option value="{{ source }}" {% if form_data.get('source_of_funds') == source %}selected{% endif %}>{{ source }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="account_currency">Account Currency</label>
+                        <select id="account_currency" name="account_currency" required>
+                            <option value="GBP" {% if form_data.get('account_currency', 'GBP') == 'GBP' %}selected{% endif %}>GBP — Pound Sterling (£)</option>
+                            <option value="USD" {% if form_data.get('account_currency') == 'USD' %}selected{% endif %}>USD — US Dollar ($)</option>
+                            <option value="EUR" {% if form_data.get('account_currency') == 'EUR' %}selected{% endif %}>EUR — Euro (€)</option>
+                        </select>
+                    </div>
+
                 </div>
 
             </div>
@@ -489,7 +533,7 @@
                         <div class="field">
 
                             <label for="initial_funding">
-                                Initial Funding Amount (£)
+                                Initial Funding Amount (<span id="currency-symbol">£</span>)
                             </label>
 
                             <input
@@ -567,5 +611,17 @@
 
 </div>
 
+<script>
+(function () {
+    const currency = document.getElementById('account_currency');
+    const symbol = document.getElementById('currency-symbol');
+    const symbols = { GBP: '£', USD: '$', EUR: '€' };
+    function updateCurrencySymbol() {
+        if (currency && symbol) symbol.textContent = symbols[currency.value] || currency.value;
+    }
+    if (currency) currency.addEventListener('change', updateCurrencySymbol);
+    updateCurrencySymbol();
+})();
+</script>
 </body>
 </html>

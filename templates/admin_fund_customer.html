@@ -1,3 +1,4 @@
+{% set currency_symbols = {'GBP': '£', 'USD': '$', 'EUR': '€'} %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -335,10 +336,13 @@
                             {% for customer in customers %}
 
                             <option
-                                value="{{ customer.customer_id }}"
+                                value="{{ customer.customer_id }}" {% if customer.customer_id == selected_customer_id %}selected{% endif %}
                             >
                                 {{ customer.full_name }}
                                 — {{ customer.customer_id }}
+                                — {{ customer.account_type|title }}
+                                — {{ (customer.account_currency or 'GBP')|upper }}
+                                — {{ currency_symbols.get((customer.account_currency or 'GBP')|upper, '£') }}{{ "{:,.2f}".format(customer.account_balance or 0) }}
                                 {% if customer.account_number %}
                                     — Account {{ customer.account_number }}
                                 {% endif %}
@@ -367,9 +371,7 @@
 
                     <div class="field">
 
-                        <label for="amount">
-                            Funding Amount
-                        </label>
+                        <label for="amount">Funding Amount (<span id="fundingCurrencyCode">Select a customer</span>)</label>
 
                         <input
                             type="number"
@@ -379,7 +381,7 @@
                             step="0.01"
                             placeholder="0.00"
                             required
-                        >
+                         min="0.01" step="0.01">
 
                         <div class="hint">
                             Enter the amount to add to the current balance.
@@ -445,6 +447,29 @@
     </div>
 
 </div>
+
+
+<script>
+(function () {
+    const customerSelect = document.getElementById("customer_id");
+    const currencyCode = document.getElementById("fundingCurrencyCode");
+    const amountInput = document.getElementById("amount");
+    if (!customerSelect) return;
+
+    const symbols = { GBP: "£", USD: "$", EUR: "€" };
+
+    function updateFundingCurrency() {
+        const option = customerSelect.options[customerSelect.selectedIndex];
+        const match = option ? option.textContent.match(/—\s*(GBP|USD|EUR)\s*—/) : null;
+        const code = match ? match[1] : "";
+        if (currencyCode) currencyCode.textContent = code || "Select a customer";
+        if (amountInput) amountInput.placeholder = code ? (symbols[code] + " 0.00") : "Select a customer first";
+    }
+
+    customerSelect.addEventListener("change", updateFundingCurrency);
+    updateFundingCurrency();
+})();
+</script>
 
 </body>
 </html>

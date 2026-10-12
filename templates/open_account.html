@@ -189,6 +189,12 @@
             color: #9aa4b2;
         }
 
+        .form-group input[type="file"] {
+            min-height: auto;
+            padding: 12px;
+            background: #ffffff;
+        }
+
         .form-group input:focus,
         .form-group select:focus {
             border-color: #b58a35;
@@ -395,7 +401,7 @@
 
         </section>
 
-        <form class="account-form" method="POST" action="/open-account">
+        <form class="account-form" method="POST" action="{{ url_for('open_account') }}" enctype="multipart/form-data">
 
             <div class="form-section-title">
                 Personal information
@@ -437,6 +443,45 @@
                     required>
             </div>
 
+            <div class="form-group">
+                <label for="birth-date">Date of birth</label>
+                <input type="date" id="birth-date" name="birth_date" autocomplete="bday" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nationality">Nationality</label>
+                <input type="text" id="nationality" name="nationality" placeholder="Enter your nationality" required>
+            </div>
+
+            <div class="form-group">
+                <label for="residential-address">Residential address</label>
+                <input type="text" id="residential-address" name="residential_address" placeholder="Street, building and town/city" autocomplete="street-address" required>
+            </div>
+
+            <div class="form-group">
+                <label for="postal-code">Postal code (if applicable)</label>
+                <input type="text" id="postal-code" name="postal_code" placeholder="Enter postal code">
+            </div>
+
+            <div class="form-group">
+                <label for="occupation">Occupation</label>
+                <input type="text" id="occupation" name="occupation" placeholder="Your occupation or profession" required>
+            </div>
+
+            <div class="form-group">
+                <label for="source-of-funds">Main source of funds</label>
+                <select id="source-of-funds" name="source_of_funds" required>
+                    <option value="" selected disabled>Select source of funds</option>
+                    <option value="Employment">Employment / salary</option>
+                    <option value="Business">Business income</option>
+                    <option value="Self-employment">Self-employment</option>
+                    <option value="Savings">Personal savings</option>
+                    <option value="Investments">Investments</option>
+                    <option value="Pension">Pension</option>
+                    <option value="Other">Other lawful source</option>
+                </select>
+            </div>
+
             <div class="form-section-title">
                 Account details
             </div>
@@ -469,6 +514,16 @@
             </div>
 
             <div class="form-group">
+                <label for="account-currency">Account currency</label>
+                <select id="account-currency" name="account_currency" required>
+                    <option value="" selected disabled>Choose your account currency</option>
+                    <option value="GBP">GBP — Pound Sterling (£)</option>
+                    <option value="EUR">EUR — Euro (€)</option>
+                    <option value="USD">USD — US Dollar ($)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="country">Country of residence</label>
 
                 <input
@@ -478,6 +533,44 @@
                     placeholder="Enter your country"
                     autocomplete="country-name"
                     required>
+            </div>
+
+            <div class="form-section-title">
+                Identity verification
+            </div>
+
+            <div class="form-group">
+                <label for="id-document-type">Identity document type</label>
+                <select id="id-document-type" name="id_document_type" required>
+                    <option value="" selected disabled>Select document type</option>
+                    <option value="National ID">National identity card</option>
+                    <option value="Passport">Passport</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="id-document-number">Document number</label>
+                <input type="text" id="id-document-number" name="id_document_number" autocomplete="off" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id-issuing-country">Issuing country</label>
+                <input type="text" id="id-issuing-country" name="id_issuing_country" placeholder="Country that issued the document" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id-expiry-date">Document expiry date (if applicable)</label>
+                <input type="date" id="id-expiry-date" name="id_expiry_date">
+            </div>
+
+            <div class="form-group">
+                <label for="id-front">Front of national ID / passport identity page (PNG, JPG, WEBP or PDF; max 8 MB total)</label>
+                <input type="file" id="id-front" name="id_front" accept=".png,.jpg,.jpeg,.webp,.pdf" required>
+            </div>
+
+            <div class="form-group" id="id-back-group">
+                <label for="id-back">Back of national ID (required for national ID; leave empty for passport)</label>
+                <input type="file" id="id-back" name="id_back" accept=".png,.jpg,.jpeg,.webp,.pdf">
             </div>
 
             <div class="form-section-title">
@@ -520,7 +613,7 @@
                     required>
 
                 <span>
-                    I confirm that the information provided is accurate and I agree to Fairmont Bank's account terms and privacy policy.
+                    I confirm the information is accurate, consent to the secure review of my identity documents for this application, and agree to the account terms and privacy notice.
                 </span>
 
             </label>
@@ -558,6 +651,19 @@
 </main>
 
 <script>
+const idType = document.getElementById("id-document-type");
+const idBack = document.getElementById("id-back");
+function updateIdBackRequirement() {
+    if (!idType || !idBack) return;
+    const nationalId = idType.value === "National ID";
+    idBack.required = nationalId;
+    document.getElementById("id-back-group").style.display = nationalId ? "block" : "none";
+}
+if (idType) {
+    idType.addEventListener("change", updateIdBackRequirement);
+    updateIdBackRequirement();
+}
+
 function toggleAccountPassword() {
 
     const password = document.getElementById("password");

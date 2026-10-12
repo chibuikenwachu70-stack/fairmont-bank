@@ -175,6 +175,14 @@
 </head>
 
 <body>
+{% set account_currency = (customer.account_currency or "GBP")|upper %}
+{% set account_currency_symbol = {
+    "GBP": "£", "USD": "$", "EUR": "€", "KES": "KSh",
+    "NGN": "₦", "INR": "₹", "JPY": "¥", "CAD": "C$",
+    "AUD": "A$", "CHF": "CHF ", "ZAR": "R", "GHS": "GH₵",
+    "UGX": "USh", "TZS": "TSh", "AED": "د.إ "
+}.get(account_currency, account_currency + " ") %}
+
 
 <div class="wrap">
 
@@ -208,10 +216,15 @@
             {% endwith %}
 
             <div class="balance">
-                <span>Available balance</span>
+                <span>Available balance ({{ (customer.account_currency or "GBP")|upper }})</span>
 
                 <strong>
-                    £{{ "%.2f"|format(customer.account_balance or 0) }}
+                    {{ {
+                        "GBP": "£", "USD": "$", "EUR": "€", "KES": "KSh",
+                        "NGN": "₦", "INR": "₹", "JPY": "¥", "CAD": "C$",
+                        "AUD": "A$", "CHF": "CHF ", "ZAR": "R", "GHS": "GH₵",
+                        "UGX": "USh", "TZS": "TSh", "AED": "د.إ "
+                    }.get((customer.account_currency or "GBP")|upper, (customer.account_currency or "GBP")|upper ~ " ") }}{{ "%.2f"|format(customer.account_balance or 0) }}
                 </strong>
             </div>
 
@@ -232,7 +245,7 @@
                 >
 
                 <label for="amount">
-                    Withdrawal amount
+                    Withdrawal amount ({{ (customer.account_currency or "GBP")|upper }})
                 </label>
 
                 <input
