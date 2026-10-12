@@ -117,7 +117,8 @@
         /* Virtual ATM card */
         .virtual-card-section{margin-top:14px!important}
         .virtual-card{
-            position:relative;overflow:hidden;min-height:218px;padding:24px;border-radius:22px;
+            position:relative;overflow:hidden;width:min(420px,100%);aspect-ratio:1.586 / 1;
+            min-height:0;padding:22px;box-sizing:border-box;border-radius:20px;
             color:#fff;background:linear-gradient(135deg,#17365f 0%,#245c96 52%,#102844 100%);
             box-shadow:0 14px 32px rgba(12,35,66,.24)
         }
@@ -133,12 +134,13 @@
         .virtual-card-brand{font-size:13px;font-weight:800;letter-spacing:1.4px}
         .virtual-card-type{font-size:10px;font-weight:700;letter-spacing:1px;opacity:.82}
         .virtual-card-chip{
-            position:relative;z-index:1;width:44px;height:32px;margin:27px 0 17px;
+            position:relative;z-index:1;width:42px;height:29px;margin:20px 0 13px;
             border-radius:7px;background:linear-gradient(135deg,#d8bd70,#f0df9c)
         }
         .virtual-card-number{
-            position:relative;z-index:1;margin-bottom:20px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-            font-size:20px;letter-spacing:2px;word-spacing:4px
+            position:relative;z-index:1;margin-bottom:16px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+            font-size:clamp(14px,3.5vw,17px);letter-spacing:1.2px;word-spacing:3px;
+            overflow-wrap:anywhere
         }
         .virtual-card-bottom{justify-content:flex-start;flex-wrap:wrap}
         .virtual-card-bottom>div{display:flex;flex-direction:column;gap:4px;margin-right:28px}
@@ -146,7 +148,7 @@
         .virtual-card-bottom strong{font-size:11px;font-weight:700;white-space:nowrap}
         .virtual-card-security{
             position:relative;z-index:2;display:flex;align-items:center;gap:8px;
-            margin-top:14px;font-size:11px
+            margin-top:10px;font-size:11px
         }
         .virtual-card-security-code{
             min-width:42px;padding:5px 8px;border-radius:7px;
@@ -187,9 +189,10 @@
             .recent-activity-item{padding:12px;gap:10px}
             .recent-activity-icon{width:36px;height:36px;min-width:36px}
             .recent-activity-amount{font-size:12px}
-            .virtual-card{padding:20px;min-height:220px}
-            .virtual-card-number{font-size:16px;letter-spacing:1.5px}
-            .virtual-card-bottom>div{margin-right:15px}
+            .virtual-card{padding:17px}
+            .virtual-card-number{font-size:clamp(12px,3.6vw,16px);letter-spacing:1px}
+            .virtual-card-bottom>div{margin-right:12px}
+            .virtual-card-bottom strong{font-size:10px}
             .virtual-card-empty{align-items:flex-start;flex-wrap:wrap}
             .virtual-card-empty-content{min-width:calc(100% - 64px)}
             .virtual-card-button{width:100%;margin-left:64px}
@@ -222,7 +225,8 @@
   #servicesScroll .service-icon { flex:0 0 auto; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:20px; }
   .virtual-card-section { margin-top:14px !important; }
   .virtual-card-section .section-heading { margin:0 0 10px; }
-  .virtual-card-section .virtual-card, .virtual-card-section .virtual-card-empty { min-height:0; }
+  .virtual-card-section .virtual-card { width:min(420px,100%); aspect-ratio:1.586 / 1; min-height:0; box-sizing:border-box; }
+  .virtual-card-section .virtual-card-empty { min-height:0; }
   .recent-activity-list { display:flex; flex-direction:column; gap:10px; }
   .recent-activity-item { width:100%; box-sizing:border-box; padding:13px 16px; }
   .recent-activity-main { min-width:0; }
@@ -444,8 +448,8 @@
 
             <div class="virtual-card-security">
                 <span class="virtual-card-label">SECURITY CODE</span>
-                <span class="virtual-card-security-code">
-                    {{ virtual_card.security_code }}
+                <span class="virtual-card-security-code" aria-label="Security code hidden">
+                    •••
                 </span>
             </div>
 
