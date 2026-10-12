@@ -1,100 +1,738 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bank Account Withdrawal</title>
-    <style>
-        *{box-sizing:border-box}
-        body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fb;color:#182230}
-        .wrap{max-width:720px;margin:0 auto;padding:28px 18px 50px}
-        .back{display:inline-block;margin-bottom:20px;color:#40556f;text-decoration:none;font-weight:600}
-        .card{background:#fff;border:1px solid #e3e9f1;border-radius:20px;box-shadow:0 10px 30px rgba(20,40,70,.08);overflow:hidden}
-        .head{padding:28px 28px 22px;border-bottom:1px solid #edf1f5}
-        .icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#eef5ff;color:#2367c8;font-size:25px;margin-bottom:14px}
-        h1{margin:0 0 8px;font-size:26px}
-        .sub{margin:0;color:#66758a;line-height:1.5}
-        .body{padding:28px}
-        .balance{padding:15px 16px;margin-bottom:22px;background:#f7f9fc;border:1px solid #e7edf4;border-radius:12px}
-        .balance span{display:block;color:#718096;font-size:13px;margin-bottom:4px}
-        .balance strong{font-size:21px}
-        label{display:block;font-size:14px;font-weight:700;margin:17px 0 7px}
-        input{width:100%;padding:13px 14px;border:1px solid #cfd8e3;border-radius:10px;font-size:15px;outline:none}
-        input:focus{border-color:#3779d3;box-shadow:0 0 0 3px rgba(55,121,211,.10)}
-        button{width:100%;margin-top:24px;padding:14px 18px;border:0;border-radius:11px;background:#2367c8;color:white;font-size:15px;font-weight:700;cursor:pointer}
-        button:hover{background:#1d58aa}
-        .notice{margin-top:17px;padding:13px 14px;border-radius:10px;background:#f8fafc;color:#66758a;font-size:12px;line-height:1.5}
-        .flash{margin-bottom:16px;padding:13px 14px;border-radius:10px;font-size:14px}
-        .flash.error{background:#fff1f1;color:#a12626;border:1px solid #f2cccc}
-        .flash.success{background:#effaf3;color:#176b3a;border:1px solid #ccebd7}
-        @media(max-width:560px){.head,.body{padding:22px}}
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>International Bank Withdrawal | Fairmont Bank</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top right,rgba(42,90,150,.28),transparent 35%),linear-gradient(145deg,#06111f,#0a1727 55%,#071321);color:#eef5ff;padding:20px}
+.wrap{width:100%;max-width:760px;margin:0 auto;padding:0 0 36px}
+.back{display:inline-block;margin:0 0 18px;color:#b8d5ff;text-decoration:none;font-size:14px}
+.card{background:rgba(10,25,43,.9);color:#eef5ff;border:1px solid rgba(255,255,255,.09);border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.32);overflow:hidden}
+.head{padding:24px 24px 18px;background:transparent;color:white}
+.icon{display:none}
+h1{margin:0 0 8px;font-size:27px}.sub{margin:0;color:#91a8c3;line-height:1.5;font-size:14px}
+.body{padding:0 24px 24px}
+.balance{padding:15px 17px;margin-bottom:22px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);border-radius:16px}
+.balance span{display:block;color:#8da6c2;font-size:12px;margin-bottom:5px}.balance strong{font-size:21px;color:#eef5ff}
+label{display:block;font-size:12px;font-weight:600;margin:16px 0 7px;color:#9eb4cc}
+input,select,textarea{width:100%;padding:13px 14px;border:1px solid rgba(255,255,255,.09);border-radius:13px;font:inherit;font-size:14px;background:rgba(3,12,22,.68);color:#f1f6ff;outline:none}
+input::placeholder,textarea::placeholder{color:#7389a2}
+input:focus,select:focus,textarea:focus{border-color:rgba(103,169,255,.62);box-shadow:0 0 0 3px rgba(68,133,207,.12)}
+select option{background:#0b1a2d;color:#eef5ff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.hint{font-size:12px;color:#91a8c3;line-height:1.5;margin-top:6px}
+.button{width:100%;margin-top:24px;padding:15px;border:0;border-radius:14px;background:linear-gradient(135deg,#2f73c7,#3c8ce0);color:white;font-size:15px;font-weight:700;cursor:pointer}.button:hover{filter:brightness(1.08)}
+.notice{margin-top:17px;padding:13px 14px;border-radius:13px;background:rgba(52,105,166,.09);color:#8fa9c5;font-size:12px;line-height:1.6;border:1px solid rgba(91,157,224,.12)}
+.flash{margin-bottom:14px;padding:12px 14px;border-radius:12px;font-size:13px;background:rgba(173,61,61,.15);border:1px solid rgba(229,100,100,.25);color:#ffc2c2}
+.hidden-select{display:none!important}
+.picker-trigger{width:100%;min-height:47px;border:1px solid rgba(255,255,255,.09);background:rgba(3,12,22,.68);color:#f1f6ff;border-radius:13px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;text-align:left;font-size:14px}
+.picker-trigger:hover{border-color:rgba(103,169,255,.5)}.picker-placeholder{color:#7389a2}.picker-arrow{color:#8ba6c4;font-size:12px}
+.picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px}
+.picker-overlay.open{display:flex}.picker-modal{width:100%;max-width:480px;max-height:min(650px,calc(100vh - 40px));background:#0b1a2d;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);display:flex;flex-direction:column}
+.picker-header{flex:0 0 auto;padding:16px;background:#0b1a2d;border-bottom:1px solid rgba(255,255,255,.08)}
+.picker-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.picker-title{font-size:16px;font-weight:700}
+.picker-close{width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:#d6e4f5;cursor:pointer;font-size:18px}
+.picker-search{width:100%;height:45px;margin:0;background:rgba(0,0,0,.28)}.picker-options{flex:1 1 auto;min-height:0;overflow-y:auto;padding:7px;scrollbar-width:thin}
+.picker-option{width:100%;padding:13px 14px;border:0;border-radius:11px;background:transparent;color:#dce9f8;text-align:left;cursor:pointer;font-size:14px}
+.picker-option:hover{background:rgba(67,133,204,.16)}.picker-option.selected{background:rgba(67,133,204,.22);color:white}
+.empty-option{padding:18px 14px;color:#758ba4;text-align:center;font-size:13px}
+@media(max-width:650px){body{padding:12px}.head,.body{padding-left:18px;padding-right:18px}.grid{grid-template-columns:1fr;gap:0}h1{font-size:24px}.picker-overlay{padding:12px}.picker-modal{max-height:calc(100vh - 24px)}}
+</style>
 </head>
-<body>
-<div class="wrap">
-    <a class="back" href="{{ url_for('withdraw') }}">← Back to withdrawal methods</a>
+<body><div class="wrap">
+<a class="back" href="{{ url_for('withdraw') }}">← Back to withdrawal methods</a>
+<div class="card">
+<div class="head"><div class="icon">🏦</div><h1>Withdraw to Bank Account</h1>
+<p class="sub">Enter the destination bank details to submit an international bank withdrawal request.</p></div>
+<div class="body">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}
+{% endwith %}
+<div class="balance"><span>Available balance</span><strong>£{{ "%.2f"|format(customer.account_balance or 0) }}</strong></div>
+<form method="POST" action="{{ url_for('withdraw_bank') }}">
+<label>Destination country</label>
+<button type="button" class="picker-trigger" data-picker="country" id="countryTrigger"><span id="countryDisplay" class="picker-placeholder">Select country</span><span class="picker-arrow">▼</span></button>
+<select id="bank_country" name="bank_country" class="hidden-select" required>
+<option value="">Choose a country</option>
 
-    <div class="card">
-        <div class="head">
-            <div class="icon">🏦</div>
-            <h1>Withdraw to Bank Account</h1>
-            <p class="sub">Enter the bank account details and amount for your withdrawal request.</p>
-        </div>
+<option value="Afghanistan">Afghanistan</option>
+<option value="Albania">Albania</option>
+<option value="Algeria">Algeria</option>
+<option value="American Samoa">American Samoa</option>
+<option value="Andorra">Andorra</option>
+<option value="Angola">Angola</option>
+<option value="Anguilla">Anguilla</option>
+<option value="Antarctica">Antarctica</option>
+<option value="Antigua and Barbuda">Antigua and Barbuda</option>
+<option value="Argentina">Argentina</option>
+<option value="Armenia">Armenia</option>
+<option value="Aruba">Aruba</option>
+<option value="Australia">Australia</option>
+<option value="Austria">Austria</option>
+<option value="Azerbaijan">Azerbaijan</option>
+<option value="Bahamas">Bahamas</option>
+<option value="Bahrain">Bahrain</option>
+<option value="Bangladesh">Bangladesh</option>
+<option value="Barbados">Barbados</option>
+<option value="Belarus">Belarus</option>
+<option value="Belgium">Belgium</option>
+<option value="Belize">Belize</option>
+<option value="Benin">Benin</option>
+<option value="Bermuda">Bermuda</option>
+<option value="Bhutan">Bhutan</option>
+<option value="Bolivia, Plurinational State of">Bolivia, Plurinational State of</option>
+<option value="Bonaire, Sint Eustatius and Saba">Bonaire, Sint Eustatius and Saba</option>
+<option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+<option value="Botswana">Botswana</option>
+<option value="Bouvet Island">Bouvet Island</option>
+<option value="Brazil">Brazil</option>
+<option value="British Indian Ocean Territory">British Indian Ocean Territory</option>
+<option value="Brunei Darussalam">Brunei Darussalam</option>
+<option value="Bulgaria">Bulgaria</option>
+<option value="Burkina Faso">Burkina Faso</option>
+<option value="Burundi">Burundi</option>
+<option value="Cabo Verde">Cabo Verde</option>
+<option value="Cambodia">Cambodia</option>
+<option value="Cameroon">Cameroon</option>
+<option value="Canada">Canada</option>
+<option value="Cayman Islands">Cayman Islands</option>
+<option value="Central African Republic">Central African Republic</option>
+<option value="Chad">Chad</option>
+<option value="Chile">Chile</option>
+<option value="China">China</option>
+<option value="Christmas Island">Christmas Island</option>
+<option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option>
+<option value="Colombia">Colombia</option>
+<option value="Comoros">Comoros</option>
+<option value="Congo">Congo</option>
+<option value="Congo, The Democratic Republic of the">Congo, The Democratic Republic of the</option>
+<option value="Cook Islands">Cook Islands</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Croatia">Croatia</option>
+<option value="Cuba">Cuba</option>
+<option value="Curaçao">Curaçao</option>
+<option value="Cyprus">Cyprus</option>
+<option value="Czechia">Czechia</option>
+<option value="Côte d&#x27;Ivoire">Côte d&#x27;Ivoire</option>
+<option value="Denmark">Denmark</option>
+<option value="Djibouti">Djibouti</option>
+<option value="Dominica">Dominica</option>
+<option value="Dominican Republic">Dominican Republic</option>
+<option value="Ecuador">Ecuador</option>
+<option value="Egypt">Egypt</option>
+<option value="El Salvador">El Salvador</option>
+<option value="Equatorial Guinea">Equatorial Guinea</option>
+<option value="Eritrea">Eritrea</option>
+<option value="Estonia">Estonia</option>
+<option value="Eswatini">Eswatini</option>
+<option value="Ethiopia">Ethiopia</option>
+<option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option>
+<option value="Faroe Islands">Faroe Islands</option>
+<option value="Fiji">Fiji</option>
+<option value="Finland">Finland</option>
+<option value="France">France</option>
+<option value="French Guiana">French Guiana</option>
+<option value="French Polynesia">French Polynesia</option>
+<option value="French Southern Territories">French Southern Territories</option>
+<option value="Gabon">Gabon</option>
+<option value="Gambia">Gambia</option>
+<option value="Georgia">Georgia</option>
+<option value="Germany">Germany</option>
+<option value="Ghana">Ghana</option>
+<option value="Gibraltar">Gibraltar</option>
+<option value="Greece">Greece</option>
+<option value="Greenland">Greenland</option>
+<option value="Grenada">Grenada</option>
+<option value="Guadeloupe">Guadeloupe</option>
+<option value="Guam">Guam</option>
+<option value="Guatemala">Guatemala</option>
+<option value="Guernsey">Guernsey</option>
+<option value="Guinea">Guinea</option>
+<option value="Guinea-Bissau">Guinea-Bissau</option>
+<option value="Guyana">Guyana</option>
+<option value="Haiti">Haiti</option>
+<option value="Heard Island and McDonald Islands">Heard Island and McDonald Islands</option>
+<option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option>
+<option value="Honduras">Honduras</option>
+<option value="Hong Kong">Hong Kong</option>
+<option value="Hungary">Hungary</option>
+<option value="Iceland">Iceland</option>
+<option value="India">India</option>
+<option value="Indonesia">Indonesia</option>
+<option value="Iran, Islamic Republic of">Iran, Islamic Republic of</option>
+<option value="Iraq">Iraq</option>
+<option value="Ireland">Ireland</option>
+<option value="Isle of Man">Isle of Man</option>
+<option value="Israel">Israel</option>
+<option value="Italy">Italy</option>
+<option value="Jamaica">Jamaica</option>
+<option value="Japan">Japan</option>
+<option value="Jersey">Jersey</option>
+<option value="Jordan">Jordan</option>
+<option value="Kazakhstan">Kazakhstan</option>
+<option value="Kenya">Kenya</option>
+<option value="Kiribati">Kiribati</option>
+<option value="Korea, Democratic People&#x27;s Republic of">Korea, Democratic People&#x27;s Republic of</option>
+<option value="Korea, Republic of">Korea, Republic of</option>
+<option value="Kuwait">Kuwait</option>
+<option value="Kyrgyzstan">Kyrgyzstan</option>
+<option value="Lao People&#x27;s Democratic Republic">Lao People&#x27;s Democratic Republic</option>
+<option value="Latvia">Latvia</option>
+<option value="Lebanon">Lebanon</option>
+<option value="Lesotho">Lesotho</option>
+<option value="Liberia">Liberia</option>
+<option value="Libya">Libya</option>
+<option value="Liechtenstein">Liechtenstein</option>
+<option value="Lithuania">Lithuania</option>
+<option value="Luxembourg">Luxembourg</option>
+<option value="Macao">Macao</option>
+<option value="Madagascar">Madagascar</option>
+<option value="Malawi">Malawi</option>
+<option value="Malaysia">Malaysia</option>
+<option value="Maldives">Maldives</option>
+<option value="Mali">Mali</option>
+<option value="Malta">Malta</option>
+<option value="Marshall Islands">Marshall Islands</option>
+<option value="Martinique">Martinique</option>
+<option value="Mauritania">Mauritania</option>
+<option value="Mauritius">Mauritius</option>
+<option value="Mayotte">Mayotte</option>
+<option value="Mexico">Mexico</option>
+<option value="Micronesia, Federated States of">Micronesia, Federated States of</option>
+<option value="Moldova, Republic of">Moldova, Republic of</option>
+<option value="Monaco">Monaco</option>
+<option value="Mongolia">Mongolia</option>
+<option value="Montenegro">Montenegro</option>
+<option value="Montserrat">Montserrat</option>
+<option value="Morocco">Morocco</option>
+<option value="Mozambique">Mozambique</option>
+<option value="Myanmar">Myanmar</option>
+<option value="Namibia">Namibia</option>
+<option value="Nauru">Nauru</option>
+<option value="Nepal">Nepal</option>
+<option value="Netherlands">Netherlands</option>
+<option value="New Caledonia">New Caledonia</option>
+<option value="New Zealand">New Zealand</option>
+<option value="Nicaragua">Nicaragua</option>
+<option value="Niger">Niger</option>
+<option value="Nigeria">Nigeria</option>
+<option value="Niue">Niue</option>
+<option value="Norfolk Island">Norfolk Island</option>
+<option value="North Macedonia">North Macedonia</option>
+<option value="Northern Mariana Islands">Northern Mariana Islands</option>
+<option value="Norway">Norway</option>
+<option value="Oman">Oman</option>
+<option value="Pakistan">Pakistan</option>
+<option value="Palau">Palau</option>
+<option value="Palestine, State of">Palestine, State of</option>
+<option value="Panama">Panama</option>
+<option value="Papua New Guinea">Papua New Guinea</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Peru">Peru</option>
+<option value="Philippines">Philippines</option>
+<option value="Pitcairn">Pitcairn</option>
+<option value="Poland">Poland</option>
+<option value="Portugal">Portugal</option>
+<option value="Puerto Rico">Puerto Rico</option>
+<option value="Qatar">Qatar</option>
+<option value="Romania">Romania</option>
+<option value="Russian Federation">Russian Federation</option>
+<option value="Rwanda">Rwanda</option>
+<option value="Réunion">Réunion</option>
+<option value="Saint Barthélemy">Saint Barthélemy</option>
+<option value="Saint Helena, Ascension and Tristan da Cunha">Saint Helena, Ascension and Tristan da Cunha</option>
+<option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+<option value="Saint Lucia">Saint Lucia</option>
+<option value="Saint Martin (French part)">Saint Martin (French part)</option>
+<option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option>
+<option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
+<option value="Samoa">Samoa</option>
+<option value="San Marino">San Marino</option>
+<option value="Sao Tome and Principe">Sao Tome and Principe</option>
+<option value="Saudi Arabia">Saudi Arabia</option>
+<option value="Senegal">Senegal</option>
+<option value="Serbia">Serbia</option>
+<option value="Seychelles">Seychelles</option>
+<option value="Sierra Leone">Sierra Leone</option>
+<option value="Singapore">Singapore</option>
+<option value="Sint Maarten (Dutch part)">Sint Maarten (Dutch part)</option>
+<option value="Slovakia">Slovakia</option>
+<option value="Slovenia">Slovenia</option>
+<option value="Solomon Islands">Solomon Islands</option>
+<option value="Somalia">Somalia</option>
+<option value="South Africa">South Africa</option>
+<option value="South Georgia and the South Sandwich Islands">South Georgia and the South Sandwich Islands</option>
+<option value="South Sudan">South Sudan</option>
+<option value="Spain">Spain</option>
+<option value="Sri Lanka">Sri Lanka</option>
+<option value="Sudan">Sudan</option>
+<option value="Suriname">Suriname</option>
+<option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>
+<option value="Sweden">Sweden</option>
+<option value="Switzerland">Switzerland</option>
+<option value="Syrian Arab Republic">Syrian Arab Republic</option>
+<option value="Taiwan, Province of China">Taiwan, Province of China</option>
+<option value="Tajikistan">Tajikistan</option>
+<option value="Tanzania, United Republic of">Tanzania, United Republic of</option>
+<option value="Thailand">Thailand</option>
+<option value="Timor-Leste">Timor-Leste</option>
+<option value="Togo">Togo</option>
+<option value="Tokelau">Tokelau</option>
+<option value="Tonga">Tonga</option>
+<option value="Trinidad and Tobago">Trinidad and Tobago</option>
+<option value="Tunisia">Tunisia</option>
+<option value="Turkmenistan">Turkmenistan</option>
+<option value="Turks and Caicos Islands">Turks and Caicos Islands</option>
+<option value="Tuvalu">Tuvalu</option>
+<option value="Türkiye">Türkiye</option>
+<option value="Uganda">Uganda</option>
+<option value="Ukraine">Ukraine</option>
+<option value="United Arab Emirates">United Arab Emirates</option>
+<option value="United Kingdom">United Kingdom</option>
+<option value="United States">United States</option>
+<option value="United States Minor Outlying Islands">United States Minor Outlying Islands</option>
+<option value="Uruguay">Uruguay</option>
+<option value="Uzbekistan">Uzbekistan</option>
+<option value="Vanuatu">Vanuatu</option>
+<option value="Venezuela, Bolivarian Republic of">Venezuela, Bolivarian Republic of</option>
+<option value="Viet Nam">Viet Nam</option>
+<option value="Virgin Islands, British">Virgin Islands, British</option>
+<option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option>
+<option value="Wallis and Futuna">Wallis and Futuna</option>
+<option value="Western Sahara">Western Sahara</option>
+<option value="Yemen">Yemen</option>
+<option value="Zambia">Zambia</option>
+<option value="Zimbabwe">Zimbabwe</option>
+<option value="Åland Islands">Åland Islands</option>
 
-        <div class="body">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <div class="balance">
-                <span>Available balance</span>
-                <strong>£{{ "%.2f"|format(customer.account_balance or 0) }}</strong>
-            </div>
-
-            <form method="POST" action="{{ url_for('withdraw_bank') }}">
-                <label for="account_holder_name">Account holder name</label>
-                <input id="account_holder_name" name="account_holder_name" type="text"
-                       value="{{ request.form.get('account_holder_name','') }}"
-                       autocomplete="name" required>
-
-                <label for="bank_name">Bank name</label>
-                <input id="bank_name" name="bank_name" type="text"
-                       value="{{ request.form.get('bank_name','') }}"
-                       autocomplete="organization" required>
-
-                <label for="account_number">Account number</label>
-                <input id="account_number" name="account_number" type="text"
-                       value="{{ request.form.get('account_number','') }}"
-                       inputmode="numeric" autocomplete="off" required>
-
-                <label for="sort_code">Sort code / routing number</label>
-                <input id="sort_code" name="sort_code" type="text"
-                       value="{{ request.form.get('sort_code','') }}"
-                       autocomplete="off" required>
-
-                <label for="amount">Withdrawal amount</label>
-                <input id="amount" name="amount" type="number"
-                       min="0.01" step="0.01"
-                       value="{{ request.form.get('amount','') }}"
-                       inputmode="decimal" required>
-
-                <label for="reference">Reference <span style="font-weight:400;color:#78879a">(optional)</span></label>
-                <input id="reference" name="reference" type="text"
-                       value="{{ request.form.get('reference','') }}"
-                       maxlength="120">
-
-                <button type="submit">Submit Withdrawal Request</button>
-            </form>
-
-            <div class="notice">
-                Your request is submitted for review. The account balance is not reduced merely by submitting a pending request; processing is handled through the bank's approval workflow.
-            </div>
-        </div>
-    </div>
+</select>
+<label>Destination currency</label>
+<button type="button" class="picker-trigger" data-picker="currency" id="currencyTrigger"><span id="currencyDisplay" class="picker-placeholder">Select currency</span><span class="picker-arrow">▼</span></button>
+<select id="currency" name="currency" class="hidden-select" required>
+<option value="">Choose currency</option>
+<option value="AED" >AED — UAE Dirham</option>
+<option value="AFN" >AFN — Afghani</option>
+<option value="ALL" >ALL — Lek</option>
+<option value="AMD" >AMD — Armenian Dram</option>
+<option value="ANG" >ANG — Netherlands Antillean Guilder</option>
+<option value="AOA" >AOA — Kwanza</option>
+<option value="ARS" >ARS — Argentine Peso</option>
+<option value="AUD" >AUD — Australian Dollar</option>
+<option value="AWG" >AWG — Aruban Florin</option>
+<option value="AZN" >AZN — Azerbaijan Manat</option>
+<option value="BAM" >BAM — Convertible Mark</option>
+<option value="BBD" >BBD — Barbados Dollar</option>
+<option value="BDT" >BDT — Taka</option>
+<option value="BGN" >BGN — Bulgarian Lev</option>
+<option value="BHD" >BHD — Bahraini Dinar</option>
+<option value="BIF" >BIF — Burundi Franc</option>
+<option value="BMD" >BMD — Bermudian Dollar</option>
+<option value="BND" >BND — Brunei Dollar</option>
+<option value="BOB" >BOB — Boliviano</option>
+<option value="BOV" >BOV — Mvdol</option>
+<option value="BRL" >BRL — Brazilian Real</option>
+<option value="BSD" >BSD — Bahamian Dollar</option>
+<option value="BTN" >BTN — Ngultrum</option>
+<option value="BWP" >BWP — Pula</option>
+<option value="BYN" >BYN — Belarusian Ruble</option>
+<option value="BZD" >BZD — Belize Dollar</option>
+<option value="CAD" >CAD — Canadian Dollar</option>
+<option value="CDF" >CDF — Congolese Franc</option>
+<option value="CHE" >CHE — WIR Euro</option>
+<option value="CHF" >CHF — Swiss Franc</option>
+<option value="CHW" >CHW — WIR Franc</option>
+<option value="CLF" >CLF — Unidad de Fomento</option>
+<option value="CLP" >CLP — Chilean Peso</option>
+<option value="CNY" >CNY — Yuan Renminbi</option>
+<option value="COP" >COP — Colombian Peso</option>
+<option value="COU" >COU — Unidad de Valor Real</option>
+<option value="CRC" >CRC — Costa Rican Colon</option>
+<option value="CUC" >CUC — Peso Convertible</option>
+<option value="CUP" >CUP — Cuban Peso</option>
+<option value="CVE" >CVE — Cabo Verde Escudo</option>
+<option value="CZK" >CZK — Czech Koruna</option>
+<option value="DJF" >DJF — Djibouti Franc</option>
+<option value="DKK" >DKK — Danish Krone</option>
+<option value="DOP" >DOP — Dominican Peso</option>
+<option value="DZD" >DZD — Algerian Dinar</option>
+<option value="EGP" >EGP — Egyptian Pound</option>
+<option value="ERN" >ERN — Nakfa</option>
+<option value="ETB" >ETB — Ethiopian Birr</option>
+<option value="EUR" >EUR — Euro</option>
+<option value="FJD" >FJD — Fiji Dollar</option>
+<option value="FKP" >FKP — Falkland Islands Pound</option>
+<option value="GBP" {% if request.form.get("currency", "GBP") == "GBP" %}selected{% endif %}>GBP — Pound Sterling</option>
+<option value="GEL" >GEL — Lari</option>
+<option value="GHS" >GHS — Ghana Cedi</option>
+<option value="GIP" >GIP — Gibraltar Pound</option>
+<option value="GMD" >GMD — Dalasi</option>
+<option value="GNF" >GNF — Guinean Franc</option>
+<option value="GTQ" >GTQ — Quetzal</option>
+<option value="GYD" >GYD — Guyana Dollar</option>
+<option value="HKD" >HKD — Hong Kong Dollar</option>
+<option value="HNL" >HNL — Lempira</option>
+<option value="HRK" >HRK — Kuna</option>
+<option value="HTG" >HTG — Gourde</option>
+<option value="HUF" >HUF — Forint</option>
+<option value="IDR" >IDR — Rupiah</option>
+<option value="ILS" >ILS — New Israeli Sheqel</option>
+<option value="INR" >INR — Indian Rupee</option>
+<option value="IQD" >IQD — Iraqi Dinar</option>
+<option value="IRR" >IRR — Iranian Rial</option>
+<option value="ISK" >ISK — Iceland Krona</option>
+<option value="JMD" >JMD — Jamaican Dollar</option>
+<option value="JOD" >JOD — Jordanian Dinar</option>
+<option value="JPY" >JPY — Yen</option>
+<option value="KES" >KES — Kenyan Shilling</option>
+<option value="KGS" >KGS — Som</option>
+<option value="KHR" >KHR — Riel</option>
+<option value="KMF" >KMF — Comorian Franc</option>
+<option value="KPW" >KPW — North Korean Won</option>
+<option value="KRW" >KRW — Won</option>
+<option value="KWD" >KWD — Kuwaiti Dinar</option>
+<option value="KYD" >KYD — Cayman Islands Dollar</option>
+<option value="KZT" >KZT — Tenge</option>
+<option value="LAK" >LAK — Lao Kip</option>
+<option value="LBP" >LBP — Lebanese Pound</option>
+<option value="LKR" >LKR — Sri Lanka Rupee</option>
+<option value="LRD" >LRD — Liberian Dollar</option>
+<option value="LSL" >LSL — Loti</option>
+<option value="LYD" >LYD — Libyan Dinar</option>
+<option value="MAD" >MAD — Moroccan Dirham</option>
+<option value="MDL" >MDL — Moldovan Leu</option>
+<option value="MGA" >MGA — Malagasy Ariary</option>
+<option value="MKD" >MKD — Denar</option>
+<option value="MMK" >MMK — Kyat</option>
+<option value="MNT" >MNT — Tugrik</option>
+<option value="MOP" >MOP — Pataca</option>
+<option value="MRU" >MRU — Ouguiya</option>
+<option value="MUR" >MUR — Mauritius Rupee</option>
+<option value="MVR" >MVR — Rufiyaa</option>
+<option value="MWK" >MWK — Malawi Kwacha</option>
+<option value="MXN" >MXN — Mexican Peso</option>
+<option value="MXV" >MXV — Mexican Unidad de Inversion (UDI)</option>
+<option value="MYR" >MYR — Malaysian Ringgit</option>
+<option value="MZN" >MZN — Mozambique Metical</option>
+<option value="NAD" >NAD — Namibia Dollar</option>
+<option value="NGN" >NGN — Naira</option>
+<option value="NIO" >NIO — Cordoba Oro</option>
+<option value="NOK" >NOK — Norwegian Krone</option>
+<option value="NPR" >NPR — Nepalese Rupee</option>
+<option value="NZD" >NZD — New Zealand Dollar</option>
+<option value="OMR" >OMR — Rial Omani</option>
+<option value="PAB" >PAB — Balboa</option>
+<option value="PEN" >PEN — Sol</option>
+<option value="PGK" >PGK — Kina</option>
+<option value="PHP" >PHP — Philippine Peso</option>
+<option value="PKR" >PKR — Pakistan Rupee</option>
+<option value="PLN" >PLN — Zloty</option>
+<option value="PYG" >PYG — Guarani</option>
+<option value="QAR" >QAR — Qatari Rial</option>
+<option value="RON" >RON — Romanian Leu</option>
+<option value="RSD" >RSD — Serbian Dinar</option>
+<option value="RUB" >RUB — Russian Ruble</option>
+<option value="RWF" >RWF — Rwanda Franc</option>
+<option value="SAR" >SAR — Saudi Riyal</option>
+<option value="SBD" >SBD — Solomon Islands Dollar</option>
+<option value="SCR" >SCR — Seychelles Rupee</option>
+<option value="SDG" >SDG — Sudanese Pound</option>
+<option value="SEK" >SEK — Swedish Krona</option>
+<option value="SGD" >SGD — Singapore Dollar</option>
+<option value="SHP" >SHP — Saint Helena Pound</option>
+<option value="SLE" >SLE — Leone</option>
+<option value="SLL" >SLL — Leone</option>
+<option value="SOS" >SOS — Somali Shilling</option>
+<option value="SRD" >SRD — Surinam Dollar</option>
+<option value="SSP" >SSP — South Sudanese Pound</option>
+<option value="STN" >STN — Dobra</option>
+<option value="SVC" >SVC — El Salvador Colon</option>
+<option value="SYP" >SYP — Syrian Pound</option>
+<option value="SZL" >SZL — Lilangeni</option>
+<option value="THB" >THB — Baht</option>
+<option value="TJS" >TJS — Somoni</option>
+<option value="TMT" >TMT — Turkmenistan New Manat</option>
+<option value="TND" >TND — Tunisian Dinar</option>
+<option value="TOP" >TOP — Pa’anga</option>
+<option value="TRY" >TRY — Turkish Lira</option>
+<option value="TTD" >TTD — Trinidad and Tobago Dollar</option>
+<option value="TWD" >TWD — New Taiwan Dollar</option>
+<option value="TZS" >TZS — Tanzanian Shilling</option>
+<option value="UAH" >UAH — Hryvnia</option>
+<option value="UGX" >UGX — Uganda Shilling</option>
+<option value="USD" >USD — US Dollar</option>
+<option value="USN" >USN — US Dollar (Next day)</option>
+<option value="UYI" >UYI — Uruguay Peso en Unidades Indexadas (UI)</option>
+<option value="UYU" >UYU — Peso Uruguayo</option>
+<option value="UYW" >UYW — Unidad Previsional</option>
+<option value="UZS" >UZS — Uzbekistan Sum</option>
+<option value="VED" >VED — Bolívar Soberano</option>
+<option value="VES" >VES — Bolívar Soberano</option>
+<option value="VND" >VND — Dong</option>
+<option value="VUV" >VUV — Vatu</option>
+<option value="WST" >WST — Tala</option>
+<option value="XAF" >XAF — CFA Franc BEAC</option>
+<option value="XAG" >XAG — Silver</option>
+<option value="XAU" >XAU — Gold</option>
+<option value="XBA" >XBA — Bond Markets Unit European Composite Unit (EURCO)</option>
+<option value="XBB" >XBB — Bond Markets Unit European Monetary Unit (E.M.U.-6)</option>
+<option value="XBC" >XBC — Bond Markets Unit European Unit of Account 9 (E.U.A.-9)</option>
+<option value="XBD" >XBD — Bond Markets Unit European Unit of Account 17 (E.U.A.-17)</option>
+<option value="XCD" >XCD — East Caribbean Dollar</option>
+<option value="XDR" >XDR — SDR (Special Drawing Right)</option>
+<option value="XOF" >XOF — CFA Franc BCEAO</option>
+<option value="XPD" >XPD — Palladium</option>
+<option value="XPF" >XPF — CFP Franc</option>
+<option value="XPT" >XPT — Platinum</option>
+<option value="XSU" >XSU — Sucre</option>
+<option value="XTS" >XTS — Codes specifically reserved for testing purposes</option>
+<option value="XUA" >XUA — ADB Unit of Account</option>
+<option value="XXX" >XXX — The codes assigned for transactions where no currency is involved</option>
+<option value="YER" >YER — Yemeni Rial</option>
+<option value="ZAR" >ZAR — Rand</option>
+<option value="ZMW" >ZMW — Zambian Kwacha</option>
+<option value="ZWL" >ZWL — Zimbabwe Dollar</option>
+</select>
+<p class="hint">Choose the currency requested for the destination account. The amount below is entered in GBP; this form does not calculate an exchange rate or send funds.</p>
+<label>Destination bank</label>
+<button type="button" class="picker-trigger" data-picker="bank" id="bankTrigger"><span id="bankDisplay" class="picker-placeholder">Select country first</span><span class="picker-arrow">▼</span></button>
+<select id="bank_select" class="hidden-select" aria-label="Choose a bank"><option value="">Choose a bank</option></select>
+<label for="bank_name_manual">Bank name</label>
+<input id="bank_name_manual" name="bank_name" type="text" value="{{ request.form.get('bank_name','') }}" autocomplete="organization" required placeholder="Enter bank name">
+<p class="hint">Bank suggestions are examples, not a live directory. If no suggestions appear for your country, enter your bank name manually. Confirm your bank details before submitting.</p>
+<label for="account_holder_name">Account holder name</label>
+<input id="account_holder_name" name="account_holder_name" type="text" value="{{ request.form.get('account_holder_name','') }}" autocomplete="name" required>
+<label for="account_number">Account number / IBAN</label>
+<input id="account_number" name="account_number" type="text" value="{{ request.form.get('account_number','') }}" autocomplete="off" required>
+<label for="sort_code">IBAN, SWIFT/BIC, or local routing code</label>
+<input id="sort_code" name="sort_code" type="text" value="{{ request.form.get('sort_code','') }}" autocomplete="off" required>
+<p class="hint">Enter the code required for your destination country and bank. Never enter your online banking password, card PIN, or one-time security code.</p>
+<div class="grid">
+<div><label for="amount">Withdrawal amount (GBP)</label><input id="amount" name="amount" type="number" min="0.01" step="0.01" max="{{ customer.account_balance or 0 }}" value="{{ request.form.get('amount','') }}" inputmode="decimal" required></div>
+<div><label for="reference">Reference (optional)</label><input id="reference" name="reference" type="text" value="{{ request.form.get('reference','') }}" maxlength="120"></div>
 </div>
-</body>
-</html>
+<button class="button" type="submit">Review &amp; Submit Request</button>
+</form>
+<div class="notice"><strong>Important:</strong> Submitting this form creates a request for review; it does not send money. Your balance is not reduced simply by submitting a pending request. Actual international payouts require a supported payment provider or banking partner and may not be available in every country.</div>
+</div></div></div>
+
+<div class="picker-overlay" id="pickerOverlay">
+  <div class="picker-modal" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+    <div class="picker-header">
+      <div class="picker-header-row"><div class="picker-title" id="pickerTitle">Select</div><button type="button" class="picker-close" id="pickerClose" aria-label="Close">×</button></div>
+      <input type="search" id="pickerSearch" class="picker-search" placeholder="Search..." autocomplete="off">
+    </div>
+    <div class="picker-options" id="pickerOptions"></div>
+  </div>
+</div>
+<script>
+const bankDirectory = {
+"Aruba":["Aruba Bank","Caribbean Mercantile Bank","Banco di Caribe Aruba"],
+"Argentina":["Banco de la Nación Argentina","Banco Galicia","Santander Argentina","BBVA Argentina"],
+"Austria":["Erste Bank","Raiffeisen Bank","Bank Austria","BAWAG"],
+"Bahrain":["National Bank of Bahrain","Bank of Bahrain and Kuwait","Ahli United Bank"],
+"Bangladesh":["Dutch-Bangla Bank","BRAC Bank","Eastern Bank","Sonali Bank"],
+"Belgium":["KBC Bank","Belfius","BNP Paribas Fortis","ING Belgium"],
+"Botswana":["First National Bank Botswana","Absa Bank Botswana","Stanbic Bank Botswana"],
+"Bulgaria":["UniCredit Bulbank","DSK Bank","United Bulgarian Bank"],
+"Chile":["BancoEstado","Banco de Chile","Santander Chile","BCI"],
+"Colombia":["Bancolombia","Davivienda","Banco de Bogotá","BBVA Colombia"],
+"Croatia":["Zagrebačka banka","Privredna banka Zagreb","Erste Bank Croatia"],
+"Cyprus":["Bank of Cyprus","Hellenic Bank","Eurobank Cyprus"],
+"Czechia":["Česká spořitelna","ČSOB","Komerční banka","Raiffeisenbank"],
+"Denmark":["Danske Bank","Nordea Denmark","Jyske Bank"],
+"Egypt":["National Bank of Egypt","Banque Misr","Commercial International Bank"],
+"Estonia":["Swedbank Estonia","SEB Estonia","LHV Pank"],
+"Ethiopia":["Commercial Bank of Ethiopia","Awash Bank","Dashen Bank"],
+"Finland":["OP Financial Group","Nordea Finland","Danske Bank Finland"],
+"Hong Kong":["HSBC Hong Kong","Bank of China (Hong Kong)","Hang Seng Bank","Standard Chartered Hong Kong"],
+"Hungary":["OTP Bank","K&H Bank","Erste Bank Hungary"],
+"Iceland":["Landsbankinn","Arion Bank","Íslandsbanki"],
+"Indonesia":["Bank Central Asia","Bank Mandiri","Bank Rakyat Indonesia","BNI"],
+"Israel":["Bank Hapoalim","Bank Leumi","Israel Discount Bank"],
+"Jamaica":["National Commercial Bank Jamaica","Scotiabank Jamaica","JMMB Bank"],
+"Japan":["MUFG Bank","SMBC","Mizuho Bank","Japan Post Bank"],
+"Jordan":["Arab Bank","Housing Bank for Trade and Finance","Bank of Jordan"],
+"Kuwait":["National Bank of Kuwait","Kuwait Finance House","Burgan Bank"],
+"Latvia":["Swedbank Latvia","SEB Latvia","Citadele Bank"],
+"Lebanon":["Bank Audi","BLOM Bank","Byblos Bank"],
+"Lithuania":["Swedbank Lithuania","SEB Lithuania","Šiaulių Bankas"],
+"Luxembourg":["BCEE","BGL BNP Paribas","Banque Internationale à Luxembourg"],
+"Malaysia":["Maybank","CIMB Bank","Public Bank","RHB Bank"],
+"Malta":["Bank of Valletta","HSBC Malta","APS Bank"],
+"Mauritius":["MCB","SBM Bank","Absa Bank Mauritius"],
+"Morocco":["Attijariwafa Bank","Banque Populaire","Bank of Africa"],
+"Namibia":["Bank Windhoek","FNB Namibia","Standard Bank Namibia"],
+"Nepal":["Nabil Bank","Global IME Bank","Nepal Investment Mega Bank"],
+"New Zealand":["ANZ New Zealand","ASB Bank","BNZ","Westpac New Zealand"],
+"Norway":["DNB","Nordea Norway","SpareBank 1"],
+"Oman":["Bank Muscat","National Bank of Oman","Sohar International"],
+"Peru":["BCP","Interbank","BBVA Perú","Scotiabank Perú"],
+"Poland":["PKO Bank Polski","Bank Pekao","Santander Bank Polska","mBank"],
+"Portugal":["Caixa Geral de Depósitos","Millennium bcp","Novo Banco"],
+"Qatar":["Qatar National Bank","Commercial Bank of Qatar","Doha Bank"],
+"Romania":["Banca Transilvania","BCR","BRD","Raiffeisen Bank Romania"],
+"Rwanda":["Bank of Kigali","Equity Bank Rwanda","I&M Bank Rwanda"],
+"Saudi Arabia":["Saudi National Bank","Al Rajhi Bank","Riyad Bank"],
+"South Korea":["KB Kookmin Bank","Shinhan Bank","Hana Bank","Woori Bank"],
+"Sri Lanka":["Bank of Ceylon","People's Bank","Commercial Bank of Ceylon"],
+"Sweden":["SEB","Swedbank","Handelsbanken","Nordea Sweden"],
+"Switzerland":["UBS","PostFinance","Zürcher Kantonalbank","Raiffeisen Switzerland"],
+"Taiwan":["Bank of Taiwan","CTBC Bank","Taiwan Cooperative Bank"],
+"Tanzania":["CRDB Bank","NMB Bank","NBC Tanzania"],
+"Thailand":["Bangkok Bank","Kasikornbank","Siam Commercial Bank","Krung Thai Bank"],
+"Turkey":["Ziraat Bankası","İş Bankası","Garanti BBVA","Akbank"],
+"Uganda":["Stanbic Bank Uganda","Centenary Bank","Absa Bank Uganda"],
+"Ukraine":["PrivatBank","Oschadbank","Raiffeisen Bank Ukraine"],
+"Uruguay":["Banco República","Banco Santander Uruguay","Itaú Uruguay"],
+"Vietnam":["Vietcombank","BIDV","VietinBank","Techcombank"],
+"Zambia":["Zanaco","Absa Bank Zambia","Stanbic Bank Zambia"],
+"Australia":["Commonwealth Bank","ANZ","National Australia Bank","Westpac"],
+"Brazil":["Banco do Brasil","Itaú Unibanco","Bradesco","Santander Brasil"],
+"Canada":["Royal Bank of Canada","TD Canada Trust","Scotiabank","Bank of Montreal","CIBC"],
+"China":["Bank of China","ICBC","China Construction Bank","Agricultural Bank of China"],
+"France":["BNP Paribas","Crédit Agricole","Société Générale","La Banque Postale"],
+"Germany":["Deutsche Bank","Commerzbank","Sparkasse","ING Germany"],
+"Ghana":["GCB Bank","Ecobank Ghana","Absa Bank Ghana","Stanbic Bank Ghana"],
+"India":["State Bank of India","HDFC Bank","ICICI Bank","Axis Bank"],
+"Ireland":["Bank of Ireland","AIB","Permanent TSB"],
+"Italy":["UniCredit","Intesa Sanpaolo","Banco BPM"],
+"Kenya":["KCB Bank Kenya","Equity Bank","Co-operative Bank of Kenya","Absa Bank Kenya","NCBA Bank","Standard Chartered Kenya"],
+"Mexico":["BBVA México","Banorte","Santander México","Citibanamex"],
+"Netherlands":["ING","Rabobank","ABN AMRO"],
+"Nigeria":["Access Bank","First Bank of Nigeria","Guaranty Trust Bank","Zenith Bank","United Bank for Africa","Fidelity Bank"],
+"Pakistan":["HBL","United Bank Limited","MCB Bank","Meezan Bank"],
+"Philippines":["BDO Unibank","BPI","Metrobank","Land Bank of the Philippines"],
+"Singapore":["DBS","OCBC","UOB"],
+"South Africa":["Standard Bank","FNB","Absa","Nedbank","Capitec Bank"],
+"Spain":["Banco Santander","BBVA","CaixaBank"],
+"United Arab Emirates":["Emirates NBD","First Abu Dhabi Bank","Abu Dhabi Commercial Bank","Dubai Islamic Bank"],
+"United Kingdom":["Barclays","HSBC UK","Lloyds Bank","NatWest","Santander UK","Nationwide"],
+"United States":["JPMorgan Chase","Bank of America","Wells Fargo","Citibank","U.S. Bank","Capital One"],
+"Suriname":["De Surinaamsche Bank","Hakrinbank","Finabank","Republic Bank Suriname","Surinaamse Volkscredietbank","Other bank in Suriname — enter manually"]
+};
+const countrySelect = document.getElementById('bank_country');
+const currencySelect = document.getElementById('currency');
+const bankSelect = document.getElementById('bank_select');
+const bankInput = document.getElementById('bank_name_manual');
+const countryDisplay = document.getElementById('countryDisplay');
+const currencyDisplay = document.getElementById('currencyDisplay');
+const bankDisplay = document.getElementById('bankDisplay');
+const overlay = document.getElementById('pickerOverlay');
+const pickerTitle = document.getElementById('pickerTitle');
+const pickerSearch = document.getElementById('pickerSearch');
+const pickerOptions = document.getElementById('pickerOptions');
+const pickerClose = document.getElementById('pickerClose');
+let activePicker = null;
+
+function updateBanks() {
+  const selected = countrySelect.value;
+  const names = bankDirectory[selected] || [];
+  bankSelect.replaceChildren();
+  const prompt = document.createElement('option');
+  prompt.value = '';
+  prompt.textContent = selected ? (names.length ? 'Choose a bank for ' + selected : 'No sample list for ' + selected) : 'Select country first';
+  bankSelect.appendChild(prompt);
+  names.forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name; opt.textContent = name; bankSelect.appendChild(opt);
+  });
+  const manual = document.createElement('option');
+  manual.value = '__manual__'; manual.textContent = 'My bank is not listed — enter manually';
+  bankSelect.appendChild(manual);
+  bankSelect.value = '';
+  bankDisplay.textContent = selected ? (names.length ? 'Select bank' : 'No suggestions — enter bank name below') : 'Select country first';
+  bankDisplay.classList.add('picker-placeholder');
+}
+function getItems(type) {
+  const select = type === 'country' ? countrySelect : type === 'currency' ? currencySelect : bankSelect;
+  return Array.from(select.options)
+    .filter(o => o.value && !o.disabled && o.value !== '__manual__')
+    .map(o => ({value:o.value,label:o.textContent.trim()}));
+}
+function openPicker(type) {
+  if (type === 'bank' && !countrySelect.value) {
+    activePicker = 'country'; pickerTitle.textContent = 'Select destination country';
+  } else {
+    activePicker = type;
+    pickerTitle.textContent = type === 'country' ? 'Select Destination Country' : type === 'currency' ? 'Select Destination Currency' : 'Select Destination Bank';
+  }
+  pickerSearch.value = '';
+  renderOptions('');
+  overlay.classList.add('open');
+  setTimeout(() => pickerSearch.focus(), 40);
+}
+function closePicker(){activePicker=null;overlay.classList.remove('open');pickerSearch.value='';}
+function renderOptions(query) {
+  pickerOptions.replaceChildren();
+  const q = (query || '').trim().toLocaleLowerCase();
+  const items = getItems(activePicker).filter(item => item.label.toLocaleLowerCase().includes(q) || item.value.toLocaleLowerCase().includes(q));
+  if (!items.length) {
+    const empty = document.createElement('div'); empty.className='empty-option'; empty.textContent = activePicker === 'bank' ? ('No bank suggestions for ' + (countrySelect.value || 'this country') + '. Close this window and enter the bank name in the Bank name field below.') : 'No matching options found. Try another search.'; pickerOptions.appendChild(empty); return;
+  }
+  const select = activePicker === 'country' ? countrySelect : activePicker === 'currency' ? currencySelect : bankSelect;
+  items.forEach(item => {
+    const button = document.createElement('button');
+    button.type='button'; button.className='picker-option';
+    if (select.value === item.value) button.classList.add('selected');
+    button.textContent=item.label;
+    button.addEventListener('click', () => selectValue(item.value));
+    pickerOptions.appendChild(button);
+  });
+}
+function selectValue(value) {
+  if (activePicker === 'country') {
+    countrySelect.value=value;
+    countryDisplay.textContent=countrySelect.options[countrySelect.selectedIndex].textContent;
+    countryDisplay.classList.remove('picker-placeholder');
+    updateBanks();
+    // If country changes, require the user to confirm the bank again.
+    bankInput.value='';
+  } else if (activePicker === 'currency') {
+    currencySelect.value=value;
+    currencyDisplay.textContent=currencySelect.options[currencySelect.selectedIndex].textContent;
+    currencyDisplay.classList.remove('picker-placeholder');
+  } else if (activePicker === 'bank') {
+    bankSelect.value=value;
+    bankDisplay.textContent=bankSelect.options[bankSelect.selectedIndex].textContent;
+    bankDisplay.classList.remove('picker-placeholder');
+    bankInput.value=value;
+    if (value === '__manual__') {
+      bankInput.value='';
+      closePicker();
+      bankInput.focus();
+      return;
+    }
+  }
+  closePicker();
+}
+document.querySelectorAll('[data-picker]').forEach(button => button.addEventListener('click', () => openPicker(button.dataset.picker)));
+pickerSearch.addEventListener('input', () => renderOptions(pickerSearch.value));
+pickerClose.addEventListener('click', closePicker);
+overlay.addEventListener('click', e => {if(e.target===overlay) closePicker();});
+document.addEventListener('keydown', e => {if(e.key==='Escape' && overlay.classList.contains('open')) closePicker();});
+countrySelect.addEventListener('change', updateBanks);
+updateBanks();
+
+// Restore submitted values when Flask re-renders the form after validation.
+const previousCountry = {{ request.form.get('bank_country','')|tojson }};
+const previousCurrency = {{ request.form.get('currency','GBP')|tojson }};
+const previousBank = {{ request.form.get('bank_name','')|tojson }};
+if (previousCountry && Array.from(countrySelect.options).some(o => o.value === previousCountry)) {
+  countrySelect.value = previousCountry;
+  countryDisplay.textContent = countrySelect.options[countrySelect.selectedIndex].textContent;
+  countryDisplay.classList.remove('picker-placeholder');
+  updateBanks();
+}
+if (previousCurrency && Array.from(currencySelect.options).some(o => o.value === previousCurrency)) {
+  currencySelect.value = previousCurrency;
+  currencyDisplay.textContent = currencySelect.options[currencySelect.selectedIndex].textContent;
+  currencyDisplay.classList.remove('picker-placeholder');
+}
+if (previousBank) {
+  bankInput.value = previousBank;
+  bankDisplay.textContent = previousBank;
+  bankDisplay.classList.remove('picker-placeholder');
+}
+</script>
+</body></html>
