@@ -155,6 +155,13 @@
             background:rgba(255,255,255,.13);font-family:ui-monospace,monospace;
             letter-spacing:2px;font-weight:800;text-align:center
         }
+        .virtual-card-code-toggle{
+            border:1px solid rgba(255,255,255,.22);border-radius:7px;
+            padding:5px 9px;background:rgba(255,255,255,.08);color:#fff;
+            font:inherit;font-size:10px;font-weight:700;cursor:pointer
+        }
+        .virtual-card-code-toggle:hover{background:rgba(255,255,255,.16)}
+        .virtual-card-code-toggle:focus-visible{outline:2px solid #fff;outline-offset:2px}
         .virtual-card-review{
             position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;
             margin-top:14px;padding:10px 15px;border-radius:10px;text-decoration:none;
@@ -448,9 +455,16 @@
 
             <div class="virtual-card-security">
                 <span class="virtual-card-label">SECURITY CODE</span>
-                <span class="virtual-card-security-code" aria-label="Security code hidden">
-                    •••
-                </span>
+                <span class="virtual-card-security-code"
+                      id="virtualCardSecurityCode"
+                      data-code="{{ virtual_card.security_code }}"
+                      aria-live="polite">•••</span>
+                <button type="button"
+                        class="virtual-card-code-toggle"
+                        id="virtualCardCodeToggle"
+                        aria-controls="virtualCardSecurityCode"
+                        aria-pressed="false"
+                        onclick="toggleVirtualCardSecurityCode()">Show</button>
             </div>
 
             <a
@@ -590,6 +604,25 @@
 </main>
 
 <script>
+function toggleVirtualCardSecurityCode() {
+    const code = document.getElementById("virtualCardSecurityCode");
+    const button = document.getElementById("virtualCardCodeToggle");
+    if (!code || !button) return;
+
+    const isVisible = button.getAttribute("aria-pressed") === "true";
+    if (isVisible) {
+        code.textContent = "•••";
+        button.textContent = "Show";
+        button.setAttribute("aria-pressed", "false");
+        code.setAttribute("aria-label", "Security code hidden");
+    } else {
+        code.textContent = code.dataset.code || "•••";
+        button.textContent = "Hide";
+        button.setAttribute("aria-pressed", "true");
+        code.setAttribute("aria-label", "Security code visible");
+    }
+}
+
 function toggleBalance() {
     const balance = document.getElementById("balance");
     const button = document.querySelector(".balance-toggle");
