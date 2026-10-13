@@ -29,6 +29,25 @@ except ImportError:
 
 
 app = Flask(__name__)
+
+
+CURRENCY_SYMBOLS = {"GBP": "£", "USD": "$", "EUR": "€"}
+
+def currency_symbol_for(currency_code):
+    """Return the display symbol for a supported account currency."""
+    code = str(currency_code or "GBP").strip().upper()
+    return CURRENCY_SYMBOLS.get(code, code + " " if code else "£")
+
+def format_account_money(currency_code, amount):
+    """Format an amount using the account's selected currency symbol."""
+    try:
+        value = float(amount or 0)
+    except (TypeError, ValueError):
+        value = 0.0
+    return f"{currency_symbol_for(currency_code)}{value:,.2f}"
+
+app.jinja_env.globals["currency_symbol_for"] = currency_symbol_for
+app.jinja_env.globals["format_account_money"] = format_account_money
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # 8 MB total application upload
 
 
@@ -454,7 +473,7 @@ def send_payment_status_email(customer, approval, event="submitted"):
         return False
 
     status = approval.status or "Pending Approval"
-    amount_text = f"£{float(approval.amount or 0):,.2f}"
+    amount_text = format_account_money(getattr(customer, "account_currency", "GBP"), approval.amount)
     details = [
         ("Request reference", approval.payment_reference),
         ("Request type", approval.payment_type),
@@ -545,7 +564,7 @@ def send_transaction_alert(customer, transaction):
     )
     message_text = (
         (
-            f"A debit transaction of £{float(transaction.amount or 0):,.2f} "
+            f"A debit transaction of {format_account_money(getattr(customer, 'account_currency', 'GBP'), transaction.amount)} "
             "has been recorded on your account.\n\n"
             "Please review the transaction details below. If you do not "
             "recognize this transaction, please contact our support team "
@@ -553,7 +572,7 @@ def send_transaction_alert(customer, transaction):
         )
         if not is_credit
         else (
-            f"A credit transaction of £{float(transaction.amount or 0):,.2f} "
+            f"A credit transaction of {format_account_money(getattr(customer, 'account_currency', 'GBP'), transaction.amount)} "
             "has been recorded on your account.\n\n"
             "Please review the transaction details below. If you have any "
             "questions about this transaction, please contact our support team "
@@ -579,14 +598,14 @@ def send_transaction_alert(customer, transaction):
         message_text,
         [
             ("Transaction type", transaction.transaction_type or direction.title()),
-            ("Amount", f"£{float(transaction.amount or 0):,.2f}"),
+            ("Amount", format_account_money(getattr(customer, "account_currency", "GBP"), transaction.amount)),
             ("Reference", transaction.transaction_reference),
             ("Description", description),
             ("Sender Name", sender_name or "Not specified"),
             ("Account", masked_account),
             ("Date", created_at),
             ("Status", transaction.status or "Recorded"),
-            ("Account Balance", f"£{float(transaction.balance_after or 0):,.2f}"),
+            ("Account Balance", format_account_money(getattr(customer, "account_currency", "GBP"), transaction.balance_after)),
         ],
     )
 
@@ -1886,9 +1905,8 @@ def inject_dashboard_values():
 
     return {
         "display_balance": balance,
-        "currency_symbol": app.config.get(
-            "CURRENCY_SYMBOL",
-            "£"
+        "currency_symbol": currency_symbol_for(
+            getattr(current_user, "account_currency", "GBP")
         )
     }
 
@@ -3158,7 +3176,7 @@ def dashboard():
         virtual_card=virtual_card,
         virtual_card_application=virtual_card_application,
         display_balance=display_balance,
-        currency_symbol=app.config.get("CURRENCY_SYMBOL", "£"),
+        currency_symbol=currency_symbol_for(getattr(customer, "account_currency", "GBP")),
         currency_locale=app.config.get("CURRENCY_LOCALE", "en-GB"),
     )
 
@@ -4414,7 +4432,7 @@ def withdrawal_receipt(approval_id):
         <div class="notice"><strong>Important:</strong> This receipt confirms submission of a withdrawal request only. It is not proof that money has been transferred or paid. The request remains subject to review and approval.</div>
         <div class="row"><span>Request reference</span><strong>{{ approval.payment_reference }}</strong></div>
         <div class="row"><span>Request type</span><strong>{{ approval.payment_type }}</strong></div>
-        <div class="row"><span>Amount requested</span><strong>£{{ "%.2f"|format(approval.amount or 0) }}</strong></div>
+        <div class="row"><span>Amount requested</span><strong>{{ currency_symbol_for(customer.account_currency) }}{{ "%.2f"|format(approval.amount or 0) }}</strong></div>
         <div class="row"><span>Status</span><strong>{{ approval.status }}</strong></div>
         <div class="row"><span>Submitted</span><strong>{{ approval.created_at.strftime("%d %b %Y, %H:%M UTC") if approval.created_at else "Not available" }}</strong></div>
         <div class="row"><span>Description</span><strong>{{ approval.description }}</strong></div>
@@ -4426,7 +4444,7 @@ def withdrawal_receipt(approval_id):
       </div>
     </section></main></body></html>
     """
-    return render_template_string(receipt_html, approval=approval)
+    return render_template_string(receipt_html, approval=approval, customer=customer)
 
 
 
@@ -4662,7 +4680,7 @@ _EXTERNAL_WITHDRAWAL_TEMPLATE = r"""
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ method }} Withdrawal</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fb;color:#182230}.wrap{max-width:720px;margin:0 auto;padding:28px 18px 50px}.back{display:inline-block;margin-bottom:20px;color:#40556f;text-decoration:none;font-weight:600}.card{background:#fff;border:1px solid #e3e9f1;border-radius:20px;box-shadow:0 10px 30px rgba(20,40,70,.08);overflow:hidden}.head{padding:28px 28px 22px;border-bottom:1px solid #edf1f5}.icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#eef5ff;color:#2367c8;font-size:25px;margin-bottom:14px}h1{margin:0 0 8px;font-size:26px}.sub{margin:0;color:#66758a;line-height:1.5}.body{padding:28px}.balance{padding:15px 16px;margin-bottom:22px;background:#f7f9fc;border:1px solid #e7edf4;border-radius:12px}.balance span{display:block;color:#718096;font-size:13px;margin-bottom:4px}.balance strong{font-size:21px}label{display:block;font-size:14px;font-weight:700;margin:17px 0 7px}input{width:100%;padding:13px 14px;border:1px solid #cfd8e3;border-radius:10px;font-size:15px;outline:none}input:focus{border-color:#3779d3;box-shadow:0 0 0 3px rgba(55,121,211,.10)}button{width:100%;margin-top:24px;padding:14px 18px;border:0;border-radius:11px;background:#2367c8;color:white;font-size:15px;font-weight:700;cursor:pointer}.flash{margin-bottom:16px;padding:13px 14px;border-radius:10px;font-size:14px}.flash.error{background:#fff1f1;color:#a12626;border:1px solid #f2cccc}.flash.success{background:#effaf3;color:#176b3a;border:1px solid #ccebd7}.notice{margin-top:17px;padding:13px 14px;border-radius:10px;background:#f8fafc;color:#66758a;font-size:12px;line-height:1.5}@media(max-width:560px){.body,.head{padding:22px}}
-</style></head><body><div class="wrap"><a class="back" href="{{ url_for('withdraw') }}">← Back to withdrawal methods</a><div class="card"><div class="head"><div class="icon">{{ icon }}</div><h1>Withdraw to {{ method }}</h1><p class="sub">Enter your {{ field_label|lower }} and withdrawal amount.</p></div><div class="body">{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}<div class="balance"><span>Available balance</span><strong>£{{ "%.2f"|format(customer.account_balance or 0) }}</strong></div><form method="POST" action="{{ action_url }}"><label for="destination">{{ field_label }}</label><input id="destination" name="destination" type="text" value="{{ request.form.get('destination','') }}" required><label for="amount">Withdrawal amount</label><input id="amount" name="amount" type="number" min="0.01" step="0.01" value="{{ request.form.get('amount','') }}" inputmode="decimal" required><button type="submit">Submit Withdrawal Request</button></form><div class="notice">Your request is submitted for review. A pending request does not reduce the account balance until it is approved by the authorized bank administrator.</div></div></div></div></body></html>
+</style></head><body><div class="wrap"><a class="back" href="{{ url_for('withdraw') }}">← Back to withdrawal methods</a><div class="card"><div class="head"><div class="icon">{{ icon }}</div><h1>Withdraw to {{ method }}</h1><p class="sub">Enter your {{ field_label|lower }} and withdrawal amount.</p></div><div class="body">{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}<div class="balance"><span>Available balance</span><strong>{{ currency_symbol_for(customer.account_currency) }}{{ "%.2f"|format(customer.account_balance or 0) }}</strong></div><form method="POST" action="{{ action_url }}"><label for="destination">{{ field_label }}</label><input id="destination" name="destination" type="text" value="{{ request.form.get('destination','') }}" required><label for="amount">Withdrawal amount</label><input id="amount" name="amount" type="number" min="0.01" step="0.01" value="{{ request.form.get('amount','') }}" inputmode="decimal" required><button type="submit">Submit Withdrawal Request</button></form><div class="notice">Your request is submitted for review. A pending request does not reduce the account balance until it is approved by the authorized bank administrator.</div></div></div></div></body></html>
 """
 
 def _external_withdrawal_page(method, field_label, payment_type, icon, endpoint):
@@ -4778,14 +4796,14 @@ def transaction_receipt(transaction_reference):
     <div class="row"><span>Transaction reference</span><strong>{{ transaction.transaction_reference }}</strong></div>
     <div class="row"><span>Transaction type</span><strong>{{ transaction.transaction_type }}</strong></div>
     <div class="row"><span>Direction</span><strong>{{ transaction.direction }}</strong></div>
-    <div class="row"><span>Amount</span><strong>£{{ "%.2f"|format(transaction.amount or 0) }}</strong></div>
+    <div class="row"><span>Amount</span><strong>{{ currency_symbol_for(customer.account_currency) }}{{ "%.2f"|format(transaction.amount or 0) }}</strong></div>
     <div class="row"><span>Counterparty</span><strong>{{ transaction.counterparty or "Not specified" }}</strong></div>
     <div class="row"><span>Description</span><strong>{{ transaction.description or "—" }}</strong></div>
-    <div class="row"><span>Balance after transaction</span><strong>£{{ "%.2f"|format(transaction.balance_after or 0) }}</strong></div>
+    <div class="row"><span>Balance after transaction</span><strong>{{ currency_symbol_for(customer.account_currency) }}{{ "%.2f"|format(transaction.balance_after or 0) }}</strong></div>
     <div class="actions"><button class="primary" type="button" onclick="window.print()">Print / Save Receipt</button><a class="secondary" href="{{ url_for('dashboard') }}">Back to dashboard</a></div>
     </div></section></main></body></html>
     """
-    return render_template_string(receipt_html, transaction=transaction)
+    return render_template_string(receipt_html, transaction=transaction, customer=customer)
 
 
 
@@ -4985,14 +5003,14 @@ def send_fairmont_money():
     create_customer_notification(
         customer.customer_id,
         "Money transfer sent",
-        f"Your transfer of £{amount:,.2f} to {recipient.full_name} was completed successfully. Reference: {sender_transaction_reference}.",
+        f"Your transfer of {format_account_money(customer.account_currency, amount)} to {recipient.full_name} was completed successfully. Reference: {sender_transaction_reference}.",
         notification_type="Transaction",
         commit=False,
     )
     create_customer_notification(
         recipient.customer_id,
         "Money received",
-        f"You received £{amount:,.2f} from {customer.full_name}. Reference: {recipient_transaction_reference}.",
+        f"You received {format_account_money(recipient.account_currency, amount)} from {customer.full_name}. Reference: {recipient_transaction_reference}.",
         notification_type="Transaction",
         commit=False,
     )
@@ -5602,7 +5620,7 @@ def pay_bills():
     if amount <= 0:
         if "Please enter a valid payment amount." not in errors:
             errors.append(
-                "Payment amount must be greater than Â£0.00."
+                "Payment amount must be greater than 0.00 in your account currency."
             )
 
     if amount > float(customer.account_balance or 0):
@@ -9960,14 +9978,14 @@ def admin_review_payment(approval_id):
         create_customer_notification(
             customer.customer_id,
             "Bank transfer completed",
-            f"Your transfer of £{amount:,.2f} to {recipient.full_name} has been approved and completed.",
+            f"Your transfer of {format_account_money(customer.account_currency, amount)} to {recipient.full_name} has been approved and completed.",
             notification_type="Transaction",
             commit=False,
         )
         create_customer_notification(
             recipient.customer_id,
             "Money received",
-            f"You received £{amount:,.2f} from {customer.full_name}. The transfer has been completed.",
+            f"You received {format_account_money(recipient.account_currency, amount)} from {customer.full_name}. The transfer has been completed.",
             notification_type="Transaction",
             commit=False,
         )
@@ -9976,7 +9994,7 @@ def admin_review_payment(approval_id):
         create_customer_notification(
             customer.customer_id,
             "Money received",
-            f"A credit of £{amount:,.2f} from {sender_label} has been posted to your account.",
+            f"A credit of {format_account_money(customer.account_currency, amount)} from {sender_label} has been posted to your account.",
             notification_type="Transaction",
             commit=False,
         )
@@ -9984,7 +10002,7 @@ def admin_review_payment(approval_id):
         create_customer_notification(
             customer.customer_id,
             "Payment completed",
-            f"Your {approval.payment_type.lower()} of £{amount:,.2f} has been approved and processed.",
+            f"Your {approval.payment_type.lower()} of {format_account_money(customer.account_currency, amount)} has been approved and processed.",
             notification_type="Transaction",
             commit=False,
         )
@@ -10395,7 +10413,7 @@ def admin_incoming_payment():
         create_customer_notification(
             receiver.customer_id,
             "Money received",
-            f"A payment of £{amount:,.2f} from {sender_name} ({sender_bank}) has been credited to your account. Reference: {transaction_reference}.",
+            f"A payment of {format_account_money(receiver.account_currency, amount)} from {sender_name} ({sender_bank}) has been credited to your account. Reference: {transaction_reference}.",
             notification_type="Transaction",
             commit=False,
         )
@@ -10896,7 +10914,7 @@ def admin_fund_customer():
             customer.customer_id,
             "Account credited",
             (
-                f"An account funding of £{amount:,.2f} has been recorded. "
+                f"An account funding of {format_account_money(customer.account_currency, amount)} has been recorded. "
                 f"Description: {description}. "
                 f"Reference: {transaction_reference}."
             ),

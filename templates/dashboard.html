@@ -349,7 +349,9 @@
             <p class="balance-label">AVAILABLE BALANCE</p>
             <button type="button" class="balance-toggle" onclick="toggleBalance()">Hide</button>
         </div>
-        <h2 id="balance">£{{ "{:,.2f}".format(customer.account_balance or 0) }}</h2>
+        {% set account_currency = (customer.account_currency or "GBP")|upper %}
+        {% set currency_symbol = "$" if account_currency == "USD" else "€" if account_currency == "EUR" else "£" %}
+        <h2 id="balance">{{ currency_symbol }}{{ "{:,.2f}".format(customer.account_balance or 0) }}</h2>
         <p class="customer-reference">Customer ID · {{ customer.customer_id }}</p>
     </section>
 
