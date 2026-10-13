@@ -52,25 +52,26 @@ def send_bank_email(recipient_email, subject, body, html_body=None):
         )
         return False
 
-    # This application is a banking-software. Make that clear in
-    # notifications so messages cannot be mistaken for proof of real transfers.
+    # Keep a concise simulation disclosure without placing a prominent banner
+    # above the email content.
     safe_subject = str(subject or "Account notification").strip()
     if not safe_subject.upper().startswith("[BANK]"):
         safe_subject = "[BANK] " + safe_subject
 
     disclosure = (
-        "SIMULATED BANKING SOFTWARE NOTICE: This email reports activity "
-        "recorded in the Fairmont Bank."
+        "Fairmont Bank is a simulated banking environment. "
+        "This email reports activity recorded in the application."
     )
 
-    text_body = disclosure + "\n\n" + str(body or "").strip()
+    text_body = str(body or "").strip() + "\\n\\n" + disclosure
     if html_body:
         html_content = (
-            '<div style="margin:0 auto 18px;padding:12px 16px;max-width:600px;'
-            'background:#fff4d6;border:1px solid #e6c56b;color:#5b4300;'
-            'font: bold 13px Arial,sans-serif;line-height:1.5">'
+            str(html_body)
+            + '<div style="margin:18px auto 0;padding:10px 16px;max-width:600px;'
+            'border-top:1px solid #e1e7ef;color:#7b8797;'
+            'font:11px Arial,sans-serif;line-height:1.6;text-align:center">'
             + disclosure
-            + '</div>' + str(html_body)
+            + '</div>'
         )
     else:
         html_content = None
@@ -9604,8 +9605,6 @@ def admin_payment_approvals():
     )
 
 
-@app.route("/admin/incoming-payment", methods=["GET", "POST"])
-
 @app.route(
     "/admin/payment-approval/<int:approval_id>",
     methods=["GET", "POST"]
@@ -10134,6 +10133,7 @@ def admin_reject_payment(approval_id):
         )
     )
 
+@app.route("/admin/incoming-payment", methods=["GET", "POST"])
 def admin_incoming_payment():
 
     admin_id = session.get("admin_id")
