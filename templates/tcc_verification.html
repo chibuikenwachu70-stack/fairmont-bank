@@ -374,7 +374,7 @@
             <div class="detail">
                 <span class="label">Amount</span>
                 <span class="value amount">
-                    GBP {{ "{:,.2f}".format(approval.amount|float) }}
+                    {{ currency_symbol_for(customer.account_currency if customer and customer.account_currency else "GBP") }}{{ "{:,.2f}".format(approval.amount|float) }}
                 </span>
             </div>
 
