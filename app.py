@@ -4803,9 +4803,29 @@ def send_fairmont_money():
         return redirect(url_for("login"))
 
     if request.method == "GET":
+        supported_currencies = {
+            "GBP": {"symbol": "£", "name": "British Pound Sterling"},
+            "EUR": {"symbol": "€", "name": "Euro"},
+            "USD": {"symbol": "$", "name": "US Dollar"},
+        }
+
+        sender_currency = (
+            getattr(customer, "account_currency", None)
+            or getattr(customer, "preferred_currency_display", None)
+            or "GBP"
+        ).upper()
+
+        if sender_currency not in supported_currencies:
+            sender_currency = "GBP"
+
+        sender_currency_symbol = supported_currencies[sender_currency]["symbol"]
+
         return render_template(
             "send_fairmont_money.html",
-            customer=customer
+            customer=customer,
+            supported_currencies=supported_currencies,
+            sender_currency=sender_currency,
+            sender_currency_symbol=sender_currency_symbol,
         )
 
     recipient_account_number = request.form.get(
