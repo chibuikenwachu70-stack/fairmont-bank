@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Balance Deduction | Fairmont Bank Administration</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#071426;color:#e6edf5}body{min-height:100vh}.admin-shell{min-height:100vh;display:flex}.sidebar{width:270px;min-height:100vh;background:#08182b;border-right:1px solid rgba(184,149,74,.18);padding:26px 18px;position:fixed;left:0;top:0;bottom:0;overflow-y:auto}.brand{padding:6px 10px 28px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}.brand img{display:block;width:218px;max-width:100%;height:auto}.admin-badge{margin-top:15px;color:#d8b96a;font-size:11px;font-weight:700;letter-spacing:1.7px;text-transform:uppercase}.nav-title{padding:0 10px;margin-bottom:10px;color:#667d97;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}.nav-link{display:flex;align-items:center;gap:12px;width:100%;padding:12px;margin-bottom:5px;border-radius:9px;color:#aabbd0;text-decoration:none;font-size:13px}.nav-link:hover,.nav-link.active{background:rgba(184,149,74,.10);color:#d8b96a}.nav-icon{width:22px;flex-shrink:0;text-align:center;font-size:14px}.sidebar-bottom{margin-top:35px;padding-bottom:5px}.admin-user{padding:13px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);margin-bottom:10px}.admin-user-label{color:#687f98;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}.admin-user-name{color:#dce6f2;font-size:13px;font-weight:700;overflow-wrap:anywhere}.logout{display:block;width:100%;padding:11px;text-align:center;border-radius:9px;border:1px solid rgba(220,100,100,.22);color:#d99a9a;text-decoration:none;font-size:12px}.main{margin-left:270px;width:calc(100% - 270px);min-height:100vh;padding:30px;background:radial-gradient(circle at top right,rgba(184,149,74,.07),transparent 35%),#071426}.page-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}.eyebrow{color:#d8b96a;text-transform:uppercase;letter-spacing:1.5px;font-size:10px;font-weight:700}.page-head h1{font-size:25px;margin:8px 0}.back{color:#d8b96a;text-decoration:none;font-size:13px}.panel{background:#0b1b2f;border:1px solid #20334b;border-radius:14px;padding:24px;max-width:1000px;box-shadow:0 12px 35px rgba(0,0,0,.12)}.muted{color:#91a5bd;font-size:12px;line-height:1.7}.notice{padding:13px 15px;border-radius:9px;background:#382e17;border:1px solid #75602c;color:#f4d98b;line-height:1.65;font-size:12px;margin:18px 0}.flash{padding:12px;border-radius:8px;margin:10px 0}.success{background:#143b2a;color:#a7edc2}.error{background:#4b2025;color:#ffb8bd}.warning{background:#3e321b;color:#f4d98b}label{display:block;font-size:12px;color:#aebed0;margin:17px 0 7px}input,select,textarea{width:100%;padding:12px 13px;border-radius:8px;border:1px solid #34465c;background:#071321;color:#fff;font:inherit}input:focus,select:focus,textarea:focus{outline:1px solid #b8954a;border-color:#b8954a}textarea{min-height:110px;resize:vertical}.check{display:flex;align-items:flex-start;gap:10px;line-height:1.6}.check input{width:auto;margin-top:3px;flex-shrink:0}.btn{border:0;border-radius:8px;background:#b8954a;color:#071321;padding:13px 18px;font-weight:800;cursor:pointer;margin-top:18px}.btn:hover{background:#d8b96a}.form-note{margin-top:8px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.form-grid .full{grid-column:1/-1}.section-label{font-size:14px;color:#e6edf5;font-weight:700;margin:22px 0 8px;padding-bottom:10px;border-bottom:1px solid #20334b}@media(max-width:900px){.sidebar{width:220px}.main{margin-left:220px;width:calc(100% - 220px);padding:22px}.form-grid{grid-template-columns:1fr}}@media(max-width:650px){.admin-shell{display:block}.sidebar{position:relative;width:100%;min-height:auto;max-height:none;padding:16px}.brand{padding-bottom:16px;margin-bottom:15px}.brand img{width:190px}.sidebar .nav-link{display:inline-flex;width:auto;margin-right:4px}.sidebar-bottom{margin-top:18px}.main{margin:0;width:100%;padding:16px}.panel{padding:17px}.page-head h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+<aside class="sidebar">
+  <div class="brand"><img src="{{ url_for('static', filename='images/fairmont-bank-logo.png') }}" alt="Fairmont Bank"><div class="admin-badge">Administration Portal</div></div>
+  <div class="nav-title">Administration</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="nav-link"><span class="nav-icon">▦</span>Dashboard</a>
+  <a href="/admin/live-chat" class="nav-link"><span class="nav-icon">?</span>Live Chat</a>
+  <a href="/admin/customers" class="nav-link"><span class="nav-icon">◎</span>Customers</a>
+  <a href="/admin/transactions" class="nav-link"><span class="nav-icon">▤</span>Transactions</a>
+  <a href="/admin/accounts" class="nav-link"><span class="nav-icon">◈</span>Accounts</a>
+  <a href="{{ url_for('admin_invoices') }}" class="nav-link"><span class="nav-icon">▣</span>Bills &amp; Invoices</a>
+  <a href="{{ url_for('admin_login_otp_requests') }}" class="nav-link"><span class="nav-icon">OTP</span>Login OTP Requests</a>
+  <a href="{{ url_for('admin_virtual_card_applications') }}" class="nav-link"><span class="nav-icon">▣</span>Virtual Card Applications</a>
+  <a href="{{ url_for('admin_deduct_customer_balance') }}" class="nav-link active"><span class="nav-icon">−</span>Balance Deduction</a>
+  <div class="sidebar-bottom"><div class="admin-user"><div class="admin-user-label">Signed in as</div><div class="admin-user-name">{{ admin.username }}</div></div><a href="{{ url_for('admin_logout') }}" class="logout">Sign Out</a></div>
+</aside>
+<main class="main">
+  <div class="page-head"><div><div class="eyebrow">Account Operations</div><h1>Customer Balance Deduction</h1><div class="muted">Record an approved, documented debit adjustment and notify the customer.</div></div><a class="back" href="{{ url_for('admin_dashboard') }}">← Back to Admin Dashboard</a></div>
+  <section class="panel">
+    <div class="notice"><strong>Important:</strong> This tool changes the balance recorded in this banking-software application. It does not retrieve or move real funds. Only submit a deduction reviewed and authorized under your procedures. For a mistaken internal transfer refund, ensure the corresponding credit and linked audit records are also handled separately.</div>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    <form method="post" onsubmit="return confirm('Confirm you have authorization and the reason and amount are correct? This will change the recorded balance.');">
+      <div class="form-grid">
+        <div class="full"><label for="customer_id">Customer account</label><select id="customer_id" name="customer_id" required><option value="">Select a customer</option>{% for c in customers %}<option value="{{ c.id }}" {% if selected_customer and selected_customer.id == c.id %}selected{% endif %}>{{ c.full_name }} · {{ c.customer_id }} · {{ c.account_number or 'No account number' }} · {{ c.account_currency or c.preferred_currency_display or 'GBP' }} {{ '{:,.2f}'.format(c.account_balance or 0) }}</option>{% endfor %}</select></div>
+        <div class="full"><label for="amount">Amount to deduct</label><input id="amount" name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00"></div>
+        <div class="full"><label for="reason">Reason for deduction</label><textarea id="reason" name="reason" required minlength="8" maxlength="500" placeholder="Example: approved service fee or documented adjustment; include the case reference and approval details."></textarea><p class="muted form-note">The reason should be saved in the transaction description and included in the customer email. Do not include passwords, full card numbers, or unnecessary sensitive information.</p></div>
+        <div class="full"><label class="check"><input type="checkbox" name="confirm_deduction" value="yes" required><span>I confirm this adjustment has been reviewed and authorized, the amount and customer are correct, and the reason is accurate.</span></label></div>
+      </div>
+      <button class="btn" type="submit">Record Deduction &amp; Notify Customer</button>
+    </form>
+  </section>
+</main>
+</div>
+</body>
+</html>

@@ -50,6 +50,24 @@
 <div id="google_translate_element" aria-hidden="true"></div>
 <script src="{{ url_for('static', filename='js/language.js') }}"></script>
 
+
+<style id="login-error-message-style">
+.login-error {
+    display: block;
+    margin: 0 0 18px;
+    padding: 13px 15px;
+    border: 1px solid #e7a6a6;
+    border-left: 4px solid #c93636;
+    border-radius: 9px;
+    background: #fff0f0;
+    color: #8f2020;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+</style>
+
 </head>
 
 <body>
@@ -75,15 +93,6 @@
             </div>
 
 
-            {% if error %}
-
-            <div class="login-error">
-                {{ error }}
-            </div>
-
-            {% endif %}
-
-
             <section class="login-intro">
 
                 <p class="eyebrow">
@@ -106,6 +115,12 @@
                 class="login-form"
                 method="POST"
                 action="/login">
+
+                {% if error %}
+                <div class="login-error" role="alert" aria-live="assertive">
+                    {{ error }}
+                </div>
+                {% endif %}
 
                 <div class="form-group">
 
@@ -172,7 +187,7 @@
 
 
                     <a
-                        href="#"
+                        href="{{ url_for('forgot_password') }}"
                         class="forgot-link">
 
                         Forgot password?
