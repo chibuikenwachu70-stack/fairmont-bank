@@ -11,6 +11,52 @@
 
 <style>
 /* Fairmont Bank language selector */
+/* Clear language-switcher caption and helpful click cue */
+.site-header .language-toggle {
+    min-width: 0 !important;
+    gap: 7px !important;
+    white-space: nowrap !important;
+}
+.site-header .language-globe {
+    font-size: 17px !important;
+    line-height: 1 !important;
+}
+.site-header .language-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+.site-header .language-toggle::after {
+    content: "Click to change language";
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: max-content;
+    max-width: min(220px, calc(100vw - 32px));
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #10243a;
+    box-shadow: 0 5px 18px rgba(0,0,0,.18);
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-3px);
+    transition: opacity .15s ease, transform .15s ease;
+    pointer-events: none;
+    z-index: 10000;
+}
+.site-header .language-toggle:hover::after,
+.site-header .language-toggle:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+@media (max-width: 560px) {
+    .site-header .language-label { display: none !important; }
+    .site-header .language-toggle { padding: 0 9px !important; }
+}
+
 .site-header .language-selector {
     position: relative !important;
     display: inline-flex !important;
@@ -298,8 +344,11 @@
             </nav>
 
             <div class="language-selector">
-                <button class="language-toggle" type="button" aria-expanded="false" aria-haspopup="listbox">
-                    <span class="language-current">EN</span><span class="language-arrow">⌄</span>
+                <button class="language-toggle" type="button" aria-expanded="false" aria-haspopup="listbox" aria-label="Change website language" title="Click to change the website language">
+                    <span class="language-globe" aria-hidden="true">◎</span>
+                    <span class="language-label">Language:</span>
+                    <span class="language-current">EN</span>
+                    <span class="language-arrow" aria-hidden="true">⌄</span>
                 </button>
                 <div class="language-menu" role="listbox">
                     <button type="button" data-lang="EN">English</button><button type="button" data-lang="FR">Français</button><button type="button" data-lang="ES">Español</button><button type="button" data-lang="NL">Nederlands</button><button type="button" data-lang="DE">Deutsch</button><button type="button" data-lang="PT">Português</button><button type="button" data-lang="IT">Italiano</button><button type="button" data-lang="AR">العربية</button><button type="button" data-lang="HI">हिन्दी (India)</button><button type="button" data-lang="BN">বাংলা</button><button type="button" data-lang="UR">اردو</button><button type="button" data-lang="ZH">中文</button><button type="button" data-lang="JA">日本語</button><button type="button" data-lang="KO">한국어</button><button type="button" data-lang="RU">Русский</button><button type="button" data-lang="TR">Türkçe</button><button type="button" data-lang="SW">Kiswahili</button><button type="button" data-lang="PA">ਪੰਜਾਬੀ</button><button type="button" data-lang="GU">ગુજરાતી</button><button type="button" data-lang="ML">മലയാളം</button>
@@ -592,7 +641,7 @@
 
             <div class="footer-column">
                 <h3>Information</h3>
-                <span>Demo / Prototype</span>
+                <span>Fairmont Bank / Prototype</span>
                 <span>Privacy-conscious design</span>
                 <span>Digital banking interface</span>
             </div>
@@ -1076,4 +1125,38 @@ body{background:#061629}
 .contact-card-icon{background:rgba(217,182,95,.13)!important;color:#f0d487!important}
 .site-footer{border-top:1px solid rgba(217,182,95,.18)!important;background:#04111f!important}
 @media(max-width:700px){.site-logo,.footer-logo{width:158px!important}}
+</style>
+
+<style id="fairmont-menu-position-fix">
+/* Keep the menu button immediately to the left of the brand on desktop and mobile. */
+.site-header .site-header-inner {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+.site-header .mobile-menu-button {
+    order: -2 !important;
+    position: relative !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+}
+.site-header .site-brand {
+    order: -1 !important;
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+.site-header .main-nav { order: 1 !important; }
+.site-header .header-actions { order: 2 !important; }
+.site-header .language-selector {
+    order: 3 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+@media (max-width: 700px) {
+    .site-header .site-header-inner { gap: 10px !important; }
+    .site-header .mobile-menu-button { padding: 10px !important; }
+    .site-header .site-logo { width: clamp(112px, 34vw, 158px) !important; }
+    .site-header .language-selector { margin-left: auto !important; }
+}
 </style>
